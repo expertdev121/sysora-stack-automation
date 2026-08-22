@@ -1,26 +1,816 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Breakpoints
+   ------------------------------------------------------------
+   The design uses max-width queries at 520 / 640 / 700 / 860 /
+   980px. Tailwind's built-in `max-*` variant compiles to
+   `not (min-width: N)`, which excludes N itself — these
+   variants keep the boundary inclusive, exactly as designed. They are
+   declared widest-first so the narrower query always wins the cascade.
+   ============================================================ */
+
+@custom-variant to-980 (@media (max-width: 980px));
+@custom-variant to-860 (@media (max-width: 860px));
+@custom-variant to-700 (@media (max-width: 700px));
+@custom-variant to-640 (@media (max-width: 640px));
+@custom-variant to-520 (@media (max-width: 520px));
+
+/* ============================================================
+   Sysora — Tailwind theme
+   ------------------------------------------------------------
+   Every token from the Sysora design system, mapped into
+   Tailwind v4 namespaces so utilities like `bg-mint-500`,
+   `text-ink-900`, `shadow-glow-btn` and `font-display` exist.
+   The raw CSS variables stay available for gradients and any
+   arbitrary value that needs them.
+   ============================================================ */
+
+@theme static {
+  /* ---- Brand: mint / emerald accent ---- */
+  --color-mint-50: #f0faf6;
+  --color-mint-100: #e6f9f1;
+  --color-mint-200: #d4edd9;
+  --color-mint-300: #b7dfc0;
+  --color-mint-400: #87c38f;
+  --color-mint-500: #00c896;
+  --color-mint-600: #00a87e;
+  --color-mint-700: #059669;
+  --color-mint-800: #047857;
+  --color-mint-900: #065f46;
+
+  /* ---- Forest: deep green dark surfaces ---- */
+  --color-forest-hero: #0a1f14;
+  --color-forest-cta: #0d2818;
+  --color-forest-deep: #065f46;
+
+  /* ---- Ink: text + headings ---- */
+  --color-ink-900: #0f172a;
+  --color-ink-800: #1a1a2e;
+  --color-ink-700: #2d3748;
+  --color-ink-600: #334155;
+  --color-ink-500: #475569;
+  --color-ink-400: #5a6478;
+  --color-ink-300: #64748b;
+  --color-ink-200: #718096;
+  --color-ink-100: #94a3b8;
+  --color-ink-050: #a0aec0;
+
+  /* ---- Neutral surfaces ---- */
+  --color-surface-0: #ffffff;
+  --color-surface-1: #fafcfb;
+  --color-surface-2: #f7f9f7;
+  --color-surface-3: #f4f8f5;
+  --color-surface-tint: #f0faf6;
+
+  /* ---- Hairlines ---- */
+  --color-line-mint: #d4edd9;
+  --color-line-mint-2: #edf2ee;
+  --color-line-slate: #e2e8f0;
+  --color-line-slate-2: #f1f5f9;
+
+  /* ---- Semantic status ---- */
+  --color-success: #00c896;
+  --color-success-700: #059669;
+  --color-info: #2563eb;
+  --color-info-bg: #eff6ff;
+  --color-info-border: #bfdbfe;
+  --color-warning: #b45309;
+  --color-warning-500: #c2410c;
+  --color-warning-bg: #fff7ed;
+  --color-warning-border: #fed7aa;
+  --color-danger: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-bg: #fef2f2;
+  --color-danger-border: #fecaca;
+  --color-premium: #7c3aed;
+  --color-premium-bg: #faf5ff;
+  --color-premium-border: #ddd6fe;
+
+  /* ---- Families ---- */
+  /* The family names come from next/font, which registers the @font-face
+     rules globally. Naming them directly (instead of the generated
+     --font-*-variable) keeps the fallback chain identical to the design. */
+  --font-sans: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-display: "Space Grotesk", "Geist", system-ui, sans-serif;
+  --font-heading: "Lato", "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-subheading: "Roboto", "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* ---- Radii ---- */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-2xl: 16px;
+  --radius-3xl: 18px;
+  --radius-pill: 999px;
+
+  /* ---- Elevation ---- */
+  --shadow-xs: 0 1px 4px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 12px rgba(0, 80, 50, 0.06);
+  --shadow-md: 0 8px 32px rgba(0, 80, 50, 0.08);
+  --shadow-lg: 0 20px 60px rgba(0, 80, 50, 0.1);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 16px 48px rgba(0, 80, 50, 0.12);
+  --shadow-glow-btn: 0 8px 24px rgba(0, 200, 150, 0.28);
+  --shadow-glow-btn-hover: 0 12px 32px rgba(0, 200, 150, 0.35);
+  --shadow-glow-featured: 0 16px 48px rgba(0, 200, 150, 0.14);
+  --shadow-glow-ring: 0 0 0 3px rgba(0, 200, 150, 0.2);
+  --shadow-focus: 0 0 0 3px rgba(0, 200, 150, 0.25);
+
+  /* ---- Motion ---- */
+  --ease-out-soft: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================
+   Sysora — raw design tokens
+   ------------------------------------------------------------
+   Kept under their original names because gradients, shadows and
+   component styles reference them directly.
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --mint-50: #f0faf6;
+  --mint-100: #e6f9f1;
+  --mint-200: #d4edd9;
+  --mint-300: #b7dfc0;
+  --mint-400: #87c38f;
+  --mint-500: #00c896;
+  --mint-600: #00a87e;
+  --mint-700: #059669;
+  --mint-800: #047857;
+  --mint-900: #065f46;
+
+  --forest-hero: #0a1f14;
+  --forest-cta: #0d2818;
+  --forest-deep: #065f46;
+
+  --ink-900: #0f172a;
+  --ink-800: #1a1a2e;
+  --ink-700: #2d3748;
+  --ink-600: #334155;
+  --ink-500: #475569;
+  --ink-400: #5a6478;
+  --ink-300: #64748b;
+  --ink-200: #718096;
+  --ink-100: #94a3b8;
+  --ink-050: #a0aec0;
+
+  --surface-0: #ffffff;
+  --surface-1: #fafcfb;
+  --surface-2: #f7f9f7;
+  --surface-3: #f4f8f5;
+  --surface-tint: #f0faf6;
+
+  --line-mint: #d4edd9;
+  --line-mint-2: #edf2ee;
+  --line-slate: #e2e8f0;
+  --line-slate-2: #f1f5f9;
+
+  /* ---- Semantic aliases ---- */
+  --color-bg: var(--surface-0);
+  --color-bg-subtle: var(--surface-1);
+  --color-surface-card: var(--surface-0);
+  --color-surface-dark: var(--forest-cta);
+
+  --text-heading: var(--ink-800);
+  --text-heading-xl: var(--ink-900);
+  --text-body: var(--ink-700);
+  --text-muted: var(--ink-200);
+  --text-faint: var(--ink-050);
+  --text-accent: var(--mint-700);
+  --text-on-dark: rgba(255, 255, 255, 0.92);
+  --text-on-dark-muted: rgba(255, 255, 255, 0.62);
+
+  --accent: var(--mint-500);
+  --accent-hover: var(--mint-600);
+  --accent-strong: var(--mint-700);
+
+  --border-default: var(--line-mint);
+  --border-faint: var(--line-mint-2);
+  --border-neutral: var(--line-slate);
+  --focus-ring: var(--mint-500);
+
+  /* ---- Typography ---- */
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-extra: 800;
+
+  --fs-hero: clamp(38px, 6vw, 68px);
+  --fs-display: clamp(32px, 4.5vw, 52px);
+  --fs-h2: clamp(28px, 3.6vw, 42px);
+  --fs-h3: clamp(20px, 2.5vw, 26px);
+
+  --fs-title: 26px;
+  --fs-xl: 20px;
+  --fs-lg: 17px;
+  --fs-md: 15px;
+  --fs-base: 14px;
+  --fs-sm: 13px;
+  --fs-xs: 12px;
+  --fs-2xs: 11px;
+
+  --lh-tight: 1.05;
+  --lh-snug: 1.2;
+  --lh-normal: 1.5;
+  --lh-relaxed: 1.65;
+  --lh-loose: 1.75;
+
+  --ls-hero: -1.5px;
+  --ls-tight: -0.8px;
+  --ls-snug: -0.3px;
+  --ls-normal: 0;
+  --ls-label: 1.5px;
+  --ls-label-2: 2px;
+
+  --eyebrow-size: 11px;
+  --eyebrow-weight: 700;
+  --eyebrow-spacing: 2px;
+
+  /* ---- Layout ---- */
+  --section-y: clamp(72px, 10vh, 120px);
+  --section-y-lg: clamp(72px, 12vh, 140px);
+  --container-max: 1160px;
+  --container-pad: 24px;
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-2xl: 16px;
+  --radius-3xl: 18px;
+  --radius-pill: 999px;
+
+  --control-h-sm: 36px;
+  --control-h-md: 42px;
+  --control-h-lg: 52px;
+
+  /* ---- Elevation ---- */
+  --shadow-xs: 0 1px 4px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 12px rgba(0, 80, 50, 0.06);
+  --shadow-md: 0 8px 32px rgba(0, 80, 50, 0.08);
+  --shadow-lg: 0 20px 60px rgba(0, 80, 50, 0.1);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 16px 48px rgba(0, 80, 50, 0.12);
+
+  --glow-btn: 0 8px 24px rgba(0, 200, 150, 0.28);
+  --glow-btn-hover: 0 12px 32px rgba(0, 200, 150, 0.35);
+  --glow-featured: 0 16px 48px rgba(0, 200, 150, 0.14);
+  --glow-ring: 0 0 0 3px rgba(0, 200, 150, 0.2);
+  --focus-shadow: 0 0 0 3px rgba(0, 200, 150, 0.25);
+
+  /* ---- Motion ---- */
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-soft: ease;
+  --dur-fast: 0.15s;
+  --dur-base: 0.2s;
+  --dur-slow: 0.25s;
+  --dur-reveal: 0.65s;
+
+  --lift-1: translateY(-1px);
+  --lift-2: translateY(-2px);
+  --lift-3: translateY(-3px);
+  --lift-4: translateY(-4px);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ============================================================
+   Base layer
+   ============================================================ */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--fs-md);
+    line-height: var(--lh-relaxed);
+    color: var(--text-body);
+    background: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv11" 1, "ss01" 1;
+    text-wrap: pretty;
+  }
+
+  h1,
+  h2 {
+    font-family: var(--font-heading);
+  }
+
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-subheading);
+    letter-spacing: -0.01em;
+  }
+
+  a {
+    color: var(--accent-strong);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--mint-800);
+  }
+
+  summary {
+    list-style: none;
+    cursor: pointer;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* The source design renders icons inline; Tailwind preflight blockifies
+     them, which changes the height of every icon wrapper. */
+  svg {
+    display: inline;
+    vertical-align: baseline;
+  }
+
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--focus-shadow);
+    border-radius: var(--radius-sm);
+  }
+
+  .tabular,
+  .mono {
+    font-variant-numeric: tabular-nums;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ============================================================
+   Scroll reveal
+   ============================================================ */
+
+.reveal-on .reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+.reveal-on .reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ============================================================
+   Hero — drifting glows and breathing rings
+   ============================================================ */
+
+.hero-ring {
+  transform: translateX(-50%);
+}
+
+@keyframes ringBreathe {
+  0% {
+    transform: translateX(-50%) scale(0.985);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(-50%) scale(1.03);
+    opacity: 1;
+  }
+}
+
+@keyframes auraFloat {
+  0% {
+    transform: translate(-50%, -2%) scale(0.94);
+    opacity: 0.65;
+  }
+  100% {
+    transform: translate(-50%, 4%) scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes heroDriftA {
+  0% {
+    transform: translate3d(-3%, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(3%, 2%, 0) scale(1.06);
+  }
+}
+
+@keyframes heroDriftB {
+  0% {
+    transform: translate3d(4%, 1%, 0) scale(1.04);
+  }
+  100% {
+    transform: translate3d(-2%, -2%, 0) scale(1);
+  }
+}
+
+/* ============================================================
+   Command center — live data flow
+   ============================================================ */
+
+.cc-in {
+  animation: ccFlowIn 2.2s linear infinite;
+}
+
+.cc-out {
+  animation: ccFlowOut 2.2s linear infinite;
+}
+
+.cc-ticker {
+  animation: ccTicker 26s linear infinite;
+}
+
+.cc-packets {
+  animation: ccPackets 2.4s linear infinite;
+}
+
+.cc-orbit {
+  animation: ccSpin 22s linear infinite;
+}
+
+.cc-orbit-2 {
+  animation: ccSpin 14s linear infinite reverse;
+}
+
+.cc-bar {
+  animation: ccBar 2.8s var(--ease-soft) infinite alternate;
+  transform-origin: bottom;
+}
+
+.cc-dot3 {
+  animation: ccBlink 1.2s var(--ease-soft) infinite;
+}
+
+.cc-blink {
+  animation: ccBlink 2.4s var(--ease-soft) infinite;
+}
+
+.cc-core {
+  animation: ccCore 2.6s var(--ease-soft) infinite;
+}
+
+.cc-sweep {
+  animation: railSweep 2.4s linear infinite;
+}
+
+.cc-dash {
+  animation: ccDash 3s linear infinite;
+}
+
+@keyframes ccFlowIn {
+  from {
+    stroke-dashoffset: 28.5;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ccFlowOut {
+  from {
+    stroke-dashoffset: 28.5;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ccTicker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes ccPackets {
+  from {
+    stroke-dashoffset: 32;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ccSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ccBar {
+  0% {
+    transform: scaleY(0.55);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes ccBlink {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes ccCore {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 200, 150, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(0, 200, 150, 0);
+  }
+}
+
+@keyframes ccDash {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+
+/* ============================================================
+   Process rail — the four-stage sequence
+   ============================================================ */
+
+.proc-tile {
+  animation: stageOn 8s var(--ease-out) infinite;
+  will-change: transform;
+}
+
+.proc-chip {
+  animation: chipOn 8s var(--ease-out) infinite;
+}
+
+@keyframes stageOn {
+  0%,
+  100% {
+    background: rgba(255, 255, 255, 0.035);
+    border-color: rgba(255, 255, 255, 0.09);
+    transform: none;
+    box-shadow: none;
+  }
+  3% {
+    background: rgba(0, 200, 150, 0.1);
+    border-color: rgba(0, 200, 150, 0.45);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0, 80, 50, 0.35);
+  }
+  22% {
+    background: rgba(0, 200, 150, 0.08);
+    border-color: rgba(0, 200, 150, 0.32);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0, 80, 50, 0.28);
+  }
+  30%,
+  99% {
+    background: rgba(255, 255, 255, 0.035);
+    border-color: rgba(255, 255, 255, 0.09);
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+@keyframes chipOn {
+  0%,
+  100% {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.7);
+  }
+  3%,
+  22% {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #06251a;
+  }
+  30%,
+  99% {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+@keyframes railFill {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes railSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@keyframes tileGlow {
+  0%,
+  22%,
+  100% {
+    opacity: 0;
+  }
+  8%,
+  14% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes dotBlink {
+  0%,
+  22%,
+  100% {
+    opacity: 0.25;
+  }
+  8%,
+  14% {
+    opacity: 1;
+  }
+}
+
+@keyframes railFlow {
+  0% {
+    background-position: -140% 0;
+  }
+  100% {
+    background-position: 240% 0;
+  }
+}
+
+@keyframes railDot {
+  0% {
+    left: 0;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes nodePulse {
+  0%,
+  70%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 200, 150, 0);
+    border-color: var(--border-default);
+  }
+  12% {
+    box-shadow: 0 0 0 8px rgba(0, 200, 150, 0.16);
+    border-color: var(--accent);
+  }
+  30% {
+    box-shadow: 0 0 0 0 rgba(0, 200, 150, 0);
+    border-color: var(--accent);
+  }
+}
+
+/* ============================================================
+   Cards — pricing, offers, FAQ
+   ============================================================ */
+
+.p-card {
+  position: relative;
+  isolation: isolate;
+  will-change: transform;
+  transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+
+.p-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -1;
+  background: linear-gradient(160deg, rgba(0, 200, 150, 0.1), rgba(0, 200, 150, 0) 55%);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-out);
+  pointer-events: none;
+}
+
+.p-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--mint-300);
+  box-shadow: 0 3px 8px rgba(0, 80, 50, 0.06), 0 22px 48px rgba(0, 80, 50, 0.13);
+}
+
+.p-card:hover::before {
+  opacity: 1;
+}
+
+.p-price {
+  transition: background var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+}
+
+.p-price:hover {
+  background: var(--mint-50) !important;
+  border-color: var(--accent) !important;
+  transform: translateY(-4px);
+  box-shadow: 0 4px 10px rgba(0, 80, 50, 0.06), 0 26px 56px rgba(0, 80, 50, 0.14);
+}
+
+.p-faq {
+  will-change: transform;
+  transition: border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+}
+
+.p-faq:hover {
+  border-color: var(--mint-400);
+  box-shadow: 0 10px 28px rgba(0, 80, 50, 0.08);
+}
+
+.faq-row summary:hover {
+  background: var(--surface-1);
+}
+
+.faq-row[open] summary {
+  background: var(--mint-50);
+}
+
+.faq-row[open] .faq-plus {
+  transform: rotate(45deg);
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* ============================================================
+   Sticky CTA bar
+   ============================================================ */
+
+.cta-bar {
+  transform: translateY(110%);
+  transition: transform 0.4s var(--ease-out);
+}
+
+.cta-bar.is-on {
+  transform: translateY(0);
+}
+
+@media (max-width: 700px) {
+  .cta-bar {
+    display: none;
+  }
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .hero-ring,
+  .hero-glow,
+  .cc-in,
+  .cc-out,
+  .cc-ticker,
+  .cc-packets,
+  .cc-orbit,
+  .cc-orbit-2,
+  .cc-bar,
+  .cc-dot3,
+  .cc-blink,
+  .cc-core,
+  .cc-sweep,
+  .cc-dash,
+  .proc-tile,
+  .proc-chip,
+  .rail-anim {
+    animation: none !important;
+  }
+
+  .p-card:hover {
+    transform: none;
+  }
+
+  .reveal-on .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }

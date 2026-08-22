@@ -1,36 +1,218 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sysora Web
 
-## Getting Started
-
-First, run the development server:
+Next.js 16 (App Router) + React 19 + Tailwind v4.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run dev     # http://localhost:3000
+npm run build
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Where things live
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+src/
+  app/                    routes — page.tsx is the landing page
+  components/
+    layout/               SiteHeader, SiteFooter, StickyCtaBar, ScrollReveal, PageShell
+    sections/             one component per landing-page section, in page order
+    ui/                   Button, Eyebrow, Icon, Logo — the shared primitives
+  content/landing/        all copy, reviews, pricing and FAQ data (typed)
+  config/site.ts          every route and CTA destination
+  lib/cn.ts               className joiner
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Editing copy** never means touching a component: every string on the landing
+page lives in `src/content/landing/*.ts`. Adding a client review is one entry in
+`reviews.ts`; changing where a CTA points is one line in `config/site.ts`.
 
-## Learn More
+**Adding a page**: wrap the body in `PageShell` (header, hero band, footer) and
+add its route to `config/site.ts`.
 
-To learn more about Next.js, take a look at the following resources:
+## Design system
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The tokens from the Sysora design system live in `src/app/globals.css`:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `@theme static` maps them into Tailwind namespaces — `bg-mint-500`,
+  `text-ink-900`, `shadow-glow-btn`, `font-display`, and so on.
+- A plain `:root` block keeps the original variable names (`--accent`,
+  `--border-default`, `--glow-btn`) because gradients and component styles
+  reference them directly.
+- `@layer base` holds the element defaults, so utility classes always win.
 
-## Deploy on Vercel
+**Fonts** (via `next/font/google`, self-hosted): Geist for body and UI, Geist
+Mono for numbers and data, Lato for `h1`/`h2`, Roboto for `h3`–`h6`, and Space
+Grotesk for the wordmark.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Breakpoints**: the design uses `max-width` queries at 520 / 640 / 700 / 860 /
+980px. Tailwind's built-in `max-*` variant compiles to `not (min-width: N)`,
+which excludes N itself, so `globals.css` defines inclusive `to-520:` …
+`to-980:` variants instead. They are declared widest-first so the narrower
+query always wins.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes on the port
+
+The page is a port of the Sysora sales-page design. Layout, type and spacing
+match the source within a pixel at every breakpoint, with two deliberate
+differences:
+
+1. **Buttons use `line-height: normal` everywhere.** In the source, CTAs
+   rendered as `<a>` inherited a 1.65 line-height (58px tall at `lg`) while
+   those rendered as `<button>` used `normal` (53px) — the same control at two
+   different heights. All of them are now 53px, matching the design system's own
+   `--control-h-lg: 52px`. To restore the source's anchor height, drop
+   `leading-[normal]` from `src/components/ui/Button.tsx`.
+2. **The header has a mobile menu.** Below 860px the source simply dropped the
+   nav links, leaving phones with no navigation.
+
+The founder card's avatar is a placeholder: drop a headshot in `public/` and set
+`founder.avatar` in `src/content/landing/proof.ts`.
+
+## Sales flow
+
+```
+/systems-review   pre-checkout survey  ─┐
+/systems-team     pre-checkout survey  ─┼─→  /checkout/SYS-000042   embedded payment
+/build-request    intake survey (free) ─┘         │
+                                                  ↓
+                                    /checkout/SYS-000042/complete   post-payment intake
+                                                  ↓
+                                        /request/SYS-000042         status page
+```
+
+Every question on those pages is a row in `sales.survey_questions` — nothing
+is hardcoded. Editing a question in the database changes the form on the next
+request; the survey pages are `force-dynamic` for exactly that reason.
+
+Answers snapshot the question's key, label and type at submission, so
+rewording or deleting a question never corrupts an old submission.
+
+### Payments
+
+Stripe's Payment Element is embedded in `/checkout/[reference]` — the customer
+never leaves the site. Card details go from the browser straight into Stripe's
+iframe, so they never touch our server or database; we store only the brand and
+last four that Stripe hands back.
+
+`/api/stripe/webhook` is the authoritative "this was paid" signal. It records
+every event in `sales.webhook_events`, which is unique on `(provider, event_id)`
+— a replayed event is a no-op rather than a double credit.
+
+The confirmation page **also** reconciles against Stripe directly, so the flow
+never hangs waiting on a webhook that is slow or (locally, without
+`stripe listen`) never arrives. Both paths call the same `markRequestPaid`,
+which only moves a request out of an unpaid state, so they cannot double-apply.
+
+A request may have **at most one payment in flight**, enforced by the
+`payments_one_open_per_request` unique index rather than by an application
+check — two concurrent renders of the checkout page would otherwise each
+create a PaymentIntent. When a request is paid, any other open intent is
+cancelled, so the same request can never be charged twice.
+
+**With no Stripe keys set, checkout runs in simulation mode**: the payment step
+completes without charging, so the rest of the flow stays testable. It refuses
+to run when `NODE_ENV=production`.
+
+### Setup
+
+```bash
+cp .env.example .env.local   # then fill in the blanks
+```
+
+`SUPABASE_SERVICE_ROLE_KEY` is required — without it the flow pages render a
+setup notice instead of the form. Stripe keys are optional until you want to
+take real money.
+
+Testing webhooks locally:
+
+```bash
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+```
+
+### Schema
+
+The `sales` schema lives in the `Sysora Stack Automation` Supabase project
+(`xulhgkrsqpodlokzpbig`). Money is stored in **minor units** as integers —
+`4900` is $49.00.
+
+Two things are easy to miss when pointing this at a fresh Supabase project,
+because neither is part of the table definitions:
+
+1. **Expose the schema.** PostgREST only serves the schemas it is told about,
+   so a non-`public` schema answers `Invalid schema: sales` until you add it
+   (Dashboard → Settings → API → Exposed schemas, or the
+   `sales_09_expose_schema` migration).
+2. **Grant `service_role`.** It bypasses RLS but still needs ordinary table
+   privileges — see `sales_10_service_role_grants`.
+
+## Dashboard
+
+`/admin` — staff only. Signing in is not enough: the account must also have an
+active row in `sales.staff`, and RLS enforces the same rule at the database
+level, so a missed check in a page still can't leak data.
+
+| Page | What it does |
+|---|---|
+| Overview | 30-day revenue, requests, survey completion, contacts, latest requests |
+| Requests | Filter by open / type / assigned to me; open one to read every answer |
+| Request detail | Change status, assign an owner, keep internal notes, see payments and receipts |
+| Contacts | Everyone who ever gave us an email, searchable, with request counts |
+| Plans | Edit the three offers — price, tagline, live/off |
+| Questions | Edit the live forms; changes appear on the public site immediately |
+| Settings | Booking link, calendar link, contact email, checkout copy |
+| Targets | Super admin only: monthly revenue and request targets, versus actual |
+| Team | Super admin only: invite staff, set roles, deactivate accounts |
+
+Every write goes through a server action that records who did it in
+`sales.audit_log`. Staff can read that log but not write to it — audit rows are
+only ever created by the service role, so they can't be doctored from the UI.
+
+### Auth
+
+Authentication is ours, in `sales.users` / `sales.sessions` /
+`sales.password_resets` — not Supabase Auth.
+
+- Passwords are hashed with **scrypt** (memory-hard), stored as
+  `scrypt$N$r$p$salt$hash`. The cost parameters travel with the hash, so they
+  can be raised later without invalidating anyone's password.
+- The session cookie holds a 256-bit random token; the database stores only its
+  SHA-256. A leaked table therefore contains nothing you can log in with. The
+  cookie is httpOnly, sameSite=lax, and secure outside development.
+- A wrong password and an unknown account return the **same** message, and an
+  unknown address still pays the cost of a hash — so the form can't be used to
+  work out who has an account.
+- Eight failures locks the account for fifteen minutes.
+- Set-password links are single-use, stored hashed, and expire. Setting a
+  password revokes every other session for that account.
+
+Because the dashboard no longer authenticates through PostgREST, the private
+tables have **no RLS policy at all**, which denies `anon` and `authenticated`
+outright. The server reaches them with the service role, behind
+`requireStaff()`. That check is now the only thing standing between a request
+and the data, so every dashboard page must call it before reading anything. The
+public catalogue policies — offers, active surveys, public settings — are
+unchanged.
+
+**Adding staff**: Team → invite. You get a one-time link to pass on, and the
+invitee sets their own password. Nobody, including a super admin, ever types
+someone else's password.
+
+**Roles**: two levels, and the difference is money.
+
+| | admin | super admin |
+|---|---|---|
+| Requests, contacts, answers, assignment, status, notes | ✓ | ✓ |
+| Questions and settings | ✓ | ✓ |
+| Plans | read only | edit |
+| Revenue, amounts, payments, receipts | — | ✓ |
+| Sales targets | — | ✓ |
+| Team | — | ✓ |
+
+An admin sees no company finances anywhere: no revenue figure, no amount
+column, no payments card. Finance data isn't merely hidden in the markup — the
+payments query doesn't run for an admin, and `/admin/targets` and
+`/admin/staff` redirect rather than render. The server actions behind pricing
+and targets call `requireSuperAdmin()`, so a crafted request fails too.
+
+A super admin can't deactivate or demote themselves — that would lock the last
+one out.

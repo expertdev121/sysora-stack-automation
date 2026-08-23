@@ -161,8 +161,12 @@ in `sales.users`, and every page asks a guard before it reads anything.
 | Plans | Edit the three offers — price, tagline, live/off |
 | Questions | Edit the live forms; changes appear on the public site immediately |
 | Settings | Booking link, calendar link, contact email, checkout copy |
-| Targets | Manager and owner: revenue targets, progress, and revenue from outside the checkout |
-| Team | Owner only: invite staff, set roles, deactivate accounts |
+| Today | Anyone: the end-of-day report, and the activity targets you're assigned to |
+| Scoreboard | Manager and owner: revenue and activity for the running period, side by side |
+| Targets | Manager and owner: revenue targets, their activity targets, and revenue from outside the checkout |
+| Daily reports | Manager and owner: every report, and filing or fixing one on someone's behalf |
+| Activities | Owner only: which activities exist and what the daily form asks |
+| Team | Owner only: invite staff, set roles, assign activities, deactivate accounts |
 
 Every write goes through a server action that records who did it in
 `sales.audit_log`. Staff can read that log but not write to it — audit rows are
@@ -198,17 +202,20 @@ unchanged.
 invitee sets their own password. Nobody, including an owner, ever types someone
 else's password.
 
-**Roles**: three levels, and the line between them is money.
+**Roles**: four levels. The line between admin and manager is money; the line
+below admin is the pipeline.
 
-| | admin | manager | owner |
-|---|---|---|---|
-| Requests, contacts, answers, assignment, status, notes | ✓ | ✓ | ✓ |
-| Questions and settings | ✓ | ✓ | ✓ |
-| Plans | read only | read only | edit |
-| Revenue, amounts, payments, receipts | — | ✓ | ✓ |
-| Revenue targets and manual revenue | — | ✓ | ✓ |
-| Deleting a target | — | — | ✓ |
-| Team | — | — | ✓ |
+| | bde | admin | manager | owner |
+|---|---|---|---|---|
+| End-of-day report, own activity | ✓ | ✓ | ✓ | ✓ |
+| Requests, contacts, answers, assignment, status, notes | — | ✓ | ✓ | ✓ |
+| Questions and settings | — | ✓ | ✓ | ✓ |
+| Plans | — | read only | read only | edit |
+| Revenue, amounts, payments, receipts | — | — | ✓ | ✓ |
+| Revenue targets, activity targets, manual revenue | — | — | ✓ | ✓ |
+| Everyone's activity; fixing an old report | — | — | ✓ | ✓ |
+| Deleting a target | — | — | — | ✓ |
+| Activities, team, assignments | — | — | — | ✓ |
 
 An admin sees no company finances anywhere: no revenue figure, no amount
 column, no payments card. Finance data isn't merely hidden in the markup — the
@@ -216,6 +223,11 @@ payments query doesn't run for an admin, and `/admin/targets` and
 `/admin/staff` redirect rather than render. The server actions behind pricing,
 targets and revenue call `requireFinance()` or `requireOwner()`, so a crafted
 request fails too.
+
+A **BDE** is narrower still: one page. Every other dashboard route redirects to
+`/admin/today`. That needed a new guard — until this role existed, having a
+session was all the pipeline pages asked for — so they and their server actions
+now call `requirePipeline()` rather than `requireStaff()`.
 
 Capabilities are named rather than compared inline: `canSeeFinances(role)`,
 `canManagePricing(role)`, `canManageTeam(role)`, `canDeleteTarget(role)`. They
@@ -259,6 +271,52 @@ One thing the schema can't decide for you: if a client pays through the
 checkout *and* you also record them by hand, that money is counted twice.
 Adding an entry whose client name matches an existing contact shows a warning,
 but it is advisory — only you know whether it is the same money.
+
+## Lead measures
+
+Revenue is a **lag measure**. By the time it moves, the week that produced it is
+over and there is nothing left to do about it. The activities that produce it —
+Upwork bids, LinkedIn outreach, emails — are **lead measures**: things somebody
+can still change on a Tuesday morning. Both halves sit on `/admin/scoreboard`,
+and the verdict at the top comes from the worse of the two.
+
+Activities are rows in `sales.activity_types`, not an enum and not columns.
+Adding the fourth kind of outreach is a form submission under **Activities**,
+never a migration. They are retired rather than deleted, because reports and
+targets point at them.
+
+**Targets are shared, assignments are personal.** A revenue target carries one
+number per activity — 100 Upwork bids for the period, not 100 each. Everyone
+assigned to that activity works the same number and sees the same progress,
+with their own contribution shown underneath. Who is assigned to what is set
+per person under **Team**, and it decides two things: which questions their
+daily form asks, and which lead measures they can see.
+
+**The end-of-day report** is one row per person per day, enforced by
+`eod_reports_one_per_day` rather than by a check some second browser tab can
+race. Saving the same day again edits it; every edit writes an audit row with
+before and after. Anyone may fix their own today and yesterday — older days go
+through **Daily reports**, so a number that changes a week later has a name
+against it.
+
+Some deliberate choices:
+
+- **A zero is a row; a missing day is not zero.** The scoreboard reports "3 of
+  7 days covered" and names the gaps. Treating silence as zero would make the
+  totals look like measurements when they're guesses.
+- **Attribution is by date**, exactly like manual revenue. A report carries no
+  target id, so backdating moves it to the right target by itself, and work on
+  a day no target covers shows up as unattributed rather than vanishing.
+- **Pacing is calendar-day**, matching how a target already counts its days.
+  `required_per_day = remaining ÷ days_remaining`, where `days_remaining`
+  includes today and never drops below one — `days_left` is *zero* on the final
+  day, and dividing by it would fail exactly when the number matters most.
+- **The pace rule lives in SQL, once per view.** `activity_progress` and
+  `target_progress` compute `expected_by_today`, `required_per_day` and `pace`
+  the same way, so "behind" means one thing on a page that shows both.
+- **Dates come from the browser.** The server runs on UTC; somebody in IST
+  filing at 01:00 is on a date UTC hasn't reached, and defaulting to the
+  server's day would file their Tuesday as Monday.
 
 ## Deploying to Vercel
 

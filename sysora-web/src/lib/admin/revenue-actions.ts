@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 
-import { canDeleteTarget, requireFinance, requireStaff } from "./auth";
+import { canDeleteTarget, requireFinance } from "./auth";
 import { salesDb } from "@/lib/supabase/admin";
+import { audit, friendly } from "./audit";
 import type { ActionResult } from "./actions";
 import type { RevenueSource } from "./types";
 
@@ -17,46 +18,6 @@ import type { RevenueSource } from "./types";
  */
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
-
-/** Audit rows are written with the service role so staff can't doctor them. */
-async function audit(input: {
-  actorId: string;
-  actorEmail: string;
-  action: string;
-  entity: string;
-  entityId: string;
-  before?: unknown;
-  after?: unknown;
-}) {
-  try {
-    await salesDb().from("audit_log").insert({
-      actor_id: input.actorId,
-      actor_email: input.actorEmail,
-      action: input.action,
-      entity: input.entity,
-      entity_id: input.entityId,
-      before: input.before ?? null,
-      after: input.after ?? null,
-    });
-  } catch (error) {
-    console.error("[audit] could not record", input.action, error);
-  }
-}
-
-/** Turns a Postgres error into something worth showing a person. */
-function friendly(error: { code?: string; message: string }): string {
-  if (error.code === "23P01") {
-    return "That overlaps an existing target. Targets can't share dates.";
-  }
-  if (error.code === "23514") {
-    if (error.message.includes("dates_ordered")) return "The end date must be on or after the start date.";
-    if (error.message.includes("amount_positive")) return "The target must be more than zero.";
-    if (error.message.includes("client_name")) return "The client needs a name.";
-    if (error.message.includes("currency")) return "Only USD amounts are supported.";
-    return "That doesn't pass one of the data rules.";
-  }
-  return error.message;
-}
 
 /** Dollars in the form, minor units in the database. */
 function toMinorUnits(major: number): number {
@@ -76,7 +37,9 @@ export type TargetInput = {
   notes: string;
 };
 
-export async function saveRevenueTarget(input: TargetInput): Promise<ActionResult> {
+export async function saveRevenueTarget(
+  input: TargetInput,
+): Promise<ActionResult & { id?: string }> {
   const session = await requireFinance();
 
   if (!DATE.test(input.startsOn) || !DATE.test(input.endsOn)) {
@@ -96,6 +59,7 @@ export async function saveRevenueTarget(input: TargetInput): Promise<ActionResul
   }
 
   const db = salesDb();
+  let savedId = input.id;
   const row = {
     name: input.name.trim() || null,
     starts_on: input.startsOn,
@@ -130,6 +94,7 @@ export async function saveRevenueTarget(input: TargetInput): Promise<ActionResul
   } else {
     const { data, error } = await db.from("revenue_targets").insert(row).select("id").single();
     if (error) return { ok: false, error: friendly(error) };
+    savedId = data.id;
 
     await audit({
       actorId: session.userId,
@@ -143,7 +108,8 @@ export async function saveRevenueTarget(input: TargetInput): Promise<ActionResul
 
   revalidatePath("/admin/targets");
   revalidatePath("/admin");
-  return { ok: true };
+  revalidatePath("/admin/scoreboard");
+  return { ok: true, id: savedId };
 }
 
 /** Owner only: deleting a target removes history everyone else relies on. */
@@ -286,7 +252,7 @@ export async function deleteManualRevenue(id: string): Promise<ActionResult> {
  * the difference — so the interface asks rather than the schema refusing.
  */
 export async function findMatchingContact(clientName: string): Promise<{ email: string } | null> {
-  await requireStaff();
+  await requireFinance();
   const name = clientName.trim();
   if (name.length < 3) return null;
 

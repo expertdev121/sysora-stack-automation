@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PageHeading } from "@/components/admin/ui";
 import { QuestionEditor } from "@/components/admin/QuestionEditor";
-import { requireStaff } from "@/lib/admin/auth";
+import { requirePipeline } from "@/lib/admin/auth";
 import type { Survey, SurveyQuestion } from "@/lib/sales/types";
 import { salesDb } from "@/lib/supabase/admin";
 
@@ -17,7 +17,7 @@ const KIND_LABELS: Record<string, string> = {
 };
 
 export default async function SurveysPage() {
-  const session = await requireStaff();
+  const session = await requirePipeline();
   const db = salesDb();
 
   const [{ data: surveys }, { data: questions }, { data: offers }] = await Promise.all([

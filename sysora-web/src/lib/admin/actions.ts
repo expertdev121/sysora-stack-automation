@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireOwner, requireStaff } from "./auth";
+import { requireOwner, requirePipeline } from "./auth";
 import { salesDb } from "@/lib/supabase/admin";
+import { audit } from "./audit";
 import { createPasswordToken } from "@/lib/auth/session";
 import { siteUrl } from "@/lib/site-url";
 import type { RequestStatus } from "@/lib/sales/types";
@@ -11,44 +12,13 @@ import type { StaffRole } from "./types";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
-/**
- * Records who changed what.
- *
- * Uses the service role because staff may read the audit log but must not
- * be able to write or doctor it — the only way a row appears is through
- * this function.
- */
-async function audit(input: {
-  actorId: string;
-  actorEmail: string;
-  action: string;
-  entity: string;
-  entityId: string;
-  before?: unknown;
-  after?: unknown;
-}) {
-  try {
-    await salesDb().from("audit_log").insert({
-      actor_id: input.actorId,
-      actor_email: input.actorEmail,
-      action: input.action,
-      entity: input.entity,
-      entity_id: input.entityId,
-      before: input.before ?? null,
-      after: input.after ?? null,
-    });
-  } catch (error) {
-    console.error("[audit] could not record", input.action, error);
-  }
-}
-
 /* ---- Requests ---------------------------------------------- */
 
 export async function updateRequestStatus(
   reference: string,
   status: RequestStatus,
 ): Promise<ActionResult> {
-  const session = await requireStaff();
+  const session = await requirePipeline();
   const db = salesDb();
 
   const { data: before } = await db
@@ -86,7 +56,7 @@ export async function assignRequest(
   reference: string,
   userId: string | null,
 ): Promise<ActionResult> {
-  const session = await requireStaff();
+  const session = await requirePipeline();
   const db = salesDb();
 
   const { data: before } = await db
@@ -123,7 +93,7 @@ export async function saveRequestNotes(
   reference: string,
   notes: string,
 ): Promise<ActionResult> {
-  const session = await requireStaff();
+  const session = await requirePipeline();
   const db = salesDb();
 
   const { error } = await db
@@ -148,7 +118,7 @@ export async function saveRequestNotes(
 /* ---- Settings ---------------------------------------------- */
 
 export async function saveSetting(key: string, value: string): Promise<ActionResult> {
-  const session = await requireStaff();
+  const session = await requirePipeline();
   const db = salesDb();
 
   const { data: before } = await db
@@ -238,7 +208,7 @@ export async function saveQuestion(
     is_active?: boolean;
   },
 ): Promise<ActionResult> {
-  const session = await requireStaff();
+  const session = await requirePipeline();
   const db = salesDb();
 
   const { data: before } = await db

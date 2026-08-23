@@ -3,14 +3,14 @@ import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PageHeading } from "@/components/admin/ui";
 import { PlanEditor } from "@/components/admin/PlanEditor";
-import { canManagePricing, requireStaff } from "@/lib/admin/auth";
+import { canManagePricing, requirePipeline } from "@/lib/admin/auth";
 import type { Offer } from "@/lib/sales/types";
 import { salesDb } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = { title: "Plans" };
 
 export default async function PlansPage() {
-  const session = await requireStaff();
+  const session = await requirePipeline();
   const canEdit = canManagePricing(session.role);
   const db = salesDb();
 

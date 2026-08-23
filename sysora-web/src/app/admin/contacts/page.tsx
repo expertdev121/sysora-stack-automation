@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { Card, CardHeader, EmptyState, PageHeading, Pill, Table, Td, Th } from "@/components/admin/ui";
-import { requireStaff } from "@/lib/admin/auth";
+import { requirePipeline } from "@/lib/admin/auth";
 import type { ContactRow } from "@/lib/admin/types";
 import { salesDb } from "@/lib/supabase/admin";
 
@@ -14,7 +14,7 @@ export default async function ContactsPage({
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
-  const session = await requireStaff();
+  const session = await requirePipeline();
   const { q = "" } = await searchParams;
   const db = salesDb();
 

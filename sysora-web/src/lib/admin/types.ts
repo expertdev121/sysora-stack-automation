@@ -1,11 +1,20 @@
 import type { OfferKind, PaymentStatus, RequestStatus, ResponseStatus } from "@/lib/sales/types";
 
-export type StaffRole = "admin" | "manager" | "owner";
+export type StaffRole = "bde" | "admin" | "manager" | "owner";
 
 export const ROLE_LABELS: Record<StaffRole, string> = {
+  bde: "BDE",
   admin: "Admin",
   manager: "Manager",
   owner: "Owner",
+};
+
+/** Shown under the role name when someone is choosing one. */
+export const ROLE_HINTS: Record<StaffRole, string> = {
+  bde: "Files a daily report. Sees only their own activity targets.",
+  admin: "Runs the pipeline. Sees no revenue.",
+  manager: "Adds revenue, targets and the whole team's activity.",
+  owner: "Everything, including pricing, the team and activity types.",
 };
 
 export type Staff = {
@@ -74,10 +83,18 @@ export type TargetRow = {
   revenue_remaining: number;
   percent_complete: number;
   days_total: number;
+  days_elapsed: number;
   days_left: number | null;
+  /** Days still available, today included. Never below 1 while open. */
+  days_remaining: number;
   status: "upcoming" | "active" | "closed";
   manual_entries: number;
   requests_actual: number;
+  /** Where a straight line would have us today, in minor units. */
+  expected_by_today: number;
+  /** Minor units per day needed to finish. */
+  required_per_day: number;
+  pace: Pace;
 };
 
 export type RevenueSource = "upwork" | "off_source" | "other";
@@ -104,6 +121,116 @@ export type ManualRevenueRow = {
 export type UnattributedRevenue = {
   revenue_stripe: number;
   revenue_manual: number;
+};
+
+/* ---- Lead measures ------------------------------------------
+ *
+ * Revenue is the lag measure: by the time it moves, the week that
+ * produced it is over. These are the things somebody can change on a
+ * Tuesday morning, which is why they get their own scoreboard.
+ */
+
+export type ActivityType = {
+  id: string;
+  slug: string;
+  label: string;
+  question: string;
+  sort_order: number;
+  is_active: boolean;
+};
+
+/** A row of sales.activity_progress — one lead measure on one target. */
+export type ActivityProgressRow = {
+  activity_target_id: string;
+  revenue_target_id: string;
+  target_name: string | null;
+  starts_on: string;
+  ends_on: string;
+  activity_type_id: string;
+  slug: string;
+  label: string;
+  question: string;
+  sort_order: number;
+  type_is_active: boolean;
+  target_count: number;
+  achieved: number;
+  contributors: number;
+  days_total: number;
+  days_elapsed: number;
+  days_left: number | null;
+  /** Days still available to work in, today included. Never below 1 while open. */
+  days_remaining: number;
+  status: "upcoming" | "active" | "closed";
+  remaining: number;
+  percent_complete: number;
+  /** Where a team holding a straight line would be today. */
+  expected_by_today: number;
+  required_per_day: number;
+  pace: Pace;
+};
+
+export type Pace = "done" | "on_track" | "at_risk" | "behind" | "upcoming" | "missed";
+
+export const PACE_LABELS: Record<Pace, string> = {
+  done: "Target met",
+  on_track: "On track",
+  at_risk: "At risk",
+  behind: "Behind",
+  upcoming: "Not started",
+  missed: "Ended short",
+};
+
+export const PACE_TONE: Record<Pace, "mint" | "amber" | "slate" | "red"> = {
+  done: "mint",
+  on_track: "mint",
+  at_risk: "amber",
+  behind: "red",
+  upcoming: "slate",
+  missed: "slate",
+};
+
+/** One person's share of one lead measure. */
+export type ActivityByUserRow = {
+  revenue_target_id: string;
+  activity_type_id: string;
+  slug: string;
+  label: string;
+  user_id: string;
+  full_name: string | null;
+  email: string;
+  role: StaffRole;
+  achieved: number;
+  days_reported: number;
+  last_reported_on: string;
+};
+
+/** Activity on days no target covers. */
+export type UnattributedActivity = {
+  activity_type_id: string;
+  slug: string;
+  label: string;
+  achieved: number;
+  entries: number;
+};
+
+export type EodReportRow = {
+  id: string;
+  user_id: string;
+  full_name: string | null;
+  email: string;
+  role: StaffRole;
+  reported_on: string;
+  notes: string | null;
+  submitted_at: string;
+  updated_at: string;
+  total_count: number;
+  entry_count: number;
+};
+
+/** What one report actually said, type by type. */
+export type EodEntry = {
+  activity_type_id: string;
+  count: number;
 };
 
 export type AnswerRow = {

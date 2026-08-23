@@ -7,7 +7,7 @@ import { useState, type ReactNode } from "react";
 import { SignOutButton } from "@/components/admin/SignOutButton";
 import { SysoraMark } from "@/components/ui/Logo";
 import { cn } from "@/lib/cn";
-import { canManageTeam, canSeeFinances } from "@/lib/admin/roles";
+import { canManageTeam, canSeeAllActivity, canSeeFinances, canSeePipeline } from "@/lib/admin/roles";
 import type { StaffSession } from "@/lib/admin/auth";
 
 /* ---- Icons: 20px, same line weight as the rest of the system ---- */
@@ -92,6 +92,28 @@ const icons = {
       <path d="M5 21a7 7 0 0 1 14 0" />
     </Icon>
   ),
+  today: (
+    <Icon>
+      <rect x="3.5" y="5" width="17" height="16" rx="2" />
+      <path d="M3.5 10h17" />
+      <path d="M8 3v4" />
+      <path d="M16 3v4" />
+      <path d="M9 15l2 2 4-4" />
+    </Icon>
+  ),
+  scoreboard: (
+    <Icon>
+      <path d="M4 20V11" />
+      <path d="M10 20V4" />
+      <path d="M16 20v-6" />
+      <path d="M22 20H2" />
+    </Icon>
+  ),
+  activities: (
+    <Icon>
+      <path d="M3 12h4l2.5-6 4 12L16 12h5" />
+    </Icon>
+  ),
 } as const;
 
 type NavItem = { href: string; label: string; icon: keyof typeof icons; exact?: boolean };
@@ -107,6 +129,8 @@ const configure: NavItem[] = [
   { href: "/admin/surveys", label: "Questions", icon: "questions" },
   { href: "/admin/settings", label: "Settings", icon: "settings" },
 ];
+
+const eod: NavItem = { href: "/admin/today", label: "Today", icon: "today" };
 
 export function AdminSidebar({ session }: { session: StaffSession }) {
   const pathname = usePathname();
@@ -182,16 +206,28 @@ export function AdminSidebar({ session }: { session: StaffSession }) {
 
       <div className={cn("flex-1 flex flex-col min-h-0", !open && "to-860:hidden")}>
         <nav className="flex-1 overflow-y-auto px-3 pb-4">
-          <div className="flex flex-col gap-[2px]">{primary.map(navLink)}</div>
+          {canSeePipeline(session.role) ? (
+            <>
+              <div className="flex flex-col gap-[2px]">
+                {primary.map(navLink)}
+                {navLink(eod)}
+              </div>
 
-          {sectionLabel("Configure")}
-          <div className="flex flex-col gap-[2px]">{configure.map(navLink)}</div>
+              {sectionLabel("Configure")}
+              <div className="flex flex-col gap-[2px]">{configure.map(navLink)}</div>
+            </>
+          ) : (
+            <div className="flex flex-col gap-[2px]">{navLink(eod)}</div>
+          )}
 
           {canSeeFinances(session.role) && (
             <>
-              {sectionLabel("Revenue")}
+              {sectionLabel("Performance")}
               <div className="flex flex-col gap-[2px]">
+                {navLink({ href: "/admin/scoreboard", label: "Scoreboard", icon: "scoreboard" })}
                 {navLink({ href: "/admin/targets", label: "Targets", icon: "targets" })}
+                {canSeeAllActivity(session.role) &&
+                  navLink({ href: "/admin/reports", label: "Daily reports", icon: "questions" })}
               </div>
             </>
           )}
@@ -200,6 +236,7 @@ export function AdminSidebar({ session }: { session: StaffSession }) {
             <>
               {sectionLabel("Admin")}
               <div className="flex flex-col gap-[2px]">
+                {navLink({ href: "/admin/activities", label: "Activities", icon: "activities" })}
                 {navLink({ href: "/admin/staff", label: "Team", icon: "team" })}
               </div>
             </>

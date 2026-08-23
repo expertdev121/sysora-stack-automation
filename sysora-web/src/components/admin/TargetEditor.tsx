@@ -6,8 +6,9 @@ import { useState, useTransition } from "react";
 import { Card, CardHeader, inputClass, labelClass, Pill } from "@/components/admin/ui";
 import { TargetProgress, formatDay } from "@/components/admin/TargetProgress";
 import { Button } from "@/components/ui/Button";
+import { saveActivityTargets } from "@/lib/admin/activity-actions";
 import { deleteRevenueTarget, saveRevenueTarget } from "@/lib/admin/revenue-actions";
-import type { TargetRow } from "@/lib/admin/types";
+import type { ActivityProgressRow, ActivityType, TargetRow } from "@/lib/admin/types";
 
 /**
  * Targets as date ranges of any length.
@@ -18,9 +19,15 @@ import type { TargetRow } from "@/lib/admin/types";
  */
 export function TargetEditor({
   targets,
+  activityTypes,
+  activityTargets,
   canDelete,
 }: {
   targets: TargetRow[];
+  /** Every live lead measure, so a target can put a number on any of them. */
+  activityTypes: ActivityType[];
+  /** What each target already asks for, keyed by target id. */
+  activityTargets: Record<string, ActivityProgressRow[]>;
   canDelete: boolean;
 }) {
   const [creating, setCreating] = useState(false);
@@ -32,7 +39,7 @@ export function TargetEditor({
   return (
     <div className="flex flex-col gap-6">
       {creating ? (
-        <TargetForm onDone={() => setCreating(false)} />
+        <TargetForm activityTypes={activityTypes} onDone={() => setCreating(false)} />
       ) : (
         <div>
           <Button size="sm" variant="ghost" onClick={() => setCreating(true)}>
@@ -49,9 +56,27 @@ export function TargetEditor({
         </Card>
       )}
 
-      <Group title="Active" targets={active} canDelete={canDelete} />
-      <Group title="Upcoming" targets={upcoming} canDelete={canDelete} />
-      <Group title="Closed" targets={closed} canDelete={canDelete} />
+      <Group
+        title="Active"
+        targets={active}
+        activityTypes={activityTypes}
+        activityTargets={activityTargets}
+        canDelete={canDelete}
+      />
+      <Group
+        title="Upcoming"
+        targets={upcoming}
+        activityTypes={activityTypes}
+        activityTargets={activityTargets}
+        canDelete={canDelete}
+      />
+      <Group
+        title="Closed"
+        targets={closed}
+        activityTypes={activityTypes}
+        activityTargets={activityTargets}
+        canDelete={canDelete}
+      />
     </div>
   );
 }
@@ -59,10 +84,14 @@ export function TargetEditor({
 function Group({
   title,
   targets,
+  activityTypes,
+  activityTargets,
   canDelete,
 }: {
   title: string;
   targets: TargetRow[];
+  activityTypes: ActivityType[];
+  activityTargets: Record<string, ActivityProgressRow[]>;
   canDelete: boolean;
 }) {
   if (targets.length === 0) return null;
@@ -73,13 +102,29 @@ function Group({
         {title}
       </p>
       {targets.map((target) => (
-        <TargetCard key={target.id} target={target} canDelete={canDelete} />
+        <TargetCard
+          key={target.id}
+          target={target}
+          activityTypes={activityTypes}
+          activities={activityTargets[target.id] ?? []}
+          canDelete={canDelete}
+        />
       ))}
     </section>
   );
 }
 
-function TargetCard({ target, canDelete }: { target: TargetRow; canDelete: boolean }) {
+function TargetCard({
+  target,
+  activityTypes,
+  activities,
+  canDelete,
+}: {
+  target: TargetRow;
+  activityTypes: ActivityType[];
+  activities: ActivityProgressRow[];
+  canDelete: boolean;
+}) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -87,7 +132,14 @@ function TargetCard({ target, canDelete }: { target: TargetRow; canDelete: boole
   const [error, setError] = useState<string | null>(null);
 
   if (editing) {
-    return <TargetForm target={target} onDone={() => setEditing(false)} />;
+    return (
+      <TargetForm
+        target={target}
+        activityTypes={activityTypes}
+        activities={activities}
+        onDone={() => setEditing(false)}
+      />
+    );
   }
 
   return (
@@ -143,7 +195,17 @@ function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function TargetForm({ target, onDone }: { target?: TargetRow; onDone: () => void }) {
+function TargetForm({
+  target,
+  activityTypes,
+  activities,
+  onDone,
+}: {
+  target?: TargetRow;
+  activityTypes: ActivityType[];
+  activities?: ActivityProgressRow[];
+  onDone: () => void;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [name, setName] = useState(target?.name ?? "");
@@ -155,6 +217,27 @@ function TargetForm({ target, onDone }: { target?: TargetRow; onDone: () => void
   const [requests, setRequests] = useState(target?.requests_target?.toString() ?? "");
   const [notes, setNotes] = useState(target?.notes ?? "");
   const [error, setError] = useState<string | null>(null);
+
+  // Lead measures, blank meaning "not on this target".
+  const [counts, setCounts] = useState<Record<string, string>>(() =>
+    Object.fromEntries(
+      activityTypes.map((type) => {
+        const existing = activities?.find((a) => a.activity_type_id === type.id);
+        return [type.id, existing ? String(existing.target_count) : ""];
+      }),
+    ),
+  );
+
+  // Adding a measure to a period already under way starts it in a hole:
+  // the days before today have no reports for it and never will.
+  const started = target ? target.status !== "upcoming" : false;
+  const addingLate =
+    started &&
+    activityTypes.some(
+      (type) =>
+        counts[type.id]?.trim() &&
+        !activities?.some((a) => a.activity_type_id === type.id),
+    );
 
   function save() {
     setError(null);
@@ -168,12 +251,34 @@ function TargetForm({ target, onDone }: { target?: TargetRow; onDone: () => void
         requestsTarget: requests.trim() ? Number(requests) : null,
         notes,
       });
-      if (result.ok) {
-        router.refresh();
-        onDone();
-      } else {
+
+      if (!result.ok) {
         setError(result.error);
+        return;
       }
+
+      // Two writes, because the lead measures need the target's id and a
+      // new target hasn't got one until it exists. If this second call
+      // fails the target is still saved — so the message says so rather
+      // than implying nothing happened.
+      if (result.id && activityTypes.length > 0) {
+        const attached = await saveActivityTargets(
+          result.id,
+          activityTypes.map((type) => ({
+            activityTypeId: type.id,
+            targetCount: counts[type.id]?.trim() ? Number(counts[type.id]) : 0,
+          })),
+        );
+
+        if (!attached.ok) {
+          setError(`The target was saved, but its activities weren't: ${attached.error}`);
+          router.refresh();
+          return;
+        }
+      }
+
+      router.refresh();
+      onDone();
     });
   }
 
@@ -234,6 +339,43 @@ function TargetForm({ target, onDone }: { target?: TargetRow; onDone: () => void
             />
           </div>
         </div>
+
+        {activityTypes.length > 0 && (
+          <div className="pt-1 border-t-[1.5px] border-[var(--border-faint)]">
+            <p className="mt-4 mb-1 font-mono text-[10px] tracking-[1.6px] uppercase text-[var(--ink-200)]">
+              Lead measures
+            </p>
+            <p className="mt-0 mb-4 max-w-[64ch] text-[12.5px] leading-[1.6] text-[var(--ink-300)]">
+              The money is what already happened. These are what produce it — one shared number per
+              activity for the whole period, not a number each. Leave blank to skip one.
+            </p>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
+              {activityTypes.map((type) => (
+                <div key={type.id} className="flex flex-col gap-[6px]">
+                  <label className={labelClass}>{type.label}</label>
+                  <input
+                    className={inputClass}
+                    inputMode="numeric"
+                    placeholder="—"
+                    value={counts[type.id] ?? ""}
+                    onChange={(e) =>
+                      setCounts((prev) => ({
+                        ...prev,
+                        [type.id]: e.target.value.replace(/[^0-9]/g, ""),
+                      }))
+                    }
+                  />
+                </div>
+              ))}
+            </div>
+            {addingLate && (
+              <p className="mt-3 mb-0 px-4 py-3 rounded-[10px] bg-[var(--warning-bg)] border-[1.5px] border-[var(--warning-border)] text-[12.5px] leading-[1.6] text-[var(--warning)]">
+                This period has already started. A measure added now counts only from today, so it
+                will read as behind for the days nobody was recording it.
+              </p>
+            )}
+          </div>
+        )}
 
         <div className="flex flex-col gap-[6px]">
           <label className={labelClass}>Note (optional)</label>

@@ -16,13 +16,26 @@ import {
 } from "@/components/admin/ui";
 import { Button } from "@/components/ui/Button";
 import { inviteStaff, setStaffActive, setStaffRole } from "@/lib/admin/actions";
-import { ROLE_LABELS, type Staff, type StaffRole } from "@/lib/admin/types";
+import { setUserActivities } from "@/lib/admin/activity-actions";
+import {
+  ROLE_HINTS,
+  ROLE_LABELS,
+  type ActivityType,
+  type Staff,
+  type StaffRole,
+} from "@/lib/admin/types";
 
 export function TeamManager({
   staff,
+  activityTypes,
+  assignments,
   currentUserId,
 }: {
   staff: Staff[];
+  /** Live lead measures, so a person can be put on one. */
+  activityTypes: ActivityType[];
+  /** User id → the activity type ids they're responsible for. */
+  assignments: Record<string, string[]>;
   currentUserId: string;
 }) {
   const router = useRouter();
@@ -83,6 +96,9 @@ export function TeamManager({
                 </option>
               ))}
             </select>
+            <span className="text-[12px] leading-[1.5] text-[var(--ink-300)]">
+              {ROLE_HINTS[role]}
+            </span>
           </div>
           <Button
             size="sm"
@@ -126,6 +142,7 @@ export function TeamManager({
                 <Th>Name</Th>
                 <Th>Email</Th>
                 <Th>Role</Th>
+                <Th>Reports on</Th>
                 <Th>Status</Th>
                 <Th />
               </tr>
@@ -159,6 +176,14 @@ export function TeamManager({
                     </select>
                   </Td>
                   <Td>
+                    <ActivityPicker
+                      types={activityTypes}
+                      selected={assignments[member.id] ?? []}
+                      disabled={pending}
+                      onChange={(ids) => run(() => setUserActivities(member.id, ids))}
+                    />
+                  </Td>
+                  <Td>
                     {member.is_active ? <Pill tone="mint">Active</Pill> : <Pill tone="slate">Off</Pill>}
                   </Td>
                   <Td>
@@ -177,6 +202,54 @@ export function TeamManager({
           </Table>
         )}
       </Card>
+    </div>
+  );
+}
+
+/**
+ * Which lead measures a person is responsible for.
+ *
+ * Checkboxes rather than a multi-select because the list is short and
+ * the answer has to be readable at a glance from the row — this is the
+ * column that decides what somebody is asked every evening.
+ */
+function ActivityPicker({
+  types,
+  selected,
+  disabled,
+  onChange,
+}: {
+  types: ActivityType[];
+  selected: string[];
+  disabled: boolean;
+  onChange: (ids: string[]) => void;
+}) {
+  if (types.length === 0) {
+    return <span className="text-[12.5px] text-[var(--ink-100)]">No activities yet</span>;
+  }
+
+  const has = new Set(selected);
+
+  return (
+    <div className="flex flex-col gap-[6px] min-w-[150px]">
+      {types.map((type) => (
+        <label key={type.id} className="flex items-center gap-2 text-[13px] text-[var(--ink-600)]">
+          <input
+            type="checkbox"
+            className="accent-[var(--accent)]"
+            checked={has.has(type.id)}
+            disabled={disabled}
+            onChange={(e) =>
+              onChange(
+                e.target.checked
+                  ? [...selected, type.id]
+                  : selected.filter((id) => id !== type.id),
+              )
+            }
+          />
+          {type.label}
+        </label>
+      ))}
     </div>
   );
 }

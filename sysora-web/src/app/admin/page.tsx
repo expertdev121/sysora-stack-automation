@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { AdminShell } from "@/components/admin/AdminShell";
-import { TargetProgress } from "@/components/admin/TargetProgress";
+import { Scoreboard } from "@/components/admin/Scoreboard";
 import {
   Card,
   CardHeader,
@@ -13,13 +13,24 @@ import {
   Td,
   Th,
 } from "@/components/admin/ui";
-import { canSeeFinances, requireStaff } from "@/lib/admin/auth";
-import { KIND_LABELS, type RequestRow, type TargetRow } from "@/lib/admin/types";
+import { redirect } from "next/navigation";
+
+import { canSeeFinances, canSeePipeline, homePathFor, requireStaff } from "@/lib/admin/auth";
+import {
+  KIND_LABELS,
+  type ActivityProgressRow,
+  type RequestRow,
+  type TargetRow,
+} from "@/lib/admin/types";
 import { formatMoney } from "@/lib/money";
 import { salesDb } from "@/lib/supabase/admin";
 
 export default async function AdminOverviewPage() {
   const session = await requireStaff();
+
+  // A field role has no overview to look at; their page is the day.
+  if (!canSeePipeline(session.role)) redirect(homePathFor(session.role));
+
   const seesFinances = canSeeFinances(session.role);
   const db = salesDb();
 
@@ -60,6 +71,18 @@ export default async function AdminOverviewPage() {
         .maybeSingle()
     : { data: null };
 
+  // The lead measures on whatever is running, so the overview answers
+  // "are we winning" and not only "what did we bank".
+  const { data: activities } = currentTarget
+    ? await db
+        .from("activity_progress")
+        .select("*")
+        .eq("revenue_target_id", (currentTarget as TargetRow).id)
+        .order("sort_order", { ascending: true })
+    : { data: [] };
+
+  const leadMeasures = (activities ?? []) as ActivityProgressRow[];
+
   return (
     <AdminShell session={session}>
       <PageHeading
@@ -94,11 +117,12 @@ export default async function AdminOverviewPage() {
 
       {seesFinances && currentTarget && (
         <div className="mb-10">
-          <TargetProgress
+          <Scoreboard
             target={currentTarget as TargetRow}
+            activities={leadMeasures}
             footer={
-              <Link href="/admin/targets" className="text-[13px] font-semibold">
-                Set targets →
+              <Link href="/admin/scoreboard" className="text-[13px] font-semibold">
+                Open the scoreboard →
               </Link>
             }
           />

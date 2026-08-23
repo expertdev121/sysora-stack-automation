@@ -1,13 +1,16 @@
 import type { StaffRole } from "./types";
 
 /**
- * Three roles, in increasing order of reach:
+ * Four roles, in increasing order of reach:
  *
+ *   bde      files a daily report and watches the activity he is
+ *            assigned to. No pipeline, no money, nothing else.
  *   admin    the pipeline — requests, contacts, questions, settings.
  *            Sees no company finances at all.
- *   manager  everything an admin sees, plus revenue, payments and
- *            sales targets.
- *   owner    everything, including pricing and the team.
+ *   manager  everything an admin sees, plus revenue, payments,
+ *            targets and everyone's activity.
+ *   owner    everything, including pricing, the team, and which
+ *            activities exist.
  *
  * Read these as capabilities rather than checking `role === …` at call
  * sites, so widening a permission later is one edit here.
@@ -20,6 +23,17 @@ import type { StaffRole } from "./types";
 
 export function canSeeFinances(role: StaffRole): boolean {
   return role === "manager" || role === "owner";
+}
+
+/**
+ * Requests, contacts, questions, settings — the day-to-day pipeline.
+ *
+ * A BDE is the first role that isn't a dashboard user in the old sense,
+ * so this predicate exists to keep him out of pages that used to be
+ * open to anyone with a session.
+ */
+export function canSeePipeline(role: StaffRole): boolean {
+  return role !== "bde";
 }
 
 export function canManageTargets(role: StaffRole): boolean {
@@ -37,4 +51,38 @@ export function canManageTeam(role: StaffRole): boolean {
 /** Deleting a target destroys history for everyone, so it stops at owner. */
 export function canDeleteTarget(role: StaffRole): boolean {
   return role === "owner";
+}
+
+/**
+ * Which activities exist at all is a structural decision, like pricing:
+ * owner only. Setting a number against one for a given period is
+ * running the business, which a manager does.
+ */
+export function canManageActivityTypes(role: StaffRole): boolean {
+  return role === "owner";
+}
+
+/** Anyone can file their own end-of-day report. */
+export function canSubmitEod(): boolean {
+  return true;
+}
+
+/** Everyone's activity, not just your own. */
+export function canSeeAllActivity(role: StaffRole): boolean {
+  return canSeeFinances(role);
+}
+
+/**
+ * Filing or correcting someone else's day.
+ *
+ * A person may fix their own report for today and yesterday — see
+ * eod-actions.ts. Anything older, or anyone else's, needs this.
+ */
+export function canEditAnyEod(role: StaffRole): boolean {
+  return canSeeFinances(role);
+}
+
+/** Where a role belongs when it signs in. */
+export function homePathFor(role: StaffRole): string {
+  return role === "bde" ? "/admin/today" : "/admin";
 }

@@ -3,7 +3,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/lib/auth/session";
-import { canSeeFinances } from "./roles";
+import { canSeeAllActivity, canSeeFinances, canSeePipeline, homePathFor } from "./roles";
 import type { StaffRole } from "./types";
 
 export type StaffSession = {
@@ -20,10 +20,15 @@ export type StaffSession = {
  */
 export {
   canDeleteTarget,
+  canEditAnyEod,
+  canManageActivityTypes,
   canManagePricing,
   canManageTargets,
   canManageTeam,
+  canSeeAllActivity,
   canSeeFinances,
+  canSeePipeline,
+  homePathFor,
 } from "./roles";
 
 /**
@@ -46,16 +51,36 @@ export async function requireStaff(): Promise<StaffSession> {
   };
 }
 
-/** Pages and actions that touch money: targets, revenue, payments. */
-export async function requireFinance(): Promise<StaffSession> {
+/**
+ * The pipeline pages: requests, contacts, questions, settings, plans.
+ *
+ * Until there was a BDE, a session was all these pages asked for. It
+ * isn't any more — a field role has a session and no business here —
+ * so every one of them calls this instead of requireStaff().
+ */
+export async function requirePipeline(): Promise<StaffSession> {
   const session = await requireStaff();
-  if (!canSeeFinances(session.role)) redirect("/admin");
+  if (!canSeePipeline(session.role)) redirect(homePathFor(session.role));
   return session;
 }
 
-/** Owner-only: pricing and the team. */
+/** Pages and actions that touch money: targets, revenue, payments. */
+export async function requireFinance(): Promise<StaffSession> {
+  const session = await requireStaff();
+  if (!canSeeFinances(session.role)) redirect(homePathFor(session.role));
+  return session;
+}
+
+/** The whole team's activity, rather than your own. */
+export async function requireActivityView(): Promise<StaffSession> {
+  const session = await requireStaff();
+  if (!canSeeAllActivity(session.role)) redirect(homePathFor(session.role));
+  return session;
+}
+
+/** Owner-only: pricing, the team, and which activities exist. */
 export async function requireOwner(): Promise<StaffSession> {
   const session = await requireStaff();
-  if (session.role !== "owner") redirect("/admin");
+  if (session.role !== "owner") redirect(homePathFor(session.role));
   return session;
 }

@@ -13,6 +13,10 @@ Two things to know before editing anything here:
   directly against the project and written down afterwards, so they are
   a faithful record rather than the file that ran. From 14 onward the
   file is the source.
+- **14 and 19 both replace the role enum rather than extending it.**
+  `ALTER TYPE … ADD VALUE` cannot run inside a migration's transaction,
+  so each new role swaps the type. Expect to do the same for the next
+  one; it is not an accident to tidy up.
 
 The project also contains `0001_schema` … `0007_credential_grants`, which
 belong to the Sysora product, not this site. They are not reproduced

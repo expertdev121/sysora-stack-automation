@@ -7,6 +7,8 @@ import { formatDay } from "@/components/admin/TargetProgress";
 import { Card, PageHeading } from "@/components/admin/ui";
 import { canDeleteTarget, requireFinance } from "@/lib/admin/auth";
 import type {
+  ActivityProgressRow,
+  ActivityType,
   ManualRevenueRow,
   TargetRow,
   UnattributedRevenue,
@@ -20,11 +22,18 @@ export default async function TargetsPage() {
   const session = await requireFinance();
   const db = salesDb();
 
-  const [{ data: targets }, { data: entries }, { data: outside }] = await Promise.all([
-    db.from("target_progress").select("*").order("starts_on", { ascending: false }),
-    db.from("manual_revenue").select("*").order("earned_on", { ascending: false }).limit(500),
-    db.from("unattributed_revenue").select("*").maybeSingle(),
-  ]);
+  const [{ data: targets }, { data: entries }, { data: outside }, { data: types }, { data: attached }] =
+    await Promise.all([
+      db.from("target_progress").select("*").order("starts_on", { ascending: false }),
+      db.from("manual_revenue").select("*").order("earned_on", { ascending: false }).limit(500),
+      db.from("unattributed_revenue").select("*").maybeSingle(),
+      db
+        .from("activity_types")
+        .select("id, slug, label, question, sort_order, is_active")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true }),
+      db.from("activity_progress").select("*").order("sort_order", { ascending: true }),
+    ]);
 
   const rows = (targets ?? []) as TargetRow[];
   const manual = (entries ?? []) as ManualRevenueRow[];
@@ -39,6 +48,12 @@ export default async function TargetsPage() {
 
   const outsideTotal = unattributed.revenue_stripe + unattributed.revenue_manual;
 
+  // Grouped by target so each card gets only its own lead measures.
+  const activityTargets: Record<string, ActivityProgressRow[]> = {};
+  for (const row of (attached ?? []) as ActivityProgressRow[]) {
+    (activityTargets[row.revenue_target_id] ??= []).push(row);
+  }
+
   return (
     <AdminShell session={session}>
       <PageHeading eyebrow="Revenue" title="Targets" />
@@ -48,7 +63,12 @@ export default async function TargetsPage() {
         belongs to exactly one target and no money is counted twice.
       </p>
 
-      <TargetEditor targets={rows} canDelete={canDeleteTarget(session.role)} />
+      <TargetEditor
+        targets={rows}
+        activityTypes={(types ?? []) as ActivityType[]}
+        activityTargets={activityTargets}
+        canDelete={canDeleteTarget(session.role)}
+      />
 
       {outsideTotal > 0 && (
         <Card className="mt-8">

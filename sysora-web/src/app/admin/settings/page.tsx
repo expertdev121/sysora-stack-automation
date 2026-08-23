@@ -3,13 +3,13 @@ import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PageHeading } from "@/components/admin/ui";
 import { SettingsEditor } from "@/components/admin/SettingsEditor";
-import { requireStaff } from "@/lib/admin/auth";
+import { requirePipeline } from "@/lib/admin/auth";
 import { salesDb } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
-  const session = await requireStaff();
+  const session = await requirePipeline();
   const db = salesDb();
 
   const { data } = await db.from("settings").select("*").order("key");

@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { Card, CardHeader, Pill } from "@/components/admin/ui";
 import { formatMoney } from "@/lib/money";
 import { cn } from "@/lib/cn";
-import type { TargetRow } from "@/lib/admin/types";
+import { PACE_LABELS, PACE_TONE, type TargetRow } from "@/lib/admin/types";
 
 export function formatDay(date: string): string {
   return new Date(date + "T00:00:00").toLocaleDateString("en-US", {
@@ -52,11 +52,9 @@ export function TargetProgress({
               {target.days_left === 0 ? "Last day" : `${target.days_left} days left`}
             </Pill>
           )}
-          {target.status === "closed" && (
-            <Pill tone={target.percent_complete >= 100 ? "mint" : "slate"}>
-              {target.percent_complete >= 100 ? "Target met" : "Ended short"}
-            </Pill>
-          )}
+          {/* The same pace vocabulary the activities use, from the same
+              rule in SQL — so "behind" means one thing on this page. */}
+          <Pill tone={PACE_TONE[target.pace]}>{PACE_LABELS[target.pace]}</Pill>
         </div>
 
         <div className="flex flex-wrap items-end gap-x-8 gap-y-4 mb-5">
@@ -85,7 +83,27 @@ export function TargetProgress({
             )}
             style={{ width: `${Math.min(100, Math.max(0, target.percent_complete))}%` }}
           />
+          {target.status === "active" && target.expected_by_today < target.revenue_target && (
+            <span
+              aria-hidden="true"
+              className="absolute inset-y-0 w-[2px] bg-[var(--ink-300)] opacity-50"
+              style={{
+                left: `${Math.min(100, (target.expected_by_today / target.revenue_target) * 100)}%`,
+              }}
+            />
+          )}
         </div>
+
+        {target.status === "active" && target.revenue_remaining > 0 && (
+          <p className="mt-3 mb-0 text-[13px] text-[var(--ink-400)]">
+            <span className="font-mono font-semibold text-[var(--ink-700)]">
+              {formatMoney(target.required_per_day)}
+            </span>{" "}
+            a day for {target.days_remaining} {target.days_remaining === 1 ? "day" : "days"} closes
+            the gap. A straight line would have us at{" "}
+            <span className="font-mono">{formatMoney(target.expected_by_today)}</span> by now.
+          </p>
+        )}
 
         {!compact && (
           <p className="mt-4 mb-0 text-[13px] text-[var(--ink-300)]">

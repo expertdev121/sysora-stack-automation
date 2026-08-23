@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { RequestControls } from "@/components/admin/RequestControls";
 import { Card, CardHeader, EmptyState, Pill, StatusPill } from "@/components/admin/ui";
-import { requireStaff } from "@/lib/admin/auth";
+import { canSeeFinances, requireStaff } from "@/lib/admin/auth";
 import { KIND_LABELS, type AnswerRow, type RequestRow, type Staff } from "@/lib/admin/types";
 import { formatMoney } from "@/lib/money";
 import { salesDb } from "@/lib/supabase/admin";
@@ -25,7 +25,7 @@ export default async function RequestDetailPage({
   params: Promise<{ reference: string }>;
 }) {
   const session = await requireStaff();
-  const seesFinances = session.role === "super_admin";
+  const seesFinances = canSeeFinances(session.role);
   const { reference } = await params;
   const db = salesDb();
 

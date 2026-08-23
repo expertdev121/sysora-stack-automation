@@ -7,6 +7,7 @@ import { useState, type ReactNode } from "react";
 import { SignOutButton } from "@/components/admin/SignOutButton";
 import { SysoraMark } from "@/components/ui/Logo";
 import { cn } from "@/lib/cn";
+import { canManageTeam, canSeeFinances } from "@/lib/admin/roles";
 import type { StaffSession } from "@/lib/admin/auth";
 
 /* ---- Icons: 20px, same line weight as the rest of the system ---- */
@@ -186,11 +187,19 @@ export function AdminSidebar({ session }: { session: StaffSession }) {
           {sectionLabel("Configure")}
           <div className="flex flex-col gap-[2px]">{configure.map(navLink)}</div>
 
-          {session.role === "super_admin" && (
+          {canSeeFinances(session.role) && (
+            <>
+              {sectionLabel("Revenue")}
+              <div className="flex flex-col gap-[2px]">
+                {navLink({ href: "/admin/targets", label: "Targets", icon: "targets" })}
+              </div>
+            </>
+          )}
+
+          {canManageTeam(session.role) && (
             <>
               {sectionLabel("Admin")}
               <div className="flex flex-col gap-[2px]">
-                {navLink({ href: "/admin/targets", label: "Targets", icon: "targets" })}
                 {navLink({ href: "/admin/staff", label: "Team", icon: "team" })}
               </div>
             </>
@@ -203,9 +212,9 @@ export function AdminSidebar({ session }: { session: StaffSession }) {
           </p>
           <p className="m-0 mb-3 text-[11.5px] text-[var(--ink-300)] break-all">
             {session.fullName ? session.email : null}
-            {session.role === "super_admin" && (
+            {session.role !== "admin" && (
               <span className="block mt-1 font-mono text-[9.5px] tracking-[1px] uppercase text-[var(--accent-strong)]">
-                super admin
+                {session.role}
               </span>
             )}
           </p>

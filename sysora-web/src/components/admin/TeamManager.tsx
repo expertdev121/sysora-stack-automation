@@ -16,7 +16,7 @@ import {
 } from "@/components/admin/ui";
 import { Button } from "@/components/ui/Button";
 import { inviteStaff, setStaffActive, setStaffRole } from "@/lib/admin/actions";
-import type { Staff } from "@/lib/admin/types";
+import { ROLE_LABELS, type Staff, type StaffRole } from "@/lib/admin/types";
 
 export function TeamManager({
   staff,
@@ -32,7 +32,7 @@ export function TeamManager({
 
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
-  const [role, setRole] = useState<"admin" | "super_admin">("admin");
+  const [role, setRole] = useState<StaffRole>("admin");
 
   const run = (work: () => Promise<{ ok: boolean; error?: string }>, message?: string) =>
     startTransition(async () => {
@@ -75,10 +75,13 @@ export function TeamManager({
             <select
               className={inputClass}
               value={role}
-              onChange={(e) => setRole(e.target.value as "admin" | "super_admin")}
+              onChange={(e) => setRole(e.target.value as StaffRole)}
             >
-              <option value="admin">Admin</option>
-              <option value="super_admin">Super admin</option>
+              {(Object.keys(ROLE_LABELS) as StaffRole[]).map((value) => (
+                <option key={value} value={value}>
+                  {ROLE_LABELS[value]}
+                </option>
+              ))}
             </select>
           </div>
           <Button
@@ -144,12 +147,15 @@ export function TeamManager({
                       disabled={pending}
                       onChange={(e) =>
                         run(() =>
-                          setStaffRole(member.id, e.target.value as "admin" | "super_admin"),
+                          setStaffRole(member.id, e.target.value as StaffRole),
                         )
                       }
                     >
-                      <option value="admin">Admin</option>
-                      <option value="super_admin">Super admin</option>
+                      {(Object.keys(ROLE_LABELS) as StaffRole[]).map((value) => (
+                        <option key={value} value={value}>
+                          {ROLE_LABELS[value]}
+                        </option>
+                      ))}
                     </select>
                   </Td>
                   <Td>

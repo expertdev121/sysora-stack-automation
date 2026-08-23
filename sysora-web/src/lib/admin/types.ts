@@ -1,6 +1,12 @@
 import type { OfferKind, PaymentStatus, RequestStatus, ResponseStatus } from "@/lib/sales/types";
 
-export type StaffRole = "admin" | "super_admin";
+export type StaffRole = "admin" | "manager" | "owner";
+
+export const ROLE_LABELS: Record<StaffRole, string> = {
+  admin: "Admin",
+  manager: "Manager",
+  owner: "Owner",
+};
 
 export type Staff = {
   id: string;
@@ -49,15 +55,55 @@ export type ContactRow = {
   created_at: string;
 };
 
-/** A row of sales.target_progress — target versus actual for one month. */
+/** A row of sales.target_progress — one target with its achieved figures. */
 export type TargetRow = {
-  period_start: string;
+  id: string;
+  name: string | null;
+  starts_on: string;
+  ends_on: string;
   revenue_target: number;
   requests_target: number | null;
+  currency: string;
   notes: string | null;
-  revenue_actual: number;
+  /** Money taken through the checkout inside the window. */
+  revenue_stripe: number;
+  /** Money recorded by hand inside the window. */
+  revenue_manual: number;
+  /** The two above, added. Cannot double-count: different tables. */
+  revenue_achieved: number;
+  revenue_remaining: number;
+  percent_complete: number;
+  days_total: number;
+  days_left: number | null;
+  status: "upcoming" | "active" | "closed";
+  manual_entries: number;
   requests_actual: number;
-  payments_actual: number;
+};
+
+export type RevenueSource = "upwork" | "off_source" | "other";
+
+export const SOURCE_LABELS: Record<RevenueSource, string> = {
+  upwork: "Upwork",
+  off_source: "Off source",
+  other: "Other",
+};
+
+export type ManualRevenueRow = {
+  id: string;
+  client_name: string;
+  source: RevenueSource;
+  description: string | null;
+  amount: number;
+  currency: string;
+  earned_on: string;
+  created_by: string | null;
+  created_at: string;
+};
+
+/** Revenue that falls outside every target window. */
+export type UnattributedRevenue = {
+  revenue_stripe: number;
+  revenue_manual: number;
 };
 
 export type AnswerRow = {

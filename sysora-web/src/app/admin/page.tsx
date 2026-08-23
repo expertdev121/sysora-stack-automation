@@ -13,14 +13,14 @@ import {
   Td,
   Th,
 } from "@/components/admin/ui";
-import { requireStaff } from "@/lib/admin/auth";
+import { canSeeFinances, requireStaff } from "@/lib/admin/auth";
 import { KIND_LABELS, type RequestRow, type TargetRow } from "@/lib/admin/types";
 import { formatMoney } from "@/lib/money";
 import { salesDb } from "@/lib/supabase/admin";
 
 export default async function AdminOverviewPage() {
   const session = await requireStaff();
-  const seesFinances = session.role === "super_admin";
+  const seesFinances = canSeeFinances(session.role);
   const db = salesDb();
 
   const [{ data: requests }, { data: metrics }, { count: contactCount }] = await Promise.all([
@@ -54,7 +54,8 @@ export default async function AdminOverviewPage() {
     ? await db
         .from("target_progress")
         .select("*")
-        .order("period_start", { ascending: false })
+        .eq("status", "active")
+        .order("starts_on", { ascending: false })
         .limit(1)
         .maybeSingle()
     : { data: null };

@@ -2,11 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireStaff, requireSuperAdmin } from "./auth";
+import { requireOwner, requireStaff } from "./auth";
 import { salesDb } from "@/lib/supabase/admin";
 import { createPasswordToken } from "@/lib/auth/session";
 import { siteUrl } from "@/lib/site-url";
 import type { RequestStatus } from "@/lib/sales/types";
+import type { StaffRole } from "./types";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -193,7 +194,7 @@ export async function saveOffer(
   slug: string,
   patch: { name?: string; tagline?: string; price_amount?: number; price_note?: string; is_active?: boolean },
 ): Promise<ActionResult> {
-  const session = await requireSuperAdmin();
+  const session = await requireOwner();
   const db = salesDb();
 
   const { data: before } = await db
@@ -271,7 +272,7 @@ export async function saveQuestion(
 /* ---- Team (super admin only) ------------------------------- */
 
 export async function setStaffActive(userId: string, isActive: boolean): Promise<ActionResult> {
-  const session = await requireSuperAdmin();
+  const session = await requireOwner();
 
   if (userId === session.userId && !isActive) {
     return { ok: false, error: "You can't deactivate your own account." };
@@ -295,12 +296,12 @@ export async function setStaffActive(userId: string, isActive: boolean): Promise
 
 export async function setStaffRole(
   userId: string,
-  role: "admin" | "super_admin",
+  role: StaffRole,
 ): Promise<ActionResult> {
-  const session = await requireSuperAdmin();
+  const session = await requireOwner();
 
-  if (userId === session.userId && role !== "super_admin") {
-    return { ok: false, error: "You can't remove your own super admin access." };
+  if (userId === session.userId && role !== "owner") {
+    return { ok: false, error: "You can't step yourself down from owner." };
   }
 
   const db = salesDb();
@@ -328,10 +329,10 @@ export async function setStaffRole(
  */
 export async function inviteStaff(
   email: string,
-  role: "admin" | "super_admin",
+  role: StaffRole,
   fullName: string,
 ): Promise<ActionResult & { link?: string }> {
-  const session = await requireSuperAdmin();
+  const session = await requireOwner();
   const address = email.trim().toLowerCase();
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(address)) {
@@ -383,7 +384,7 @@ export async function inviteStaff(
 
 /** A fresh set-password link for someone who lost theirs. */
 export async function resetStaffPassword(userId: string): Promise<ActionResult & { link?: string }> {
-  const session = await requireSuperAdmin();
+  const session = await requireOwner();
 
   const { data: user } = await salesDb()
     .from("users")
@@ -404,64 +405,4 @@ export async function resetStaffPassword(userId: string): Promise<ActionResult &
   });
 
   return { ok: true, link: `${siteUrl()}/admin/set-password?token=${token}` };
-}
-
-/* ---- Targets (super admin only) ---------------------------- */
-
-/**
- * Sets the revenue and request targets for a month.
- *
- * Targets are commercial information, so this is gated the same way the
- * numbers themselves are — checked here on the server, not just hidden
- * in the interface.
- */
-export async function saveTarget(
-  periodStart: string,
-  revenueTargetMajor: number,
-  requestsTarget: number | null,
-  notes: string,
-): Promise<ActionResult> {
-  const session = await requireSuperAdmin();
-
-  if (!/^\d{4}-\d{2}-01$/.test(periodStart)) {
-    return { ok: false, error: "Pick a month." };
-  }
-  if (!Number.isFinite(revenueTargetMajor) || revenueTargetMajor < 0) {
-    return { ok: false, error: "Revenue target must be zero or more." };
-  }
-  if (requestsTarget !== null && (!Number.isInteger(requestsTarget) || requestsTarget < 0)) {
-    return { ok: false, error: "Requests target must be a whole number." };
-  }
-
-  const db = salesDb();
-  const { data: before } = await db
-    .from("targets")
-    .select("revenue_target, requests_target, notes")
-    .eq("period_start", periodStart)
-    .maybeSingle();
-
-  const row = {
-    period_start: periodStart,
-    revenue_target: Math.round(revenueTargetMajor * 100),
-    requests_target: requestsTarget,
-    notes: notes.trim() || null,
-    created_by: session.userId,
-  };
-
-  const { error } = await db.from("targets").upsert(row, { onConflict: "period_start" });
-  if (error) return { ok: false, error: error.message };
-
-  await audit({
-    actorId: session.userId,
-    actorEmail: session.email,
-    action: "target.saved",
-    entity: "target",
-    entityId: periodStart,
-    before,
-    after: row,
-  });
-
-  revalidatePath("/admin/targets");
-  revalidatePath("/admin");
-  return { ok: true };
 }

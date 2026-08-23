@@ -3,14 +3,14 @@ import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PageHeading } from "@/components/admin/ui";
 import { TeamManager } from "@/components/admin/TeamManager";
-import { requireSuperAdmin } from "@/lib/admin/auth";
+import { requireOwner } from "@/lib/admin/auth";
 import type { Staff } from "@/lib/admin/types";
 import { salesDb } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = { title: "Team" };
 
 export default async function StaffPage() {
-  const session = await requireSuperAdmin();
+  const session = await requireOwner();
   const db = salesDb();
 
   const { data } = await db.from("users").select("*").order("created_at");

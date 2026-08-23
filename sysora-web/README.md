@@ -133,7 +133,9 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 
 The `sales` schema lives in the `Sysora Stack Automation` Supabase project
 (`xulhgkrsqpodlokzpbig`). Money is stored in **minor units** as integers —
-`4900` is $49.00.
+`4900` is $49.00. Every migration is in
+[`supabase/migrations`](supabase/migrations); read the README there before
+adding one.
 
 Two things are easy to miss when pointing this at a fresh Supabase project,
 because neither is part of the table definitions:
@@ -147,9 +149,8 @@ because neither is part of the table definitions:
 
 ## Dashboard
 
-`/admin` — staff only. Signing in is not enough: the account must also have an
-active row in `sales.staff`, and RLS enforces the same rule at the database
-level, so a missed check in a page still can't leak data.
+`/admin` — staff only. Signing in is not enough: the account must also be active
+in `sales.users`, and every page asks a guard before it reads anything.
 
 | Page | What it does |
 |---|---|
@@ -160,8 +161,8 @@ level, so a missed check in a page still can't leak data.
 | Plans | Edit the three offers — price, tagline, live/off |
 | Questions | Edit the live forms; changes appear on the public site immediately |
 | Settings | Booking link, calendar link, contact email, checkout copy |
-| Targets | Super admin only: monthly revenue and request targets, versus actual |
-| Team | Super admin only: invite staff, set roles, deactivate accounts |
+| Targets | Manager and owner: revenue targets, progress, and revenue from outside the checkout |
+| Team | Owner only: invite staff, set roles, deactivate accounts |
 
 Every write goes through a server action that records who did it in
 `sales.audit_log`. Staff can read that log but not write to it — audit rows are
@@ -194,28 +195,70 @@ public catalogue policies — offers, active surveys, public settings — are
 unchanged.
 
 **Adding staff**: Team → invite. You get a one-time link to pass on, and the
-invitee sets their own password. Nobody, including a super admin, ever types
-someone else's password.
+invitee sets their own password. Nobody, including an owner, ever types someone
+else's password.
 
-**Roles**: two levels, and the difference is money.
+**Roles**: three levels, and the line between them is money.
 
-| | admin | super admin |
-|---|---|---|
-| Requests, contacts, answers, assignment, status, notes | ✓ | ✓ |
-| Questions and settings | ✓ | ✓ |
-| Plans | read only | edit |
-| Revenue, amounts, payments, receipts | — | ✓ |
-| Sales targets | — | ✓ |
-| Team | — | ✓ |
+| | admin | manager | owner |
+|---|---|---|---|
+| Requests, contacts, answers, assignment, status, notes | ✓ | ✓ | ✓ |
+| Questions and settings | ✓ | ✓ | ✓ |
+| Plans | read only | read only | edit |
+| Revenue, amounts, payments, receipts | — | ✓ | ✓ |
+| Revenue targets and manual revenue | — | ✓ | ✓ |
+| Deleting a target | — | — | ✓ |
+| Team | — | — | ✓ |
 
 An admin sees no company finances anywhere: no revenue figure, no amount
 column, no payments card. Finance data isn't merely hidden in the markup — the
 payments query doesn't run for an admin, and `/admin/targets` and
-`/admin/staff` redirect rather than render. The server actions behind pricing
-and targets call `requireSuperAdmin()`, so a crafted request fails too.
+`/admin/staff` redirect rather than render. The server actions behind pricing,
+targets and revenue call `requireFinance()` or `requireOwner()`, so a crafted
+request fails too.
 
-A super admin can't deactivate or demote themselves — that would lock the last
-one out.
+Capabilities are named rather than compared inline: `canSeeFinances(role)`,
+`canManagePricing(role)`, `canManageTeam(role)`, `canDeleteTarget(role)`. They
+live in `src/lib/admin/roles.ts` — a plain module, so client components can ask
+the same questions — while the redirecting guards live in
+`src/lib/admin/auth.ts`, which is `server-only`. The predicates decide what to
+**render**; the guards decide what to **serve**. Widening a permission is one
+edit in `roles.ts`.
+
+An owner can't step themselves down — that would lock the last one out.
+
+## Revenue and targets
+
+A **target** is a revenue goal over a date range: a name, a start, an end, and
+an amount. Any length — a week, a quarter, a campaign. Windows may not overlap,
+and the database enforces that with an exclusion constraint rather than an
+application check somebody can forget. Because each day belongs to at most one
+target, "achieved" and "remaining" have exactly one meaning.
+
+Two things count toward a target, and they cannot double-count because they
+come from different tables:
+
+- **Checkout revenue** — succeeded Stripe payments, net of refunds, whose
+  success date falls inside the window.
+- **Manual revenue** — Upwork and other outside clients, entered by hand with a
+  client name, a source, an amount, and the date it was earned.
+
+Manual entries carry no target id. Attribution is by date alone, so moving a
+target's window re-attributes the money automatically and an entry is never
+orphaned. Money earned outside every window isn't lost either — the targets
+page reports it as revenue no target covers.
+
+Nothing is snapshotted. Editing, deleting or backdating an entry shows up the
+next time the page is read, which is why a closed target's number can still
+move — and should, because the truth about last quarter can change.
+
+A target's status is derived from today's date, never stored: upcoming, active,
+closed. There is no job to run and no state to go stale.
+
+One thing the schema can't decide for you: if a client pays through the
+checkout *and* you also record them by hand, that money is counted twice.
+Adding an entry whose client name matches an existing contact shows a warning,
+but it is advisory — only you know whether it is the same money.
 
 ## Deploying to Vercel
 

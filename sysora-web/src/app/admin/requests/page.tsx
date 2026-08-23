@@ -13,7 +13,7 @@ import {
   Td,
   Th,
 } from "@/components/admin/ui";
-import { requireStaff } from "@/lib/admin/auth";
+import { canSeeFinances, requireStaff } from "@/lib/admin/auth";
 import { KIND_LABELS, type RequestRow, type Staff } from "@/lib/admin/types";
 import { formatMoney } from "@/lib/money";
 import { cn } from "@/lib/cn";
@@ -45,7 +45,7 @@ export default async function RequestsPage({
   searchParams: Promise<{ filter?: string }>;
 }) {
   const session = await requireStaff();
-  const seesFinances = session.role === "super_admin";
+  const seesFinances = canSeeFinances(session.role);
   const { filter = "open" } = await searchParams;
   const db = salesDb();
 

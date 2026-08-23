@@ -216,3 +216,36 @@ and targets call `requireSuperAdmin()`, so a crafted request fails too.
 
 A super admin can't deactivate or demote themselves — that would lock the last
 one out.
+
+## Deploying to Vercel
+
+The Next.js app lives in `sysora-web/`, not at the repository root, so the
+Vercel project needs **Root Directory = `sysora-web`** (Settings → General).
+Pointed at the root, Vercel finds no `package.json` and the build fails before
+it starts.
+
+Environment variables to set (Settings → Environment Variables):
+
+| Variable | |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | public |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | public |
+| `SUPABASE_SERVICE_ROLE_KEY` | **secret** — the app cannot read anything without it |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | public |
+| `STRIPE_SECRET_KEY` | **secret** |
+| `STRIPE_WEBHOOK_SECRET` | **secret**, from the webhook endpoint you add in Stripe |
+| `NEXT_PUBLIC_SITE_URL` | your domain, e.g. `https://sysora.com` |
+
+Leave `ALLOW_SIMULATED_PAYMENTS` unset in production — simulated payments
+refuse to run there anyway, but there is no reason to define it.
+
+`NEXT_PUBLIC_SITE_URL` only matters on a custom domain: without it the app
+falls back to Vercel's own deployment URL, so generated invite links never
+point at localhost.
+
+Point the Stripe webhook at `https://your-domain/api/stripe/webhook` and paste
+its signing secret into `STRIPE_WEBHOOK_SECRET`.
+
+The database is not in this repository — the `sales` schema is applied
+directly to Supabase, so a new environment needs those migrations replayed
+against its own project.

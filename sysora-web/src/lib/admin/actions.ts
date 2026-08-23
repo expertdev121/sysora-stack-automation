@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireStaff, requireSuperAdmin } from "./auth";
 import { salesDb } from "@/lib/supabase/admin";
 import { createPasswordToken } from "@/lib/auth/session";
+import { siteUrl } from "@/lib/site-url";
 import type { RequestStatus } from "@/lib/sales/types";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
@@ -366,7 +367,6 @@ export async function inviteStaff(
   if (!userId) return { ok: false, error: "Could not create that account." };
 
   const token = await createPasswordToken(userId, "invite", 72);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   await audit({
     actorId: session.userId,
@@ -378,7 +378,7 @@ export async function inviteStaff(
   });
 
   revalidatePath("/admin/staff");
-  return { ok: true, link: `${siteUrl}/admin/set-password?token=${token}` };
+  return { ok: true, link: `${siteUrl()}/admin/set-password?token=${token}` };
 }
 
 /** A fresh set-password link for someone who lost theirs. */
@@ -394,7 +394,6 @@ export async function resetStaffPassword(userId: string): Promise<ActionResult &
   if (!user) return { ok: false, error: "We couldn't find that account." };
 
   const token = await createPasswordToken(user.id, "reset", 24);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   await audit({
     actorId: session.userId,
@@ -404,7 +403,7 @@ export async function resetStaffPassword(userId: string): Promise<ActionResult &
     entityId: user.id,
   });
 
-  return { ok: true, link: `${siteUrl}/admin/set-password?token=${token}` };
+  return { ok: true, link: `${siteUrl()}/admin/set-password?token=${token}` };
 }
 
 /* ---- Targets (super admin only) ---------------------------- */

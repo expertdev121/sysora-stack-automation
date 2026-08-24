@@ -134,7 +134,7 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 The `sales` schema lives in the `Sysora Stack Automation` Supabase project
 (`xulhgkrsqpodlokzpbig`). Money is stored in **minor units** as integers —
 `4900` is $49.00. Every migration is in
-[`supabase/migrations`](supabase/migrations); read the README there before
+[`supabase/migrations`](../supabase/migrations); read the README there before
 adding one.
 
 Two things are easy to miss when pointing this at a fresh Supabase project,

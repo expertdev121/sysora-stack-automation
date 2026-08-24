@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["--prefix", "sysora-web", "run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "sysora-sales",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "sysora-sales", "run", "dev"],
+      "port": 3100
     }
   ]
 }

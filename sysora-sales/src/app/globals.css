@@ -1,0 +1,177 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Breakpoints
+   ------------------------------------------------------------
+   Tailwind's built-in `max-*` variant compiles to
+   `not (min-width: N)`, which excludes N itself. These keep the
+   boundary inclusive, and are declared widest-first so the
+   narrower query wins the cascade.
+   ============================================================ */
+
+@custom-variant to-980 (@media (max-width: 980px));
+@custom-variant to-860 (@media (max-width: 860px));
+@custom-variant to-700 (@media (max-width: 700px));
+@custom-variant to-520 (@media (max-width: 520px));
+
+/* ============================================================
+   Theme
+   ------------------------------------------------------------
+   The same tokens as the marketing site, so the two apps read as
+   one company. `static` matters: a plain @theme tree-shakes any
+   variable no utility happens to reference, and the charts read
+   several of these through var() rather than through a class.
+   ============================================================ */
+
+@theme static {
+  --color-mint-50: #f0faf6;
+  --color-mint-100: #e6f9f1;
+  --color-mint-200: #d4edd9;
+  --color-mint-300: #b7dfc0;
+  --color-mint-400: #87c38f;
+  --color-mint-500: #00c896;
+  --color-mint-600: #00a87e;
+  --color-mint-700: #059669;
+  --color-mint-800: #047857;
+  --color-mint-900: #065f46;
+
+  --color-ink-900: #0f172a;
+  --color-ink-800: #1a1a2e;
+  --color-ink-700: #2d3748;
+  --color-ink-600: #334155;
+  --color-ink-500: #475569;
+  --color-ink-400: #5a6478;
+  --color-ink-300: #64748b;
+  --color-ink-200: #718096;
+  --color-ink-100: #94a3b8;
+
+  --color-surface-0: #ffffff;
+  --color-surface-1: #fafcfb;
+  --color-surface-2: #f7f9f7;
+
+  --color-line-mint: #d4edd9;
+  --color-line-mint-2: #edf2ee;
+  --color-line-slate: #e2e8f0;
+
+  --font-sans: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-2xl: 16px;
+  --radius-pill: 999px;
+}
+
+:root {
+  --mint-50: #f0faf6;
+  --mint-100: #e6f9f1;
+  --mint-200: #d4edd9;
+  --mint-300: #b7dfc0;
+  --mint-400: #87c38f;
+  --mint-500: #00c896;
+  --mint-600: #00a87e;
+  --mint-700: #059669;
+  --mint-800: #047857;
+
+  --ink-900: #0f172a;
+  --ink-800: #1a1a2e;
+  --ink-700: #2d3748;
+  --ink-600: #334155;
+  --ink-500: #475569;
+  --ink-400: #5a6478;
+  --ink-300: #64748b;
+  --ink-200: #718096;
+  --ink-100: #94a3b8;
+
+  --surface-0: #ffffff;
+  --surface-1: #fafcfb;
+  --surface-2: #f7f9f7;
+
+  --line-mint: #d4edd9;
+  --line-mint-2: #edf2ee;
+  --line-slate: #e2e8f0;
+
+  --text-heading: var(--ink-800);
+  --text-body: var(--ink-700);
+
+  --accent: var(--mint-500);
+  --accent-hover: var(--mint-600);
+  --accent-strong: var(--mint-700);
+
+  --border-default: var(--line-mint);
+  --border-faint: var(--line-mint-2);
+
+  --warning: #b45309;
+  --warning-bg: #fff7ed;
+  --warning-border: #fed7aa;
+  --danger: #ef4444;
+  --danger-600: #dc2626;
+  --danger-bg: #fef2f2;
+  --danger-border: #fecaca;
+
+  --focus-shadow: 0 0 0 3px rgba(0, 200, 150, 0.25);
+
+  /* ---- Chart palette -------------------------------------
+     Two series, validated rather than chosen by eye
+     (scripts/validate_palette.js, light mode, #ffffff surface):
+     worst-pair CVD ΔE 24.7 protan / 32.7 tritan, both ≥ 3:1
+     against the surface.
+
+     The obvious pick for money — green in, red out — measures
+     ΔE 7.9 under deuteranopia. It is the classic red/green trap
+     and it failed, so it isn't here.
+
+     Mint is the brand, not a series. It carries chrome: active
+     nav, progress fills, the accent on a figure. Keeping it out
+     of the series slots is what stops a bar meaning "Sysora" in
+     one chart and "revenue" in the next.
+     ---------------------------------------------------------- */
+  --series-revenue: #2a78d6;
+  --series-spend: #eb6834;
+  --series-3: #1baf7a;
+
+  --chart-grid: #e1e0d9;
+  --chart-axis: #c3c2b7;
+  --chart-muted: #898781;
+}
+
+/* ============================================================
+   Base layer
+   ------------------------------------------------------------
+   Wrapped in @layer base so utilities still win: unlayered CSS
+   beats layered utilities in the cascade, which silently breaks
+   any class meant to override an element rule.
+   ============================================================ */
+
+@layer base {
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-body);
+    background: var(--surface-1);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-wrap: pretty;
+  }
+
+  h1,
+  h2,
+  h3,
+  p {
+    margin: 0;
+  }
+
+  /* Tailwind preflight sets svg { display: block }, which changes
+     the height of any inline icon sitting beside text. */
+  svg {
+    display: inline;
+    vertical-align: baseline;
+  }
+
+  *:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-shadow);
+  }
+}

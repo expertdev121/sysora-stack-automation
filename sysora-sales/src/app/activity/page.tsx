@@ -7,7 +7,7 @@ import { formatDay } from "@/components/TargetProgress";
 import { Card, CardHeader, EmptyState, PageHeading, Pill, Table, Td, Th } from "@/components/ui";
 import { requireFinance } from "@/lib/admin/auth";
 import {
-  ROLE_LABELS,
+  profileRoleLabel,
   type ActivityByUserRow,
   type ActivityProgressRow,
   type EodReportRow,
@@ -90,11 +90,13 @@ export default async function ActivityPage() {
   const silent = elapsed.filter((day) => !reportedDays.has(day));
   const covered = elapsed.length - silent.length;
 
-  const people = new Map<string, { name: string; role: string; counts: Record<string, number> }>();
+  type Contribution = { name: string; role: string; counts: Record<string, number> };
+  const people = new Map<string, Contribution>();
   for (const row of contributions) {
-    const entry = people.get(row.user_id) ?? {
+    const entry: Contribution = people.get(row.user_id) ?? {
       name: row.full_name ?? row.email,
-      role: ROLE_LABELS[row.role] ?? row.role,
+      // A job title from the employee record, not a dashboard permission.
+      role: profileRoleLabel(row.role),
       counts: {},
     };
     entry.counts[row.activity_type_id] = row.achieved;

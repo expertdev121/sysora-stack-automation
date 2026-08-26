@@ -174,6 +174,7 @@ export function Shell({
               <>
                 {sectionLabel("Admin")}
                 <div className="flex flex-col gap-[2px]">
+                  {navLink({ href: "/metrics", label: "Metrics", icon: "activity" })}
                   {navLink({ href: "/team", label: "Team", icon: "team" })}
                 </div>
               </>

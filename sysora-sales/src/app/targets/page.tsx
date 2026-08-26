@@ -7,12 +7,12 @@ import { Card, CardHeader, EmptyState, PageHeading, Table, Td, Th } from "@/comp
 import { canDeleteTarget, requireFinance } from "@/lib/admin/auth";
 import type {
   ActivityProgressRow,
-  ActivityType,
+  WorkMetric,
   TargetEconomics,
   TargetRow,
 } from "@/lib/admin/types";
 import { formatMoney } from "@/lib/money";
-import { salesDb } from "@/lib/supabase/admin";
+import { publicDb, salesDb } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = { title: "Targets" };
 
@@ -23,9 +23,9 @@ export default async function TargetsPage() {
   const [{ data: targets }, { data: types }, { data: attached }, { data: economics }] =
     await Promise.all([
       db.from("target_progress").select("*").order("starts_on", { ascending: false }),
-      db
-        .from("activity_types")
-        .select("id, slug, label, question, sort_order, is_active")
+      publicDb()
+        .from("work_metrics")
+        .select("id, slug, label, question, unit, sort_order, is_active, feeds_sales")
         .eq("is_active", true)
         .order("sort_order", { ascending: true }),
       db.from("activity_progress").select("*").order("sort_order", { ascending: true }),
@@ -53,7 +53,7 @@ export default async function TargetsPage() {
 
       <TargetEditor
         targets={rows}
-        activityTypes={(types ?? []) as ActivityType[]}
+        activityTypes={(types ?? []) as WorkMetric[]}
         activityTargets={activityTargets}
         canDelete={canDeleteTarget(session.role)}
       />

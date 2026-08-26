@@ -6,11 +6,11 @@ import { Shell } from "@/components/Shell";
 import { ExpenseTable } from "@/components/ExpenseTable";
 import { Card, CardHeader, EmptyState, PageHeading, Stat, Table, Td, Th } from "@/components/ui";
 import { requireFinance } from "@/lib/admin/auth";
-import type { ActivityEconomics, ActivityType, SpendCategory } from "@/lib/admin/types";
+import type { ActivityEconomics, WorkMetric, SpendCategory } from "@/lib/admin/types";
 import { formatMoney } from "@/lib/money";
 import { rangeFromParam } from "@/lib/range-options";
 import { change, inPrevious, inWindow, loadRange, missing, sumInr } from "@/lib/range";
-import { salesDb } from "@/lib/supabase/admin";
+import { publicDb, salesDb } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = { title: "Expenses" };
 
@@ -49,9 +49,9 @@ export default async function ExpensesPage({
       .select("id, slug, label, is_acquisition, sort_order, is_active")
       .eq("is_active", true)
       .order("sort_order"),
-    db
-      .from("activity_types")
-      .select("id, slug, label, question, sort_order, is_active")
+    publicDb()
+      .from("work_metrics")
+      .select("id, slug, label, question, unit, sort_order, is_active, feeds_sales")
       .eq("is_active", true)
       .order("sort_order"),
     db.from("activity_economics").select("*"),
@@ -151,7 +151,7 @@ export default async function ExpensesPage({
       <ExpenseTable
         entries={spend}
         categories={(categories ?? []) as SpendCategory[]}
-        activities={(activities ?? []) as ActivityType[]}
+        activities={(activities ?? []) as WorkMetric[]}
       />
     </Shell>
   );

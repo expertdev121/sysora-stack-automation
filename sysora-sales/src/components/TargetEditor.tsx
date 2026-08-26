@@ -10,7 +10,7 @@ import { saveActivityTargets } from "@/lib/admin/activity-actions";
 import { deleteRevenueTarget, saveRevenueTarget } from "@/lib/admin/revenue-actions";
 import type {
   ActivityProgressRow,
-  ActivityType,
+  WorkMetric,
   TargetLevel,
   TargetRow,
 } from "@/lib/admin/types";
@@ -31,7 +31,7 @@ export function TargetEditor({
 }: {
   targets: TargetRow[];
   /** Every live lead measure, so a target can put a number on any of them. */
-  activityTypes: ActivityType[];
+  activityTypes: WorkMetric[];
   /** What each target already asks for, keyed by target id. */
   activityTargets: Record<string, ActivityProgressRow[]>;
   canDelete: boolean;
@@ -105,7 +105,7 @@ function Group({
 }: {
   title: string;
   targets: TargetRow[];
-  activityTypes: ActivityType[];
+  activityTypes: WorkMetric[];
   activityTargets: Record<string, ActivityProgressRow[]>;
   canDelete: boolean;
 }) {
@@ -136,7 +136,7 @@ function TargetCard({
   canDelete,
 }: {
   target: TargetRow;
-  activityTypes: ActivityType[];
+  activityTypes: WorkMetric[];
   activities: ActivityProgressRow[];
   canDelete: boolean;
 }) {
@@ -217,7 +217,7 @@ function TargetForm({
   onDone,
 }: {
   target?: TargetRow;
-  activityTypes: ActivityType[];
+  activityTypes: WorkMetric[];
   activities?: ActivityProgressRow[];
   onDone: () => void;
 }) {

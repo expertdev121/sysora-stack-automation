@@ -213,17 +213,13 @@ export type DailyMoney = {
 
 /* ---- Lead measures ------------------------------------------ */
 
-export type ActivityType = {
-  id: string;
-  slug: string;
-  label: string;
-  question: string;
-  sort_order: number;
-  is_active: boolean;
-};
+/** @deprecated Use WorkMetric — the catalogue moved to public.work_metrics. */
+export type ActivityType = WorkMetric;
 
 /** A row of sales.activity_progress. */
 export type ActivityProgressRow = {
+  /** What the number is measured in: count, connects. */
+  unit: string;
   activity_target_id: string;
   revenue_target_id: string;
   target_name: string | null;
@@ -252,13 +248,16 @@ export type ActivityProgressRow = {
 
 export type ActivityByUserRow = {
   revenue_target_id: string;
+  target_name: string | null;
+  target_level: TargetLevel;
+  unit: string;
   activity_type_id: string;
   slug: string;
   label: string;
   user_id: string;
   full_name: string | null;
   email: string;
-  role: StaffRole;
+  role: string;
   achieved: number;
   days_reported: number;
   last_reported_on: string;
@@ -274,14 +273,74 @@ export type UnattributedActivity = {
 
 export type EodReportRow = {
   id: string;
+  /** The profile that filed it — a person, not a login. */
   user_id: string;
   full_name: string | null;
   email: string;
-  role: StaffRole;
+  role: string;
   reported_on: string;
   notes: string | null;
+  blockers: string | null;
+  mood: number | null;
+  source: string | null;
   submitted_at: string;
   updated_at: string;
   total_count: number;
   entry_count: number;
+};
+
+/* ---- The org: people and the work they report ---------------
+ *
+ * These live in the `public` schema, the EMS's home, and are read
+ * across rather than copied. One person, one end-of-day report, one
+ * catalogue of what is worth counting.
+ */
+
+export type ProfileRole = "owner" | "manager" | "employee" | "bde";
+
+/**
+ * A job title, not a dashboard permission.
+ *
+ * Capitalising the first letter turns "bde" into "Bde", which reads as a
+ * name rather than an acronym — so the labels are written out.
+ */
+export const PROFILE_ROLE_LABELS: Record<ProfileRole, string> = {
+  owner: "Owner",
+  manager: "Manager",
+  employee: "Employee",
+  bde: "BDE",
+};
+
+export function profileRoleLabel(role: string): string {
+  return PROFILE_ROLE_LABELS[role as ProfileRole] ?? role;
+}
+
+export type Profile = {
+  id: string;
+  org_id: string;
+  full_name: string | null;
+  email: string;
+  role: ProfileRole;
+  manager_id: string | null;
+  is_active: boolean;
+};
+
+/** A row of public.work_metrics — a thing worth counting at day's end. */
+export type WorkMetric = {
+  id: string;
+  slug: string;
+  label: string;
+  question: string;
+  /** "count", "connects" — what the number is measured in. */
+  unit: string;
+  sort_order: number;
+  is_active: boolean;
+  /** Whether hitting this number moves a sales target. */
+  feeds_sales: boolean;
+};
+
+/** One report, one metric, one number. */
+export type EodMetric = {
+  metric_id: string;
+  quantity: number;
 };

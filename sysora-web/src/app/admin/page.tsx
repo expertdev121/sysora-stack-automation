@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { AdminShell } from "@/components/admin/AdminShell";
-import { Scoreboard } from "@/components/admin/Scoreboard";
 import {
   Card,
   CardHeader,
@@ -16,12 +15,7 @@ import {
 import { redirect } from "next/navigation";
 
 import { canSeeFinances, canSeePipeline, homePathFor, requireStaff } from "@/lib/admin/auth";
-import {
-  KIND_LABELS,
-  type ActivityProgressRow,
-  type RequestRow,
-  type TargetRow,
-} from "@/lib/admin/types";
+import { KIND_LABELS, type RequestRow } from "@/lib/admin/types";
 import { formatMoney } from "@/lib/money";
 import { salesDb } from "@/lib/supabase/admin";
 
@@ -60,29 +54,6 @@ export default async function AdminOverviewPage() {
     ),
   ).length;
 
-  // Only fetched when it will actually be shown.
-  const { data: currentTarget } = seesFinances
-    ? await db
-        .from("target_progress")
-        .select("*")
-        .eq("status", "active")
-        .order("starts_on", { ascending: false })
-        .limit(1)
-        .maybeSingle()
-    : { data: null };
-
-  // The lead measures on whatever is running, so the overview answers
-  // "are we winning" and not only "what did we bank".
-  const { data: activities } = currentTarget
-    ? await db
-        .from("activity_progress")
-        .select("*")
-        .eq("revenue_target_id", (currentTarget as TargetRow).id)
-        .order("sort_order", { ascending: true })
-    : { data: [] };
-
-  const leadMeasures = (activities ?? []) as ActivityProgressRow[];
-
   return (
     <AdminShell session={session}>
       <PageHeading
@@ -115,18 +86,14 @@ export default async function AdminOverviewPage() {
         )}
       </div>
 
-      {seesFinances && currentTarget && (
-        <div className="mb-10">
-          <Scoreboard
-            target={currentTarget as TargetRow}
-            activities={leadMeasures}
-            footer={
-              <Link href="/admin/scoreboard" className="text-[13px] font-semibold">
-                Open the scoreboard →
-              </Link>
-            }
-          />
-        </div>
+      {seesFinances && (
+        <p className="mb-10 px-4 py-3 rounded-[10px] bg-[var(--mint-50)] border-[1.5px] border-[var(--border-default)] text-[13.5px] leading-[1.6] text-[var(--ink-600)]">
+          Revenue, targets, spend and the daily activity now live in the{" "}
+          <a href="http://localhost:3100" className="font-semibold text-[var(--accent-strong)]">
+            sales app
+          </a>{" "}
+          — one place each, so two screens can never disagree about a number.
+        </p>
       )}
 
       <Card>

@@ -7,7 +7,7 @@ import { useState, type ReactNode } from "react";
 import { SignOutButton } from "@/components/admin/SignOutButton";
 import { SysoraMark } from "@/components/ui/Logo";
 import { cn } from "@/lib/cn";
-import { canManageTeam, canSeeAllActivity, canSeeFinances, canSeePipeline } from "@/lib/admin/roles";
+import { canManageTeam } from "@/lib/admin/roles";
 import type { StaffSession } from "@/lib/admin/auth";
 
 /* ---- Icons: 20px, same line weight as the rest of the system ---- */
@@ -130,8 +130,6 @@ const configure: NavItem[] = [
   { href: "/admin/settings", label: "Settings", icon: "settings" },
 ];
 
-const eod: NavItem = { href: "/admin/today", label: "Today", icon: "today" };
-
 export function AdminSidebar({ session }: { session: StaffSession }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -206,37 +204,15 @@ export function AdminSidebar({ session }: { session: StaffSession }) {
 
       <div className={cn("flex-1 flex flex-col min-h-0", !open && "to-860:hidden")}>
         <nav className="flex-1 overflow-y-auto px-3 pb-4">
-          {canSeePipeline(session.role) ? (
-            <>
-              <div className="flex flex-col gap-[2px]">
-                {primary.map(navLink)}
-                {navLink(eod)}
-              </div>
+          <div className="flex flex-col gap-[2px]">{primary.map(navLink)}</div>
 
-              {sectionLabel("Configure")}
-              <div className="flex flex-col gap-[2px]">{configure.map(navLink)}</div>
-            </>
-          ) : (
-            <div className="flex flex-col gap-[2px]">{navLink(eod)}</div>
-          )}
-
-          {canSeeFinances(session.role) && (
-            <>
-              {sectionLabel("Performance")}
-              <div className="flex flex-col gap-[2px]">
-                {navLink({ href: "/admin/scoreboard", label: "Scoreboard", icon: "scoreboard" })}
-                {navLink({ href: "/admin/targets", label: "Targets", icon: "targets" })}
-                {canSeeAllActivity(session.role) &&
-                  navLink({ href: "/admin/reports", label: "Daily reports", icon: "questions" })}
-              </div>
-            </>
-          )}
+          {sectionLabel("Configure")}
+          <div className="flex flex-col gap-[2px]">{configure.map(navLink)}</div>
 
           {canManageTeam(session.role) && (
             <>
               {sectionLabel("Admin")}
               <div className="flex flex-col gap-[2px]">
-                {navLink({ href: "/admin/activities", label: "Activities", icon: "activities" })}
                 {navLink({ href: "/admin/staff", label: "Team", icon: "team" })}
               </div>
             </>

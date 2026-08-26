@@ -3,41 +3,44 @@
 import { revalidatePath } from "next/cache";
 
 import { requireFinance, requireOwner } from "./auth";
-import { salesDb } from "@/lib/supabase/admin";
+import { publicDb, salesDb } from "@/lib/supabase/admin";
 import { audit, friendly } from "./audit";
 import type { ActionResult } from "./types";
 
 /**
- * Lead measures: the activities themselves, who is assigned to them,
- * and the number attached to a revenue target.
+ * Lead measures: what is worth counting, who reports it, and the number
+ * attached to a target.
  *
- * Same conventions as revenue-actions.ts: guard first, re-validate on
- * the server whatever the form already checked, write an audit row,
- * revalidate the pages that show it.
+ * The catalogue and the assignments live in `public` alongside the
+ * people and their end-of-day reports — that is where work happens. The
+ * *target* is a sales idea, so it stays in `sales` and reaches across by
+ * foreign key. Nothing is duplicated between the two.
  */
 
 const SLUG = /^[a-z][a-z0-9_]*$/;
 
-/* ---- Activity types ---------------------------------------- */
+/* ---- The catalogue ------------------------------------------ */
 
-export type ActivityTypeInput = {
+export type WorkMetricInput = {
   id?: string;
   slug: string;
   label: string;
   question: string;
+  unit: string;
   sortOrder: number;
+  feedsSales: boolean;
 };
 
-/** Owner only: which activities exist is structural, like pricing. */
-export async function saveActivityType(input: ActivityTypeInput): Promise<ActionResult> {
+/** Owner only: what the business counts is structural, like pricing. */
+export async function saveWorkMetric(input: WorkMetricInput): Promise<ActionResult> {
   const session = await requireOwner();
 
   const slug = input.slug.trim().toLowerCase();
   const label = input.label.trim();
   const question = input.question.trim();
 
-  if (!label) return { ok: false, error: "Give the activity a name." };
-  if (!question) return { ok: false, error: "Write the question the daily form should ask." };
+  if (!label) return { ok: false, error: "Give the metric a name." };
+  if (!question) return { ok: false, error: "Write the question the daily report should ask." };
   if (!SLUG.test(slug)) {
     return {
       ok: false,
@@ -45,74 +48,54 @@ export async function saveActivityType(input: ActivityTypeInput): Promise<Action
     };
   }
 
-  const db = salesDb();
+  const db = publicDb();
   const row = {
     slug,
     label,
     question,
+    unit: input.unit.trim() || "count",
     sort_order: Number.isFinite(input.sortOrder) ? Math.trunc(input.sortOrder) : 0,
+    feeds_sales: input.feedsSales,
   };
 
   if (input.id) {
-    const { data: before } = await db
-      .from("activity_types")
-      .select("slug, label, question, sort_order")
-      .eq("id", input.id)
-      .maybeSingle();
-
-    if (!before) return { ok: false, error: "We couldn't find that activity." };
-
-    const { error } = await db.from("activity_types").update(row).eq("id", input.id);
+    const { error } = await db.from("work_metrics").update(row).eq("id", input.id);
     if (error) return { ok: false, error: friendly(error) };
-
-    await audit({
-      actorId: session.userId,
-      actorEmail: session.email,
-      action: "activity_type.updated",
-      entity: "activity_type",
-      entityId: input.id,
-      before,
-      after: row,
-    });
   } else {
-    const { data, error } = await db.from("activity_types").insert(row).select("id").single();
+    const { error } = await db.from("work_metrics").insert(row);
     if (error) return { ok: false, error: friendly(error) };
-
-    await audit({
-      actorId: session.userId,
-      actorEmail: session.email,
-      action: "activity_type.created",
-      entity: "activity_type",
-      entityId: data.id,
-      after: row,
-    });
   }
+
+  await audit({
+    actorId: session.userId,
+    actorEmail: session.email,
+    action: input.id ? "work_metric.updated" : "work_metric.created",
+    entity: "work_metric",
+    entityId: input.id ?? slug,
+    after: row,
+  });
 
   revalidateActivity();
   return { ok: true };
 }
 
 /**
- * Retire an activity without erasing what it measured.
+ * Retire a metric without erasing what it measured.
  *
- * There is no delete. Reports and targets point at these rows, and a
- * scoreboard whose history vanished would be worse than one showing a
- * measure nobody uses any more.
+ * No delete: reports and targets point at these rows, and the foreign
+ * key from eod_metrics is `restrict` for exactly that reason.
  */
-export async function setActivityTypeActive(
-  id: string,
-  isActive: boolean,
-): Promise<ActionResult> {
+export async function setWorkMetricActive(id: string, isActive: boolean): Promise<ActionResult> {
   const session = await requireOwner();
 
-  const { error } = await salesDb().from("activity_types").update({ is_active: isActive }).eq("id", id);
+  const { error } = await publicDb().from("work_metrics").update({ is_active: isActive }).eq("id", id);
   if (error) return { ok: false, error: friendly(error) };
 
   await audit({
     actorId: session.userId,
     actorEmail: session.email,
-    action: isActive ? "activity_type.activated" : "activity_type.retired",
-    entity: "activity_type",
+    action: isActive ? "work_metric.activated" : "work_metric.retired",
+    entity: "work_metric",
     entityId: id,
     after: { is_active: isActive },
   });
@@ -121,56 +104,57 @@ export async function setActivityTypeActive(
   return { ok: true };
 }
 
-/* ---- Assignment -------------------------------------------- */
+/* ---- Who reports what --------------------------------------- */
 
 /**
- * Which activities a person is responsible for.
+ * Which numbers a person is asked for, keyed by profile.
  *
- * This decides what their end-of-day form asks and which lead measures
- * they can see, so it belongs with the rest of "who is on the team" —
- * owner territory.
+ * A person does the work whether or not they can sign into this app, so
+ * the assignment hangs off their employee record rather than off a
+ * dashboard login.
  */
-export async function setUserActivities(
-  userId: string,
-  activityTypeIds: string[],
+export async function setProfileMetrics(
+  profileId: string,
+  metricIds: string[],
 ): Promise<ActionResult> {
   const session = await requireOwner();
-  const db = salesDb();
+  const db = publicDb();
 
-  const { data: user } = await db.from("users").select("id, email").eq("id", userId).maybeSingle();
-  if (!user) return { ok: false, error: "We couldn't find that person." };
+  const { data: profile } = await db
+    .from("profiles")
+    .select("id, full_name")
+    .eq("id", profileId)
+    .maybeSingle();
+
+  if (!profile) return { ok: false, error: "We couldn't find that person." };
 
   const { data: before } = await db
-    .from("user_activities")
-    .select("activity_type_id")
-    .eq("user_id", userId);
+    .from("profile_metrics")
+    .select("metric_id")
+    .eq("profile_id", profileId);
 
-  const wanted = [...new Set(activityTypeIds)];
+  const wanted = [...new Set(metricIds)];
 
-  // Replace wholesale: the form always sends the complete list, so a
-  // diff would only be a slower way to reach the same state.
-  const { error: cleared } = await db.from("user_activities").delete().eq("user_id", userId);
+  // The form always sends the complete list, so a diff would only be a
+  // slower way to reach the same state.
+  const { error: cleared } = await db.from("profile_metrics").delete().eq("profile_id", profileId);
   if (cleared) return { ok: false, error: friendly(cleared) };
 
   if (wanted.length > 0) {
-    const { error } = await db.from("user_activities").insert(
-      wanted.map((activity_type_id) => ({
-        user_id: userId,
-        activity_type_id,
-        assigned_by: session.userId,
-      })),
-    );
+    const { error } = await db
+      .from("profile_metrics")
+      .insert(wanted.map((metric_id) => ({ profile_id: profileId, metric_id })));
     if (error) return { ok: false, error: friendly(error) };
   }
 
   await audit({
     actorId: session.userId,
     actorEmail: session.email,
-    action: "staff.activities_assigned",
-    entity: "user",
-    entityId: userId,
-    before: { activity_type_ids: (before ?? []).map((r) => r.activity_type_id) },
-    after: { activity_type_ids: wanted },
+    action: "profile.metrics_assigned",
+    entity: "profile",
+    entityId: profileId,
+    before: { metric_ids: (before ?? []).map((r) => r.metric_id) },
+    after: { metric_ids: wanted },
   });
 
   revalidatePath("/team");
@@ -178,7 +162,46 @@ export async function setUserActivities(
   return { ok: true };
 }
 
-/* ---- Activity targets -------------------------------------- */
+/**
+ * Join a dashboard login to the person it belongs to.
+ *
+ * Not one login matched a profile by email, so this is a decision
+ * somebody makes rather than something the system can infer. Unique on
+ * the column, so one person cannot end up with two logins quietly
+ * diverging.
+ */
+export async function linkLoginToProfile(
+  userId: string,
+  profileId: string | null,
+): Promise<ActionResult> {
+  const session = await requireOwner();
+
+  const { error } = await salesDb()
+    .from("users")
+    .update({ profile_id: profileId })
+    .eq("id", userId);
+
+  if (error) {
+    if (error.code === "23505") {
+      return { ok: false, error: "That person already has a login. One person, one login." };
+    }
+    return { ok: false, error: friendly(error) };
+  }
+
+  await audit({
+    actorId: session.userId,
+    actorEmail: session.email,
+    action: profileId ? "login.linked_to_profile" : "login.unlinked",
+    entity: "user",
+    entityId: userId,
+    after: { profile_id: profileId },
+  });
+
+  revalidatePath("/team");
+  return { ok: true };
+}
+
+/* ---- Activity targets --------------------------------------- */
 
 export type ActivityTargetInput = {
   activityTypeId: string;
@@ -186,13 +209,6 @@ export type ActivityTargetInput = {
   targetCount: number | null;
 };
 
-/**
- * Sets every lead measure on one revenue target in a single call.
- *
- * The editor sends the whole set each time, so this reconciles rather
- * than appending: anything at zero is removed, everything else is
- * inserted or updated.
- */
 export async function saveActivityTargets(
   revenueTargetId: string,
   rows: ActivityTargetInput[],
@@ -228,10 +244,7 @@ export async function saveActivityTargets(
       .from("activity_targets")
       .delete()
       .eq("revenue_target_id", revenueTargetId)
-      .in(
-        "activity_type_id",
-        drop.map((r) => r.activityTypeId),
-      );
+      .in("activity_type_id", drop.map((r) => r.activityTypeId));
     if (error) return { ok: false, error: friendly(error) };
   }
 
@@ -271,6 +284,6 @@ function revalidateActivity() {
   revalidatePath("/");
   revalidatePath("/targets");
   revalidatePath("/activity");
-  revalidatePath("/activity");
-  revalidatePath("/activity");
+  revalidatePath("/metrics");
+  revalidatePath("/expenses");
 }

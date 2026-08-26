@@ -4,9 +4,35 @@ Two applications and one database.
 
 | Folder | What it is | Port |
 |---|---|---|
-| [`sysora-web`](sysora-web) | The public site — landing page, checkout, and the operations dashboard at `/admin` | 3000 |
-| [`sysora-sales`](sysora-sales) | The sales app — revenue, targets, spend, and what winning the work costs | 3100 |
-| [`supabase`](supabase/migrations) | The `sales` schema both of them read and write | — |
+| [`sysora-web`](sysora-web) | The public site — landing page, checkout, and the pipeline dashboard at `/admin` | 3000 |
+| [`sysora-sales`](sysora-sales) | Money — revenue, targets, spend, and the activity that produces them | 3100 |
+| [`supabase`](supabase/migrations) | The schemas all of it reads and writes | — |
+
+## One thing in one place
+
+| | owns |
+|---|---|
+| The EMS (separate app) | People, attendance, leave, and **submitting the end-of-day report** |
+| `sysora-web` | The website, the checkout, and the request pipeline |
+| `sysora-sales` | Revenue, targets, spend, and **reading** the daily activity |
+
+Each of those used to have a copy of something another one owned —
+three end-of-day forms, two target editors, two catalogues of what to
+count. They now have one each, which is why no two screens can disagree
+about a number.
+
+### How a bid becomes target progress
+
+```
+profiles → eod_reports → eod_metrics → work_metrics ← sales.activity_targets
+```
+
+A BDE files one report saying two bids and fourteen Connects. Those rows
+are the only place that fact exists; `sales.activity_progress` reads
+them. Nothing is copied into the sales schema, so nothing can drift.
+
+Only profiles whose job is `bde` count toward sales targets — one
+predicate in one view, easy to widen later.
 
 The schema sits at the top level rather than inside either app, because
 neither owns it. Revenue targets aggregate over payments, and payments

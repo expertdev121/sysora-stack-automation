@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 
 import { BarList, type BarDatum } from "@/components/charts/BarList";
 import { ManualRevenueTable, type WindowLookup } from "@/components/ManualRevenueTable";
+import { PendingSettlements } from "@/components/PendingSettlements";
 import { RangeFilter } from "@/components/RangeFilter";
 import { Shell } from "@/components/Shell";
 import { formatDay } from "@/components/TargetProgress";
 import { Card, CardHeader, EmptyState, PageHeading, Pill, Stat, Table, Td, Th } from "@/components/ui";
 import { requireFinance } from "@/lib/admin/auth";
-import type { ManualRevenueRow, TargetRow } from "@/lib/admin/types";
+import type { ManualRevenueRow, RevenueLedgerRow, TargetRow } from "@/lib/admin/types";
 import { formatMoney } from "@/lib/money";
 import { rangeFromParam } from "@/lib/range-options";
 import { change, inPrevious, inWindow, loadRange, missing, sumInr, sumUsd } from "@/lib/range";
@@ -57,9 +58,18 @@ export default async function RevenuePage({
     }
   }
 
-  const [{ data: entries }, { data: targets }] = await Promise.all([
+  const [{ data: entries }, { data: targets }, { data: unsettled }] = await Promise.all([
     db.from("manual_revenue").select("*").order("earned_on", { ascending: false }).limit(500),
     db.from("target_progress").select("*").order("starts_on", { ascending: false }),
+    // Deliberately not filtered by the range above: a charge from six
+    // weeks ago still needs its rupees, and hiding it behind a date
+    // filter would make the gap look smaller than it is.
+    db
+      .from("revenue_ledger")
+      .select("*")
+      .eq("stream", "checkout")
+      .is("amount_inr", null)
+      .order("earned_on", { ascending: true }),
   ]);
 
   const windows: WindowLookup = ((targets ?? []) as TargetRow[]).map((target) => ({
@@ -122,6 +132,8 @@ export default async function RevenuePage({
           settles days after the charge, so its rupees only exist once the payout lands.
         </p>
       )}
+
+      <PendingSettlements payments={(unsettled ?? []) as RevenueLedgerRow[]} />
 
       <Card className="mb-10">
         <CardHeader title="Every payment" hint={`${revenue.length} in this window`} />

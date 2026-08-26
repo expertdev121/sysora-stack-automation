@@ -5,51 +5,64 @@ import { revalidatePath } from "next/cache";
 import { requireFinance, requireOwner } from "./auth";
 import { salesDb } from "@/lib/supabase/admin";
 import { audit, friendly } from "./audit";
+import { toMinorUnits } from "@/lib/money";
 import type { ActionResult } from "./types";
 
 /**
- * What winning the work costs.
+ * Every cost: the Connects that win work and the salaries that run it.
  *
- * Same conventions as the revenue side: guard first, re-validate on the
- * server whatever the form already checked, write an audit row, then
- * revalidate. Amounts are minor units and attribution is by date, so a
- * spend row lands in a target window by exactly the rule revenue does.
+ * Same conventions as the revenue side — guard, re-validate, audit,
+ * revalidate — and the same two-currency rule. Salaries are paid in
+ * rupees and have no dollar figure; Connects are billed in dollars and
+ * carry the rupees your card was actually charged. Nothing is
+ * converted between them.
  */
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const SLUG = /^[a-z][a-z0-9_]*$/;
 
-function toMinorUnits(major: number): number {
-  return Math.round(major * 100);
-}
-
 /* ---- Entries ------------------------------------------------ */
 
-export type SpendInput = {
+export type ExpenseInput = {
   id?: string;
   categoryId: string;
   description: string;
-  /** Major units, as typed. */
-  amount: number;
+  /** Who was paid. Salaries are one line per person per month. */
+  paidTo: string;
+  /** Major units. Either may be blank, but not both. */
+  amountUsd: number | null;
+  amountInr: number | null;
   spentOn: string;
   /** Optional: the lead measure this money bought. */
   activityTypeId: string | null;
 };
 
-export async function saveSpend(input: SpendInput): Promise<ActionResult> {
+export async function saveExpense(input: ExpenseInput): Promise<ActionResult> {
   const session = await requireFinance();
 
   if (!input.categoryId) return { ok: false, error: "Pick what the money went on." };
   if (!DATE.test(input.spentOn)) return { ok: false, error: "Pick the date it was spent." };
-  if (!Number.isFinite(input.amount) || input.amount <= 0) {
-    return { ok: false, error: "The amount must be more than zero." };
+
+  const usd = input.amountUsd ?? null;
+  const inr = input.amountInr ?? null;
+
+  if (usd === null && inr === null) {
+    return { ok: false, error: "Put in the rupees, the dollars, or both." };
+  }
+  if (usd !== null && (!Number.isFinite(usd) || usd <= 0)) {
+    return { ok: false, error: "The dollar amount must be more than zero." };
+  }
+  if (inr !== null && (!Number.isFinite(inr) || inr <= 0)) {
+    return { ok: false, error: "The rupee amount must be more than zero." };
   }
 
   const db = salesDb();
   const row = {
     category_id: input.categoryId,
     description: input.description.trim() || null,
-    amount: toMinorUnits(input.amount),
+    paid_to: input.paidTo.trim() || null,
+    amount_usd: usd === null ? null : toMinorUnits(usd),
+    amount_inr: inr === null ? null : toMinorUnits(inr),
     spent_on: input.spentOn,
     activity_type_id: input.activityTypeId || null,
     created_by: session.userId,
@@ -57,34 +70,34 @@ export async function saveSpend(input: SpendInput): Promise<ActionResult> {
 
   if (input.id) {
     const { data: before } = await db
-      .from("acquisition_spend")
-      .select("category_id, description, amount, spent_on, activity_type_id")
+      .from("expenses")
+      .select("category_id, description, paid_to, amount_usd, amount_inr, spent_on, activity_type_id")
       .eq("id", input.id)
       .maybeSingle();
 
     if (!before) return { ok: false, error: "We couldn't find that entry." };
 
-    const { error } = await db.from("acquisition_spend").update(row).eq("id", input.id);
+    const { error } = await db.from("expenses").update(row).eq("id", input.id);
     if (error) return { ok: false, error: friendly(error) };
 
     await audit({
       actorId: session.userId,
       actorEmail: session.email,
-      action: "spend.updated",
-      entity: "acquisition_spend",
+      action: "expense.updated",
+      entity: "expense",
       entityId: input.id,
       before,
       after: row,
     });
   } else {
-    const { data, error } = await db.from("acquisition_spend").insert(row).select("id").single();
+    const { data, error } = await db.from("expenses").insert(row).select("id").single();
     if (error) return { ok: false, error: friendly(error) };
 
     await audit({
       actorId: session.userId,
       actorEmail: session.email,
-      action: "spend.recorded",
-      entity: "acquisition_spend",
+      action: "expense.recorded",
+      entity: "expense",
       entityId: data.id,
       after: row,
     });
@@ -94,26 +107,26 @@ export async function saveSpend(input: SpendInput): Promise<ActionResult> {
   return { ok: true };
 }
 
-export async function deleteSpend(id: string): Promise<ActionResult> {
+export async function deleteExpense(id: string): Promise<ActionResult> {
   const session = await requireFinance();
   const db = salesDb();
 
   const { data: before } = await db
-    .from("acquisition_spend")
+    .from("expenses")
     .select("*")
     .eq("id", id)
     .maybeSingle();
 
   if (!before) return { ok: false, error: "We couldn't find that entry." };
 
-  const { error } = await db.from("acquisition_spend").delete().eq("id", id);
+  const { error } = await db.from("expenses").delete().eq("id", id);
   if (error) return { ok: false, error: friendly(error) };
 
   await audit({
     actorId: session.userId,
     actorEmail: session.email,
-    action: "spend.deleted",
-    entity: "acquisition_spend",
+    action: "expense.deleted",
+    entity: "expense",
     entityId: id,
     before,
   });
@@ -210,6 +223,6 @@ export async function setSpendCategoryActive(
 
 function revalidateSpend() {
   revalidatePath("/");
-  revalidatePath("/spend");
+  revalidatePath("/expenses");
   revalidatePath("/targets");
 }

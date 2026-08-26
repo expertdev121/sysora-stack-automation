@@ -8,7 +8,13 @@ import { TargetProgress, formatDay } from "@/components/TargetProgress";
 import { Button } from "@/components/ui";
 import { saveActivityTargets } from "@/lib/admin/activity-actions";
 import { deleteRevenueTarget, saveRevenueTarget } from "@/lib/admin/revenue-actions";
-import type { ActivityProgressRow, ActivityType, TargetRow } from "@/lib/admin/types";
+import type {
+  ActivityProgressRow,
+  ActivityType,
+  TargetLevel,
+  TargetRow,
+} from "@/lib/admin/types";
+import type { Currency } from "@/lib/money";
 
 /**
  * Targets as date ranges of any length.
@@ -32,9 +38,11 @@ export function TargetEditor({
 }) {
   const [creating, setCreating] = useState(false);
 
-  const active = targets.filter((t) => t.status === "active");
-  const upcoming = targets.filter((t) => t.status === "upcoming");
-  const closed = targets.filter((t) => t.status === "closed");
+  const annual = targets.filter((t) => t.level === "annual");
+  const sprints = targets.filter((t) => t.level === "sprint");
+  const active = sprints.filter((t) => t.status === "active");
+  const upcoming = sprints.filter((t) => t.status === "upcoming");
+  const closed = sprints.filter((t) => t.status === "closed");
 
   return (
     <div className="flex flex-col gap-6">
@@ -56,6 +64,13 @@ export function TargetEditor({
         </Card>
       )}
 
+      <Group
+        title="The year"
+        targets={annual}
+        activityTypes={activityTypes}
+        activityTargets={activityTargets}
+        canDelete={canDelete}
+      />
       <Group
         title="Active"
         targets={active}
@@ -209,6 +224,9 @@ function TargetForm({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [name, setName] = useState(target?.name ?? "");
+  const [level, setLevel] = useState<TargetLevel>(target?.level ?? "sprint");
+  const [currency, setCurrency] = useState<Currency>(target?.currency ?? "INR");
+  const [isLocked, setIsLocked] = useState(target?.is_locked ?? false);
   const [startsOn, setStartsOn] = useState(target?.starts_on ?? todayISO());
   const [endsOn, setEndsOn] = useState(target?.ends_on ?? "");
   const [amount, setAmount] = useState(
@@ -245,11 +263,14 @@ function TargetForm({
       const result = await saveRevenueTarget({
         id: target?.id,
         name,
+        level,
+        currency,
         startsOn,
         endsOn,
         revenueTarget: Number(amount || 0),
         requestsTarget: requests.trim() ? Number(requests) : null,
         notes,
+        isLocked,
       });
 
       if (!result.ok) {
@@ -302,6 +323,7 @@ function TargetForm({
               className={inputClass}
               type="date"
               value={startsOn}
+              disabled={Boolean(target?.is_locked)}
               onChange={(e) => setStartsOn(e.target.value)}
             />
           </div>
@@ -312,6 +334,7 @@ function TargetForm({
               type="date"
               value={endsOn}
               min={startsOn}
+              disabled={Boolean(target?.is_locked)}
               onChange={(e) => setEndsOn(e.target.value)}
             />
           </div>
@@ -319,12 +342,41 @@ function TargetForm({
 
         <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
           <div className="flex flex-col gap-[6px]">
-            <label className={labelClass}>Revenue target (USD)</label>
+            <label className={labelClass}>What kind</label>
+            <select
+              className={inputClass}
+              value={level}
+              disabled={Boolean(target?.is_locked)}
+              onChange={(e) => setLevel(e.target.value as TargetLevel)}
+            >
+              <option value="sprint">A sprint</option>
+              <option value="annual">The financial year</option>
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-[6px]">
+            <label className={labelClass}>Counted in</label>
+            <select
+              className={inputClass}
+              value={currency}
+              disabled={Boolean(target?.is_locked)}
+              onChange={(e) => setCurrency(e.target.value as Currency)}
+            >
+              <option value="INR">Rupees</option>
+              <option value="USD">Dollars</option>
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-[6px]">
+            <label className={labelClass}>
+              Revenue target ({currency === "INR" ? "₹" : "$"})
+            </label>
             <input
               className={inputClass}
               inputMode="decimal"
-              placeholder="10000"
+              placeholder={currency === "INR" ? "6000000" : "10000"}
               value={amount}
+              disabled={Boolean(target?.is_locked)}
               onChange={(e) => setAmount(e.target.value)}
             />
           </div>
@@ -385,6 +437,27 @@ function TargetForm({
             onChange={(e) => setNotes(e.target.value)}
           />
         </div>
+
+        <label className="flex items-start gap-3 text-[13px] leading-[1.6] text-[var(--ink-500)]">
+          <input
+            type="checkbox"
+            className="mt-[3px] accent-[var(--accent)]"
+            checked={isLocked}
+            onChange={(e) => setIsLocked(e.target.checked)}
+          />
+          <span>
+            <span className="font-semibold text-[var(--ink-700)]">Lock this target.</span> The
+            amount, dates and currency stop being editable — the note and the requests goal don&apos;t.
+            Only an owner can unlock it, and the unlock is recorded.
+          </span>
+        </label>
+
+        {target?.is_locked && (
+          <p className="m-0 px-4 py-3 rounded-[10px] bg-[var(--surface-2)] border-[1.5px] border-[var(--line-slate)] text-[12.5px] leading-[1.6] text-[var(--ink-500)]">
+            This target is locked, so its amount, dates and currency are fixed. That is the point
+            of locking: the number people plan against does not move under them.
+          </p>
+        )}
 
         {startsOn && endsOn && endsOn >= startsOn && (
           <p className="m-0 text-[12.5px] text-[var(--ink-300)]">

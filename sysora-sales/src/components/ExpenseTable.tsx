@@ -15,17 +15,21 @@ import {
   inputClass,
   labelClass,
 } from "@/components/ui";
-import { deleteSpend, saveSpend } from "@/lib/admin/spend-actions";
-import { formatMoney } from "@/lib/money";
-import type { ActivityType, SpendCategory, SpendLedgerRow } from "@/lib/admin/types";
+import { deleteExpense, saveExpense } from "@/lib/admin/expense-actions";
+import { formatMoney, impliedRate } from "@/lib/money";
+import type { ActivityType, SpendCategory, ExpenseRow } from "@/lib/admin/types";
 
 /**
- * What was spent to win the work.
+ * Every cost: the Connects that win work and the salaries that run it.
+ *
+ * Rupees lead, because that is what leaves the account. A dollar
+ * figure sits underneath where the cost was billed in dollars — never
+ * converted, just recorded.
  *
  * Tagging an entry to a lead measure is optional but it is where the
  * useful number comes from: spend tagged to bidding, divided by bids
- * submitted, is a cost per bid — and that is the figure that tells you
- * whether to buy more Connects or write better proposals.
+ * submitted, is a cost per bid — the figure that says whether to buy
+ * more Connects or write better proposals.
  */
 
 function formatDay(date: string): string {
@@ -36,22 +40,23 @@ function formatDay(date: string): string {
   });
 }
 
-export function SpendTable({
+export function ExpenseTable({
   entries,
   categories,
   activities,
 }: {
-  entries: SpendLedgerRow[];
+  entries: ExpenseRow[];
   categories: SpendCategory[];
   activities: ActivityType[];
 }) {
   const [adding, setAdding] = useState(false);
-  const total = entries.reduce((sum, entry) => sum + entry.amount, 0);
+  const total = entries.reduce((sum, entry) => sum + (entry.amount_inr ?? 0), 0);
+  const awaiting = entries.filter((entry) => entry.amount_inr === null).length;
 
   return (
     <div className="flex flex-col gap-4">
       {adding ? (
-        <SpendForm
+        <ExpenseForm
           categories={categories}
           activities={activities}
           onDone={() => setAdding(false)}
@@ -69,13 +74,13 @@ export function SpendTable({
           title="Every entry"
           hint={
             entries.length
-              ? `${entries.length} ${entries.length === 1 ? "entry" : "entries"} · ${formatMoney(total)}`
+              ? `${entries.length} ${entries.length === 1 ? "entry" : "entries"} · ${formatMoney(total)}${awaiting ? ` · ${awaiting} awaiting rupees` : ""}`
               : "None yet"
           }
         />
         {entries.length === 0 ? (
           <EmptyState>
-            Connects, ads, tools, subcontractors — anything you paid to win work goes here.
+            Connects, ads, salaries, rent — every rupee that leaves goes here.
           </EmptyState>
         ) : (
           <Table>
@@ -83,6 +88,7 @@ export function SpendTable({
               <tr>
                 <Th>What</Th>
                 <Th>Category</Th>
+                <Th>Who</Th>
                 <Th>Bought</Th>
                 <Th>Spent</Th>
                 <Th>Amount</Th>
@@ -91,7 +97,7 @@ export function SpendTable({
             </thead>
             <tbody>
               {entries.map((entry) => (
-                <SpendRow
+                <ExpenseRowLine
                   key={entry.id}
                   entry={entry}
                   categories={categories}
@@ -106,12 +112,12 @@ export function SpendTable({
   );
 }
 
-function SpendRow({
+function ExpenseRowLine({
   entry,
   categories,
   activities,
 }: {
-  entry: SpendLedgerRow;
+  entry: ExpenseRow;
   categories: SpendCategory[];
   activities: ActivityType[];
 }) {
@@ -124,9 +130,9 @@ function SpendRow({
   if (editing) {
     return (
       <tr>
-        <td colSpan={6} className="p-0">
+        <td colSpan={7} className="p-0">
           <div className="px-6 py-4">
-            <SpendForm
+            <ExpenseForm
               entry={entry}
               categories={categories}
               activities={activities}
@@ -154,6 +160,9 @@ function SpendRow({
       <Td>
         <Pill tone="slate">{entry.category_label}</Pill>
       </Td>
+      <Td className="whitespace-nowrap text-[13px] text-[var(--ink-600)]">
+        {entry.paid_to ?? <span className="text-[var(--ink-100)]">—</span>}
+      </Td>
       <Td className="whitespace-nowrap">
         {entry.activity_label ? (
           <Pill tone="mint">{entry.activity_label}</Pill>
@@ -164,8 +173,22 @@ function SpendRow({
       <Td className="whitespace-nowrap text-[13px] text-[var(--ink-500)]">
         {formatDay(entry.spent_on)}
       </Td>
-      <Td className="whitespace-nowrap font-semibold text-[var(--ink-800)] [font-variant-numeric:tabular-nums]">
-        {formatMoney(entry.amount, entry.currency)}
+      <Td className="whitespace-nowrap">
+        {entry.amount_inr === null ? (
+          <span className="text-[13px] font-semibold text-[var(--warning)]">₹ pending</span>
+        ) : (
+          <span className="font-semibold text-[var(--ink-800)] [font-variant-numeric:tabular-nums]">
+            {formatMoney(entry.amount_inr, "INR")}
+          </span>
+        )}
+        {entry.amount_usd !== null && (
+          <span className="block text-[12px] text-[var(--ink-300)] [font-variant-numeric:tabular-nums]">
+            {formatMoney(entry.amount_usd, "USD")}
+            {entry.amount_inr !== null && (
+              <> · ₹{impliedRate(entry.amount_usd, entry.amount_inr)}/$</>
+            )}
+          </span>
+        )}
       </Td>
       <Td>
         <div className="flex items-center gap-2">
@@ -180,7 +203,7 @@ function SpendRow({
                 disabled={pending}
                 onClick={() =>
                   startTransition(async () => {
-                    const result = await deleteSpend(entry.id);
+                    const result = await deleteExpense(entry.id);
                     if (result.ok) router.refresh();
                     else setError(result.error);
                     setConfirming(false);
@@ -215,14 +238,14 @@ function todayISO(): string {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
-function SpendForm({
+function ExpenseForm({
   entry,
   categories,
   activities,
   onDone,
   inline,
 }: {
-  entry?: SpendLedgerRow;
+  entry?: ExpenseRow;
   categories: SpendCategory[];
   activities: ActivityType[];
   onDone: () => void;
@@ -234,7 +257,13 @@ function SpendForm({
   const byKey = categories.find((c) => c.slug === entry?.category_key);
   const [categoryId, setCategoryId] = useState(byKey?.id ?? categories[0]?.id ?? "");
   const [description, setDescription] = useState(entry?.description ?? "");
-  const [amount, setAmount] = useState(entry ? (entry.amount / 100).toString() : "");
+  const [amountUsd, setAmountUsd] = useState(
+    entry?.amount_usd != null ? (entry.amount_usd / 100).toString() : "",
+  );
+  const [amountInr, setAmountInr] = useState(
+    entry?.amount_inr != null ? (entry.amount_inr / 100).toString() : "",
+  );
+  const [paidTo, setPaidTo] = useState(entry?.paid_to ?? "");
   const [spentOn, setSpentOn] = useState(entry?.spent_on ?? todayISO());
   const [activityTypeId, setActivityTypeId] = useState(entry?.activity_type_id ?? "");
   const [error, setError] = useState<string | null>(null);
@@ -242,11 +271,13 @@ function SpendForm({
   function save() {
     setError(null);
     startTransition(async () => {
-      const result = await saveSpend({
+      const result = await saveExpense({
         id: entry?.id,
         categoryId,
         description,
-        amount: Number(amount || 0),
+        paidTo,
+        amountUsd: amountUsd.trim() ? Number(amountUsd) : null,
+        amountInr: amountInr.trim() ? Number(amountInr) : null,
         spentOn,
         activityTypeId: activityTypeId || null,
       });
@@ -278,13 +309,24 @@ function SpendForm({
         </div>
 
         <div className="flex flex-col gap-[6px]">
-          <label className={labelClass}>Amount (USD)</label>
+          <label className={labelClass}>Rupees paid</label>
+          <input
+            className={inputClass}
+            inputMode="decimal"
+            placeholder="3400"
+            value={amountInr}
+            onChange={(e) => setAmountInr(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col gap-[6px]">
+          <label className={labelClass}>Dollars billed (optional)</label>
           <input
             className={inputClass}
             inputMode="decimal"
             placeholder="40"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            value={amountUsd}
+            onChange={(e) => setAmountUsd(e.target.value)}
           />
         </div>
 
@@ -313,6 +355,16 @@ function SpendForm({
             ))}
           </select>
         </div>
+      </div>
+
+      <div className="flex flex-col gap-[6px]">
+        <label className={labelClass}>Who was paid? (salaries)</label>
+        <input
+          className={inputClass}
+          placeholder="Leave blank unless this is somebody's pay"
+          value={paidTo}
+          onChange={(e) => setPaidTo(e.target.value)}
+        />
       </div>
 
       <div className="flex flex-col gap-[6px]">

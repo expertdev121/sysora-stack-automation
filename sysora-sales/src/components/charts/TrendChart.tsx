@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Card, CardHeader, Table, Td, Th } from "@/components/ui";
-import { formatMoney } from "@/lib/money";
+import { compactMoney, formatMoney } from "@/lib/money";
 
 /**
  * Money in and money out, over time.
@@ -32,15 +32,6 @@ function niceCeiling(value: number): number {
     if (candidate >= value) return candidate;
   }
   return magnitude * 10;
-}
-
-/** $1.2K on an axis; the full figure lives in the tooltip and table. */
-function compact(minor: number): string {
-  const major = minor / 100;
-  if (major === 0) return "$0";
-  if (Math.abs(major) >= 1_000_000) return `$${(major / 1_000_000).toFixed(1)}M`;
-  if (Math.abs(major) >= 1_000) return `$${(major / 1_000).toFixed(major % 1000 === 0 ? 0 : 1)}K`;
-  return `$${Math.round(major)}`;
 }
 
 function shortDay(iso: string): string {
@@ -166,7 +157,7 @@ export function TrendChart({
                   textAnchor="end"
                   className="fill-[var(--chart-muted)] text-[10.5px] [font-variant-numeric:tabular-nums]"
                 >
-                  {compact(tick)}
+                  {compactMoney(tick)}
                 </text>
               </g>
             ))}
@@ -270,14 +261,14 @@ export function TrendChart({
                   y={y(last.revenue) + 4}
                   className="fill-[var(--ink-700)] text-[11.5px] font-semibold"
                 >
-                  {compact(last.revenue)}
+                  {compactMoney(last.revenue)}
                 </text>
                 <text
                   x={x(points.length - 1) + 10}
                   y={y(last.spend) + 4}
                   className="fill-[var(--ink-400)] text-[11.5px] font-semibold"
                 >
-                  {compact(last.spend)}
+                  {compactMoney(last.spend)}
                 </text>
               </>
             )}

@@ -5,12 +5,13 @@ import { TrendChart } from "@/components/charts/TrendChart";
 import { RangeFilter } from "@/components/RangeFilter";
 import { Scoreboard } from "@/components/Scoreboard";
 import { Shell } from "@/components/Shell";
+import { TargetProgress } from "@/components/TargetProgress";
 import { Card, PageHeading, Stat } from "@/components/ui";
 import { requireFinance } from "@/lib/admin/auth";
 import type { ActivityProgressRow, TargetRow } from "@/lib/admin/types";
 import { formatMoney } from "@/lib/money";
 import { rangeFromParam } from "@/lib/range-options";
-import { change, inPrevious, inWindow, loadRange, sum } from "@/lib/range";
+import { change, inPrevious, inWindow, loadRange, missing, sumInr } from "@/lib/range";
 import { salesDb } from "@/lib/supabase/admin";
 
 export default async function OverviewPage({
@@ -27,14 +28,15 @@ export default async function OverviewPage({
   const spend = inWindow(range.spend, "spent_on", range);
   const revenueBefore = inPrevious(range.revenue, "earned_on", range);
 
-  const earned = sum(revenue);
-  const spent = sum(spend);
-  const acquisition = sum(spend.filter((row) => row.is_acquisition));
+  // Rupees throughout. Anything without a rupee figure is counted as
+  // missing rather than as zero — see the notice under the hero.
+  const earned = sumInr(revenue);
+  const spent = sumInr(spend);
+  const acquisition = sumInr(spend.filter((row) => row.is_acquisition));
   const net = earned - spent;
-  const growth = change(earned, sum(revenueBefore));
+  const growth = change(earned, sumInr(revenueBefore));
+  const gap = missing(revenue);
 
-  // A client is a client whichever door they came through, so the
-  // checkout customer and the hand-entered name are counted once each.
   const clients = new Set(revenue.map((row) => row.client ?? "—"));
   const costPerClient = clients.size === 0 ? null : Math.round(acquisition / clients.size);
 
@@ -44,7 +46,7 @@ export default async function OverviewPage({
     bySource.set(row.source_key, {
       key: row.source_key,
       label: row.source_label,
-      value: (existing?.value ?? 0) + row.amount,
+      value: (existing?.value ?? 0) + (row.amount_inr ?? 0),
     });
   }
 
@@ -54,34 +56,43 @@ export default async function OverviewPage({
     byCategory.set(row.category_key, {
       key: row.category_key,
       label: row.category_label,
-      value: (existing?.value ?? 0) + row.amount,
+      value: (existing?.value ?? 0) + (row.amount_inr ?? 0),
     });
   }
 
-  // Whatever is running today, so the page answers "are we winning"
-  // and not only "what did we bank".
-  const { data: current } = await db
-    .from("target_progress")
-    .select("*")
-    .eq("status", "active")
-    .order("starts_on", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  // The year, then whatever sprint is running inside it.
+  const [{ data: annual }, { data: current }] = await Promise.all([
+    db
+      .from("target_progress")
+      .select("*")
+      .eq("level", "annual")
+      .eq("status", "active")
+      .maybeSingle(),
+    db
+      .from("target_progress")
+      .select("*")
+      .eq("level", "sprint")
+      .eq("status", "active")
+      .order("starts_on", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
-  const target = current as TargetRow | null;
+  const year = annual as TargetRow | null;
+  const sprint = current as TargetRow | null;
 
-  const { data: leadMeasures } = target
+  const { data: leadMeasures } = sprint
     ? await db
         .from("activity_progress")
         .select("*")
-        .eq("revenue_target_id", target.id)
+        .eq("revenue_target_id", sprint.id)
         .order("sort_order", { ascending: true })
     : { data: [] };
 
   return (
     <Shell session={session}>
       <PageHeading
-        eyebrow={`${range.days} days to ${new Date(range.to + "T00:00:00").toLocaleDateString("en-US", { day: "numeric", month: "short" })}`}
+        eyebrow={`${range.days} days to ${new Date(range.to + "T00:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`}
         title="Overview"
         action={<RangeFilter />}
       />
@@ -101,7 +112,9 @@ export default async function OverviewPage({
             <>
               <span
                 className={
-                  growth >= 0 ? "font-semibold text-[var(--mint-700)]" : "font-semibold text-[var(--danger-600)]"
+                  growth >= 0
+                    ? "font-semibold text-[var(--mint-700)]"
+                    : "font-semibold text-[var(--danger-600)]"
                 }
               >
                 {growth >= 0 ? "▲" : "▼"} {Math.abs(growth)}%
@@ -112,10 +125,25 @@ export default async function OverviewPage({
           {" · "}
           {clients.size} {clients.size === 1 ? "client" : "clients"}
         </p>
+
+        {gap.count > 0 && (
+          <p className="mt-4 mb-0 px-4 py-3 rounded-[10px] bg-[var(--warning-bg)] border-[1.5px] border-[var(--warning-border)] text-[12.5px] leading-[1.6] text-[var(--warning)]">
+            {gap.count} {gap.count === 1 ? "payment is" : "payments are"} missing from that figure —{" "}
+            {formatMoney(gap.usd, "USD")} with no rupee amount recorded yet.{" "}
+            <Link href="/revenue" className="font-semibold underline">
+              Add what landed
+            </Link>{" "}
+            and they join the total.
+          </p>
+        )}
       </Card>
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-4 mb-8">
-        <Stat label="Spend" value={formatMoney(spent)} sub={`${formatMoney(acquisition)} of it to win work`} />
+        <Stat
+          label="Spend"
+          value={formatMoney(spent)}
+          sub={`${formatMoney(acquisition)} of it to win work`}
+        />
         <Stat
           label="Net"
           value={formatMoney(net)}
@@ -131,12 +159,24 @@ export default async function OverviewPage({
               : `${formatMoney(acquisition)} ÷ ${clients.size}`
           }
         />
-        <Stat
-          label="Days covered"
-          value={String(range.days)}
-          sub={`${range.from} → ${range.to}`}
-        />
+        <Stat label="Days covered" value={String(range.days)} sub={`${range.from} → ${range.to}`} />
       </div>
+
+      {year && (
+        <div className="mb-8">
+          <p className="m-0 mb-3 font-mono text-[10px] tracking-[1.6px] uppercase text-[var(--ink-200)]">
+            The year
+          </p>
+          <TargetProgress
+            target={year}
+            footer={
+              <Link href="/targets" className="text-[13px] font-semibold text-[var(--accent-strong)]">
+                Every target →
+              </Link>
+            }
+          />
+        </div>
+      )}
 
       <div className="mb-8">
         <TrendChart points={range.daily} title="Revenue and spend" />
@@ -146,7 +186,7 @@ export default async function OverviewPage({
         <BarList
           data={[...bySource.values()]}
           title="Where revenue came from"
-          empty="No revenue in this window."
+          empty="No revenue with a rupee figure in this window."
         />
         <BarList
           data={[...byCategory.values()]}
@@ -156,9 +196,9 @@ export default async function OverviewPage({
         />
       </div>
 
-      {target ? (
+      {sprint ? (
         <Scoreboard
-          target={target}
+          target={sprint}
           activities={(leadMeasures ?? []) as ActivityProgressRow[]}
           footer={
             <Link href="/targets" className="text-[13px] font-semibold text-[var(--accent-strong)]">
@@ -168,11 +208,11 @@ export default async function OverviewPage({
         />
       ) : (
         <Card className="px-6 py-10 text-center text-[15px] text-[var(--ink-300)]">
-          No target is running today.{" "}
+          No sprint is running today.{" "}
           <Link href="/targets" className="font-semibold text-[var(--accent-strong)]">
             Set one
           </Link>{" "}
-          and this page starts telling you whether you&apos;re winning.
+          and this page starts telling you whether you&apos;re winning the week, not just the year.
         </Card>
       )}
     </Shell>

@@ -81,7 +81,7 @@ type NavItem = { href: string; label: string; icon: keyof typeof icons; exact?: 
 const money: NavItem[] = [
   { href: "/", label: "Overview", icon: "overview", exact: true },
   { href: "/revenue", label: "Revenue", icon: "revenue" },
-  { href: "/spend", label: "Spend", icon: "spend" },
+  { href: "/expenses", label: "Expenses", icon: "spend" },
 ];
 
 const plan: NavItem[] = [

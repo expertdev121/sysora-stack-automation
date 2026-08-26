@@ -21,7 +21,7 @@ import {
   findMatchingContact,
   saveManualRevenue,
 } from "@/lib/admin/revenue-actions";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, impliedRate } from "@/lib/money";
 import { SOURCE_LABELS, type ManualRevenueRow, type RevenueSource } from "@/lib/admin/types";
 
 /** Which target's window a given date falls inside, for display. */
@@ -39,7 +39,9 @@ export function ManualRevenueTable({
   windows: WindowLookup;
 }) {
   const [adding, setAdding] = useState(false);
-  const total = entries.reduce((sum, entry) => sum + entry.amount, 0);
+  // Rupees only. An entry with no rupee figure is unknown, not zero.
+  const total = entries.reduce((sum, entry) => sum + (entry.amount_inr ?? 0), 0);
+  const pending = entries.filter((entry) => entry.amount_inr === null).length;
 
   return (
     <div className="flex flex-col gap-4">
@@ -58,7 +60,7 @@ export function ManualRevenueTable({
           title="Outside the checkout"
           hint={
             entries.length
-              ? `${entries.length} ${entries.length === 1 ? "entry" : "entries"} · ${formatMoney(total)}`
+              ? `${entries.length} ${entries.length === 1 ? "entry" : "entries"} · ${formatMoney(total)}${pending ? ` · ${pending} awaiting rupees` : ""}`
               : "None yet"
           }
         />
@@ -134,8 +136,22 @@ function EntryRow({ entry, windows }: { entry: ManualRevenueRow; windows: Window
           <span className="text-[13px] text-[var(--ink-100)]">No target</span>
         )}
       </Td>
-      <Td className="font-mono whitespace-nowrap text-[var(--ink-800)]">
-        {formatMoney(entry.amount, entry.currency)}
+      <Td className="whitespace-nowrap">
+        {entry.amount_inr === null ? (
+          <span className="text-[13px] font-semibold text-[var(--warning)]">₹ pending</span>
+        ) : (
+          <span className="font-semibold text-[var(--ink-800)] [font-variant-numeric:tabular-nums]">
+            {formatMoney(entry.amount_inr, "INR")}
+          </span>
+        )}
+        {entry.amount_usd !== null && (
+          <span className="block text-[12px] text-[var(--ink-300)] [font-variant-numeric:tabular-nums]">
+            {formatMoney(entry.amount_usd, "USD")}
+            {entry.amount_inr !== null && (
+              <> · ₹{impliedRate(entry.amount_usd, entry.amount_inr)}/$</>
+            )}
+          </span>
+        )}
       </Td>
       <Td>
         <div className="flex items-center gap-2">
@@ -199,7 +215,12 @@ function EntryForm({
   const [clientName, setClientName] = useState(entry?.client_name ?? "");
   const [source, setSource] = useState<RevenueSource>(entry?.source ?? "upwork");
   const [description, setDescription] = useState(entry?.description ?? "");
-  const [amount, setAmount] = useState(entry ? (entry.amount / 100).toString() : "");
+  const [amountUsd, setAmountUsd] = useState(
+    entry?.amount_usd != null ? (entry.amount_usd / 100).toString() : "",
+  );
+  const [amountInr, setAmountInr] = useState(
+    entry?.amount_inr != null ? (entry.amount_inr / 100).toString() : "",
+  );
   const [earnedOn, setEarnedOn] = useState(entry?.earned_on ?? todayISO());
   const [error, setError] = useState<string | null>(null);
   const [duplicate, setDuplicate] = useState<string | null>(null);
@@ -227,7 +248,8 @@ function EntryForm({
         clientName,
         source,
         description,
-        amount: Number(amount || 0),
+        amountUsd: amountUsd.trim() ? Number(amountUsd) : null,
+        amountInr: amountInr.trim() ? Number(amountInr) : null,
         earnedOn,
       });
       if (result.ok) {
@@ -265,13 +287,23 @@ function EntryForm({
           </select>
         </div>
         <div className="flex flex-col gap-[6px]">
-          <label className={labelClass}>Amount (USD)</label>
+          <label className={labelClass}>Rupees received</label>
+          <input
+            className={inputClass}
+            inputMode="decimal"
+            placeholder="208000"
+            value={amountInr}
+            onChange={(e) => setAmountInr(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col gap-[6px]">
+          <label className={labelClass}>Dollars invoiced (optional)</label>
           <input
             className={inputClass}
             inputMode="decimal"
             placeholder="2500"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            value={amountUsd}
+            onChange={(e) => setAmountUsd(e.target.value)}
           />
         </div>
         <div className="flex flex-col gap-[6px]">
@@ -294,6 +326,16 @@ function EntryForm({
           onChange={(e) => setDescription(e.target.value)}
         />
       </div>
+
+      {amountUsd.trim() && amountInr.trim() && Number(amountUsd) > 0 && (
+        <p className="m-0 text-[12.5px] text-[var(--ink-300)]">
+          That works out at{" "}
+          <span className="font-semibold text-[var(--ink-600)]">
+            ₹{(Number(amountInr) / Number(amountUsd)).toFixed(2)} to the dollar
+          </span>{" "}
+          — recorded as a fact about this payment, never applied to any other.
+        </p>
+      )}
 
       <p className="m-0 text-[12.5px] text-[var(--ink-300)]">
         {window ? (

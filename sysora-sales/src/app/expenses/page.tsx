@@ -3,18 +3,18 @@ import type { Metadata } from "next";
 import { BarList, type BarDatum } from "@/components/charts/BarList";
 import { RangeFilter } from "@/components/RangeFilter";
 import { Shell } from "@/components/Shell";
-import { SpendTable } from "@/components/SpendTable";
+import { ExpenseTable } from "@/components/ExpenseTable";
 import { Card, CardHeader, EmptyState, PageHeading, Stat, Table, Td, Th } from "@/components/ui";
 import { requireFinance } from "@/lib/admin/auth";
 import type { ActivityEconomics, ActivityType, SpendCategory } from "@/lib/admin/types";
 import { formatMoney } from "@/lib/money";
 import { rangeFromParam } from "@/lib/range-options";
-import { change, inPrevious, inWindow, loadRange, sum } from "@/lib/range";
+import { change, inPrevious, inWindow, loadRange, missing, sumInr } from "@/lib/range";
 import { salesDb } from "@/lib/supabase/admin";
 
-export const metadata: Metadata = { title: "Spend" };
+export const metadata: Metadata = { title: "Expenses" };
 
-export default async function SpendPage({
+export default async function ExpensesPage({
   searchParams,
 }: {
   searchParams: Promise<{ days?: string }>;
@@ -28,10 +28,10 @@ export default async function SpendPage({
   const before = inPrevious(range.spend, "spent_on", range);
   const revenue = inWindow(range.revenue, "earned_on", range);
 
-  const spent = sum(spend);
-  const acquisition = sum(spend.filter((row) => row.is_acquisition));
-  const growth = change(spent, sum(before));
-  const earned = sum(revenue);
+  const spent = sumInr(spend);
+  const acquisition = sumInr(spend.filter((row) => row.is_acquisition));
+  const growth = change(spent, sumInr(before));
+  const earned = sumInr(revenue);
 
   const byCategory = new Map<string, BarDatum>();
   for (const row of spend) {
@@ -39,7 +39,7 @@ export default async function SpendPage({
     byCategory.set(row.category_key, {
       key: row.category_key,
       label: row.category_label,
-      value: (existing?.value ?? 0) + row.amount,
+      value: (existing?.value ?? 0) + (row.amount_inr ?? 0),
     });
   }
 
@@ -58,11 +58,12 @@ export default async function SpendPage({
   ]);
 
   // Only the lead measures that actually had money spent against them.
-  const costPerUnit = ((economics ?? []) as ActivityEconomics[]).filter((row) => row.spend > 0);
+  const costPerUnit = ((economics ?? []) as ActivityEconomics[]).filter((row) => row.spend_inr > 0);
+  const gap = missing(spend);
 
   return (
     <Shell session={session}>
-      <PageHeading eyebrow="What winning the work costs" title="Spend" action={<RangeFilter />} />
+      <PageHeading eyebrow="Every rupee that leaves" title="Expenses" action={<RangeFilter />} />
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-4 mb-8">
         <Stat
@@ -77,7 +78,7 @@ export default async function SpendPage({
         <Stat
           label="To win work"
           value={formatMoney(acquisition)}
-          sub={`${formatMoney(spent - acquisition)} was running it, not winning it`}
+          sub={`${formatMoney(spent - acquisition)} was running it — salaries, rent, tools`}
         />
         <Stat
           label="Return"
@@ -106,7 +107,7 @@ export default async function SpendPage({
           {costPerUnit.length === 0 ? (
             <EmptyState>
               Tag an entry to an activity — Connects to bidding, say — and the cost per bid
-              appears here.
+              appears here, in rupees.
             </EmptyState>
           ) : (
             <Table>
@@ -123,13 +124,13 @@ export default async function SpendPage({
                   <tr key={`${row.revenue_target_id}-${row.activity_type_id}`}>
                     <Td className="font-semibold text-[var(--ink-800)]">{row.label}</Td>
                     <Td className="[font-variant-numeric:tabular-nums]">
-                      {formatMoney(row.spend)}
+                      {formatMoney(row.spend_inr)}
                     </Td>
                     <Td className="[font-variant-numeric:tabular-nums]">
                       {row.achieved.toLocaleString()}
                     </Td>
                     <Td className="font-semibold text-[var(--ink-800)] [font-variant-numeric:tabular-nums]">
-                      {row.cost_per_unit === null ? "—" : formatMoney(Math.round(row.cost_per_unit))}
+                      {row.cost_per_unit_inr === null ? "—" : formatMoney(Math.round(row.cost_per_unit_inr))}
                     </Td>
                   </tr>
                 ))}
@@ -139,7 +140,15 @@ export default async function SpendPage({
         </Card>
       </div>
 
-      <SpendTable
+      {gap.count > 0 && (
+        <p className="mb-4 px-4 py-3 rounded-[10px] bg-[var(--warning-bg)] border-[1.5px] border-[var(--warning-border)] text-[12.5px] leading-[1.6] text-[var(--warning)]">
+          {gap.count} {gap.count === 1 ? "cost has" : "costs have"} no rupee amount yet, so the
+          totals above leave {formatMoney(gap.usd, "USD")} out. Open the row and add what actually
+          left the account.
+        </p>
+      )}
+
+      <ExpenseTable
         entries={spend}
         categories={(categories ?? []) as SpendCategory[]}
         activities={(activities ?? []) as ActivityType[]}

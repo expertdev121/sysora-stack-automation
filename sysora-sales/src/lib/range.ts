@@ -1,7 +1,7 @@
 import "server-only";
 
 import { salesDb } from "@/lib/supabase/admin";
-import type { DailyMoney, RevenueLedgerRow, SpendLedgerRow } from "@/lib/admin/types";
+import type { DailyMoney, ExpenseRow, RevenueLedgerRow } from "@/lib/admin/types";
 
 /**
  * One slice of time, loaded once.
@@ -18,7 +18,7 @@ export type MoneyRange = {
   /** The equal-length window immediately before, for the comparison. */
   previousFrom: string;
   revenue: RevenueLedgerRow[];
-  spend: SpendLedgerRow[];
+  spend: ExpenseRow[];
   daily: DailyMoney[];
 };
 
@@ -47,7 +47,7 @@ export async function loadRange(days: number): Promise<MoneyRange> {
       .lte("earned_on", to)
       .order("earned_on", { ascending: false }),
     db
-      .from("spend_ledger")
+      .from("expense_ledger")
       .select("*")
       .gte("spent_on", previousFrom)
       .lte("spent_on", to)
@@ -61,7 +61,7 @@ export async function loadRange(days: number): Promise<MoneyRange> {
     to,
     previousFrom,
     revenue: (revenue ?? []) as RevenueLedgerRow[],
-    spend: (spend ?? []) as SpendLedgerRow[],
+    spend: (spend ?? []) as ExpenseRow[],
     daily: (daily ?? []) as DailyMoney[],
   };
 }
@@ -90,8 +90,28 @@ export function inPrevious<T extends { [k: string]: unknown }>(
   });
 }
 
-export function sum(rows: { amount: number }[]): number {
-  return rows.reduce((total, row) => total + row.amount, 0);
+/**
+ * Rupees only.
+ *
+ * A row whose rupee figure is missing is skipped rather than treated as
+ * zero — see `missing` below. Adding an unknown as a zero is how a
+ * total ends up looking authoritative while being wrong.
+ */
+export function sumInr(rows: { amount_inr: number | null }[]): number {
+  return rows.reduce((total, row) => total + (row.amount_inr ?? 0), 0);
+}
+
+export function sumUsd(rows: { amount_usd: number | null }[]): number {
+  return rows.reduce((total, row) => total + (row.amount_usd ?? 0), 0);
+}
+
+/** The size of the hole: how many rows, and what they're worth in dollars. */
+export function missing(rows: { amount_inr: number | null; amount_usd: number | null }[]) {
+  const rowsWithout = rows.filter((row) => row.amount_inr === null);
+  return {
+    count: rowsWithout.length,
+    usd: rowsWithout.reduce((total, row) => total + (row.amount_usd ?? 0), 0),
+  };
 }
 
 /**

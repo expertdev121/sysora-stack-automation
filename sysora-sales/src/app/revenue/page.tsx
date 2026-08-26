@@ -10,7 +10,7 @@ import { requireFinance } from "@/lib/admin/auth";
 import type { ManualRevenueRow, TargetRow } from "@/lib/admin/types";
 import { formatMoney } from "@/lib/money";
 import { rangeFromParam } from "@/lib/range-options";
-import { change, inPrevious, inWindow, loadRange, sum } from "@/lib/range";
+import { change, inPrevious, inWindow, loadRange, missing, sumInr, sumUsd } from "@/lib/range";
 import { salesDb } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = { title: "Revenue" };
@@ -28,10 +28,14 @@ export default async function RevenuePage({
   const revenue = inWindow(range.revenue, "earned_on", range);
   const before = inPrevious(range.revenue, "earned_on", range);
 
-  const earned = sum(revenue);
-  const growth = change(earned, sum(before));
-  const checkout = sum(revenue.filter((row) => row.stream === "checkout"));
+  // Rupees are the total. Dollars are shown beside a row, never added
+  // into it — see `missing` for what that leaves out.
+  const earned = sumInr(revenue);
+  const growth = change(earned, sumInr(before));
+  const checkout = sumInr(revenue.filter((row) => row.stream === "checkout"));
   const manual = earned - checkout;
+  const gap = missing(revenue);
+  const invoiced = sumUsd(revenue);
 
   const bySource = new Map<string, BarDatum>();
   const byClient = new Map<string, BarDatum>();
@@ -41,15 +45,15 @@ export default async function RevenuePage({
     bySource.set(row.source_key, {
       key: row.source_key,
       label: row.source_label,
-      value: (source ?? { value: 0 }).value + row.amount,
+      value: (source ?? { value: 0 }).value + (row.amount_inr ?? 0),
     });
 
     const who = row.client ?? "Unnamed";
     const client = byClient.get(who);
     if (client) {
-      client.value += row.amount;
+      client.value += row.amount_inr ?? 0;
     } else {
-      byClient.set(who, { key: who, label: who, value: row.amount });
+      byClient.set(who, { key: who, label: who, value: row.amount_inr ?? 0 });
     }
   }
 
@@ -90,6 +94,11 @@ export default async function RevenuePage({
           value={formatMoney(manual)}
           sub="Upwork and direct, entered by hand"
         />
+        <Stat
+          label="Invoiced in dollars"
+          value={formatMoney(invoiced, "USD")}
+          sub="What was billed, before it became rupees"
+        />
         <Stat label="Clients" value={String(byClient.size)} sub="Distinct, however they paid" />
       </div>
 
@@ -106,8 +115,16 @@ export default async function RevenuePage({
         />
       </div>
 
+      {gap.count > 0 && (
+        <p className="mb-5 px-4 py-3 rounded-[10px] bg-[var(--warning-bg)] border-[1.5px] border-[var(--warning-border)] text-[12.5px] leading-[1.6] text-[var(--warning)]">
+          {gap.count} {gap.count === 1 ? "payment has" : "payments have"} no rupee figure yet, so
+          they are not in any total above — {formatMoney(gap.usd, "USD")} between them. Stripe
+          settles days after the charge, so its rupees only exist once the payout lands.
+        </p>
+      )}
+
       <Card className="mb-10">
-        <CardHeader title="Every pound" hint={`${revenue.length} in this window`} />
+        <CardHeader title="Every payment" hint={`${revenue.length} in this window`} />
         {revenue.length === 0 ? (
           <EmptyState>Nothing earned in this window.</EmptyState>
         ) : (
@@ -139,8 +156,21 @@ export default async function RevenuePage({
                       {row.stream === "checkout" ? "Checkout" : "By hand"}
                     </Pill>
                   </Td>
-                  <Td className="whitespace-nowrap font-semibold text-[var(--ink-800)] [font-variant-numeric:tabular-nums]">
-                    {formatMoney(row.amount, row.currency)}
+                  <Td className="whitespace-nowrap">
+                    {row.amount_inr === null ? (
+                      <span className="text-[13px] font-semibold text-[var(--warning)]">
+                        ₹ pending
+                      </span>
+                    ) : (
+                      <span className="font-semibold text-[var(--ink-800)] [font-variant-numeric:tabular-nums]">
+                        {formatMoney(row.amount_inr)}
+                      </span>
+                    )}
+                    {row.amount_usd !== null && (
+                      <span className="block text-[12px] text-[var(--ink-300)] [font-variant-numeric:tabular-nums]">
+                        {formatMoney(row.amount_usd, "USD")}
+                      </span>
+                    )}
                   </Td>
                 </tr>
               ))}
@@ -154,8 +184,9 @@ export default async function RevenuePage({
           Clients from outside the checkout
         </h2>
         <p className="mt-0 mb-5 max-w-[72ch] text-[14px] leading-[1.7] text-[var(--ink-400)]">
-          Upwork and direct work never touches Stripe, so it&apos;s recorded here. Each entry
-          counts toward whichever target covers the date it was earned.
+          Upwork and direct work never touches Stripe, so it&apos;s recorded here. Put in the
+          rupees that actually landed — that is what a rupee target counts. The dollar figure is
+          optional and is only ever shown beside it, never converted.
         </p>
         <ManualRevenueTable entries={(entries ?? []) as ManualRevenueRow[]} windows={windows} />
       </div>

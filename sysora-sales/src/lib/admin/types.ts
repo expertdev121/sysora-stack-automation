@@ -1,3 +1,5 @@
+import type { Currency } from "@/lib/money";
+
 /**
  * Shapes this app reads out of the `sales` schema.
  *
@@ -36,16 +38,24 @@ export type Staff = {
 
 /* ---- Targets ------------------------------------------------ */
 
-/** A row of sales.target_progress. */
+export type TargetLevel = "annual" | "sprint";
+
+/** A row of sales.target_progress. Amounts are in `currency`, never converted. */
 export type TargetRow = {
   id: string;
   name: string | null;
+  level: TargetLevel;
   starts_on: string;
   ends_on: string;
   revenue_target: number;
   requests_target: number | null;
-  currency: string;
+  currency: Currency;
   notes: string | null;
+  is_locked: boolean;
+  /** Rows inside the window with no figure in this target's currency. */
+  unconverted_rows: number;
+  /** What those rows are worth in the currency they do have. */
+  unconverted_usd: number;
   revenue_stripe: number;
   revenue_manual: number;
   revenue_achieved: number;
@@ -98,22 +108,26 @@ export type ManualRevenueRow = {
   client_name: string;
   source: RevenueSource;
   description: string | null;
-  amount: number;
+  /** Cents. Null when the money was never in dollars. */
+  amount_usd: number | null;
+  /** Paise. What actually landed — this is what an INR target counts. */
+  amount_inr: number | null;
   currency: string;
   earned_on: string;
   created_by: string | null;
   created_at: string;
 };
 
-/** A row of sales.revenue_ledger — every pound, whichever door it came through. */
+/** A row of sales.revenue_ledger — every payment, whichever door it came through. */
 export type RevenueLedgerRow = {
   id: string;
   stream: "checkout" | "manual";
   source_key: string;
   source_label: string;
   client: string | null;
-  amount: number;
-  currency: string;
+  amount_usd: number | null;
+  amount_inr: number | null;
+  settled_on: string | null;
   earned_on: string;
   created_at: string;
 };
@@ -134,13 +148,15 @@ export type SpendCategory = {
   is_active: boolean;
 };
 
-/** A row of sales.spend_ledger. */
-export type SpendLedgerRow = {
+/** A row of sales.expense_ledger. */
+export type ExpenseRow = {
   id: string;
   spent_on: string;
-  amount: number;
-  currency: string;
+  amount_usd: number | null;
+  amount_inr: number | null;
   description: string | null;
+  /** Who was paid. Used for salaries, so one hire is one line. */
+  paid_to: string | null;
   category_key: string;
   category_label: string;
   is_acquisition: boolean;
@@ -154,14 +170,17 @@ export type SpendLedgerRow = {
 export type TargetEconomics = {
   revenue_target_id: string;
   name: string | null;
+  level: TargetLevel;
   starts_on: string;
   ends_on: string;
   status: "upcoming" | "active" | "closed";
+  currency: Currency;
   revenue_target: number;
   revenue_achieved: number;
   percent_complete: number;
   spend_total: number;
   spend_acquisition: number;
+  spend_unconverted_rows: number;
   net: number;
   /** Null when nothing was spent — "4x" and "we spent nothing" differ. */
   return_multiple: number | null;
@@ -178,8 +197,9 @@ export type ActivityEconomics = {
   label: string;
   target_count: number;
   achieved: number;
-  spend: number;
-  cost_per_unit: number | null;
+  spend_inr: number;
+  spend_usd: number;
+  cost_per_unit_inr: number | null;
 };
 
 /** A row of sales.daily_money — the trend line. */

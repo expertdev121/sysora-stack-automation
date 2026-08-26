@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { Card, CardHeader, EmptyState } from "@/components/ui";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, type Currency } from "@/lib/money";
 
 /**
  * Composition — where a total came from, biggest first.
@@ -29,12 +29,14 @@ export function BarList({
   title,
   hint,
   color = "var(--series-revenue)",
+  currency = "INR",
   empty = "Nothing here yet.",
 }: {
   data: BarDatum[];
   title: string;
   hint?: string;
   color?: string;
+  currency?: Currency;
   empty?: string;
 }) {
   const [hovered, setHovered] = useState<string | null>(null);
@@ -54,7 +56,7 @@ export function BarList({
 
   return (
     <Card>
-      <CardHeader title={title} hint={hint ?? formatMoney(total)} />
+      <CardHeader title={title} hint={hint ?? formatMoney(total, currency)} />
       <ul className="m-0 list-none px-6 py-5 flex flex-col gap-4">
         {rows.map((row) => {
           const share = total === 0 ? 0 : Math.round((row.value / total) * 100);
@@ -72,7 +74,7 @@ export function BarList({
                   {row.label}
                 </span>
                 <span className="text-[13px] whitespace-nowrap text-[var(--ink-600)] [font-variant-numeric:tabular-nums]">
-                  {formatMoney(row.value)}
+                  {formatMoney(row.value, currency)}
                   <span className="ml-2 text-[var(--ink-200)]">{share}%</span>
                 </span>
               </div>

@@ -4,14 +4,38 @@
     {
       "name": "sysora-web",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "sysora-web", "run", "dev"],
+      "runtimeArgs": [
+        "--prefix",
+        "sysora-web",
+        "run",
+        "dev"
+      ],
       "port": 3000
     },
     {
       "name": "sysora-sales",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "sysora-sales", "run", "dev"],
+      "runtimeArgs": [
+        "--prefix",
+        "sysora-sales",
+        "run",
+        "dev"
+      ],
       "port": 3100
+    },
+    {
+      "name": "sysora-ems",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "../../../../sysora-stack-ems",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "3200"
+      ],
+      "port": 3200
     }
   ]
 }

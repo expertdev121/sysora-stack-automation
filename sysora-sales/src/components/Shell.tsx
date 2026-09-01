@@ -68,6 +68,14 @@ const icons = {
       <path d="M3 12h4l2.5-6 4 12L16 12h5" />
     </Icon>
   ),
+  acquisition: (
+    <Icon>
+      <path d="M3 21l7-7" />
+      <path d="M14 4h6v6" />
+      <path d="M20 4l-8.5 8.5" />
+      <circle cx="7" cy="17" r="3.5" />
+    </Icon>
+  ),
   team: (
     <Icon>
       <circle cx="12" cy="7" r="3.5" />
@@ -82,6 +90,7 @@ const money: NavItem[] = [
   { href: "/", label: "Overview", icon: "overview", exact: true },
   { href: "/revenue", label: "Revenue", icon: "revenue" },
   { href: "/expenses", label: "Expenses", icon: "spend" },
+  { href: "/acquisition", label: "Acquisition", icon: "acquisition" },
 ];
 
 const plan: NavItem[] = [

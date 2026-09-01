@@ -344,3 +344,120 @@ export type EodMetric = {
   metric_id: string;
   quantity: number;
 };
+
+/* ---- Client acquisition ------------------------------------- */
+
+/** A batch of connects bought, or a free membership grant. */
+export type ConnectPurchase = {
+  id: string;
+  purchased_on: string;
+  connects: number;
+  /** Cents, before tax. Null for a free grant. */
+  amount_usd: number | null;
+  /** Cents. Kept apart from the amount because GST may be reclaimable. */
+  tax_usd: number | null;
+  /** Paise — what the card was actually charged, tax included. */
+  amount_inr: number | null;
+  is_free: boolean;
+  note: string | null;
+  created_at: string;
+};
+
+export type ProposalOutcome =
+  | "sent"
+  | "viewed"
+  | "replied"
+  | "interviewing"
+  | "hired"
+  | "declined"
+  | "expired";
+
+export const PROPOSAL_OUTCOME_LABELS: Record<ProposalOutcome, string> = {
+  sent: "Sent",
+  viewed: "Viewed",
+  replied: "Replied",
+  interviewing: "Interviewing",
+  hired: "Won",
+  declined: "Declined",
+  expired: "Expired",
+};
+
+/** Mint only for a win. Everything else stays neutral — a decline is
+ *  information, not an alarm, and two saturated hues in one table is noise. */
+export const PROPOSAL_OUTCOME_TONE: Record<ProposalOutcome, "mint" | "amber" | "slate"> = {
+  sent: "slate",
+  viewed: "slate",
+  replied: "slate",
+  interviewing: "amber",
+  hired: "mint",
+  declined: "slate",
+  expired: "slate",
+};
+
+/** One job bid on. The only place connect consumption is recorded. */
+export type Proposal = {
+  id: string;
+  submitted_on: string;
+  job_title: string;
+  job_url: string | null;
+  client_name: string | null;
+  connects_spent: number;
+  connects_refunded: number;
+  outcome: ProposalOutcome;
+  outcome_on: string | null;
+  submitted_by: string | null;
+  won_revenue_id: string | null;
+  notes: string | null;
+  created_at: string;
+};
+
+/** sales.connect_position — one row, always. */
+export type ConnectPosition = {
+  connects_acquired: number;
+  connects_free: number;
+  connects_bought: number;
+  paid_inr: number;
+  paid_usd: number;
+  tax_usd: number;
+  connects_spent: number;
+  connects_refunded: number;
+  proposals: number;
+  connects_left: number;
+  /** Paise per connect, blended across everything acquired. Null before any purchase. */
+  rate_inr: number | null;
+  rate_usd: number | null;
+};
+
+/** sales.acquisition_daily. */
+export type AcquisitionDay = {
+  day: string;
+  proposals: number;
+  connects_spent: number;
+  connects_refunded: number;
+  connects_cost_inr: number;
+  won: number;
+};
+
+/** sales.acquisition_progress — budget against actual, per target window. */
+export type AcquisitionProgress = {
+  revenue_target_id: string;
+  name: string | null;
+  level: TargetLevel;
+  starts_on: string;
+  ends_on: string;
+  currency: Currency;
+  /** Paise. Always INR, whatever the revenue target is denominated in. */
+  acquisition_budget: number | null;
+  connects_cost_inr: number;
+  connects_spent: number;
+  proposals: number;
+  proposals_won: number;
+  other_acquisition_inr: number;
+  other_rows_without_rupees: number;
+  spent_inr: number;
+  remaining_inr: number | null;
+  percent_used: number | null;
+  expected_by_today_inr: number | null;
+  cost_per_win_inr: number | null;
+  win_rate_percent: number | null;
+};

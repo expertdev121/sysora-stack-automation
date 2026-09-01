@@ -2,13 +2,16 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "sysora-web",
+      "name": "sysora-ems",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "--prefix",
-        "sysora-web",
+        "../../../../sysora-stack-ems",
         "run",
-        "dev"
+        "dev",
+        "--",
+        "--port",
+        "3000"
       ],
       "port": 3000
     },
@@ -24,18 +27,15 @@
       "port": 3100
     },
     {
-      "name": "sysora-ems",
+      "name": "sysora-web",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "--prefix",
-        "../../../../sysora-stack-ems",
+        "sysora-web",
         "run",
-        "dev",
-        "--",
-        "--port",
-        "3200"
+        "dev"
       ],
-      "port": 3200
+      "port": 3000
     }
   ]
 }

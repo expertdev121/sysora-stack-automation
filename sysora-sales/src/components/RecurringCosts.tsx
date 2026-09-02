@@ -219,7 +219,7 @@ export function CostList({
   costs: RecurringCost[];
   categories: SpendCategory[];
 }) {
-  const [adding, setAdding] = useState(false);
+  const [adding, setAdding] = useState(costs.length === 0);
 
   const running = costs.filter((c) => !c.ended_on);
   const stopped = costs.filter((c) => c.ended_on);
@@ -233,8 +233,8 @@ export function CostList({
             <span className="text-[12.5px] text-[var(--ink-300)]">
               {running.length} running{stopped.length > 0 ? ` · ${stopped.length} stopped` : ""}
             </span>
-            <Button size="sm" variant="ghost" onClick={() => setAdding((v) => !v)}>
-              {adding ? "Cancel" : "Add one"}
+            <Button size="sm" onClick={() => setAdding((v) => !v)}>
+              {adding ? "Cancel" : "Add a subscription"}
             </Button>
           </span>
         }
@@ -245,9 +245,17 @@ export function CostList({
       )}
 
       {costs.length === 0 ? (
-        <EmptyState>
-          Nothing added yet. Put your subscriptions in and each month totals itself.
-        </EmptyState>
+        <div className="px-6 pb-6">
+          <p className="m-0 max-w-[64ch] text-[14px] leading-[1.7] text-[var(--ink-400)]">
+            Nothing added yet. Add each subscription once — Zapier, ClickUp, a retainer, anything
+            that bills again — and every month totals itself from then on.
+          </p>
+          {!adding && (
+            <Button className="mt-4" onClick={() => setAdding(true)}>
+              Add your first subscription
+            </Button>
+          )}
+        </div>
       ) : (
         <Table>
           <thead>

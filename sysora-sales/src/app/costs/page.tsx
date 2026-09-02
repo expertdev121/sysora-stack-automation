@@ -190,6 +190,8 @@ export default async function CostsPage({
         </p>
       )}
 
+      {costs.length === 0 && <CostList costs={costs} categories={categories} />}
+
       <MonthDue charges={charges} paidIds={paidIds} />
 
       <Card className="mb-8">
@@ -246,7 +248,7 @@ export default async function CostsPage({
         )}
       </Card>
 
-      <CostList costs={costs} categories={categories} />
+      {costs.length > 0 && <CostList costs={costs} categories={categories} />}
     </Shell>
   );
 }

@@ -68,6 +68,12 @@ const icons = {
       <path d="M3 12h4l2.5-6 4 12L16 12h5" />
     </Icon>
   ),
+  costs: (
+    <Icon>
+      <path d="M12 2v20" />
+      <path d="M17 6.5H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6" />
+    </Icon>
+  ),
   acquisition: (
     <Icon>
       <path d="M3 21l7-7" />
@@ -91,6 +97,7 @@ const money: NavItem[] = [
   { href: "/revenue", label: "Revenue", icon: "revenue" },
   { href: "/expenses", label: "Expenses", icon: "spend" },
   { href: "/acquisition", label: "Acquisition", icon: "acquisition" },
+  { href: "/costs", label: "Monthly costs", icon: "costs" },
 ];
 
 const plan: NavItem[] = [

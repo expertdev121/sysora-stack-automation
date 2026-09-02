@@ -461,3 +461,70 @@ export type AcquisitionProgress = {
   cost_per_win_inr: number | null;
   win_rate_percent: number | null;
 };
+
+/* ---- Recurring costs ---------------------------------------- */
+
+export type BillingCadence = "monthly" | "quarterly" | "yearly";
+
+export const CADENCE_LABELS: Record<BillingCadence, string> = {
+  monthly: "Monthly",
+  quarterly: "Quarterly",
+  yearly: "Yearly",
+};
+
+/** A standing commitment — a subscription, a retainer, anything that repeats. */
+export type RecurringCost = {
+  id: string;
+  name: string;
+  vendor: string | null;
+  category_id: string | null;
+  cadence: BillingCadence;
+  /** Paise. What you expect to be charged. */
+  amount_inr: number | null;
+  /** Cents, for tools billed in dollars. Never converted into the rupees. */
+  amount_usd: number | null;
+  billing_day: number;
+  started_on: string;
+  /** Null while it is still running. */
+  ended_on: string | null;
+  notes: string | null;
+  created_at: string;
+};
+
+/** One charge a recurring cost is due to make, in one month. */
+export type RecurringCharge = {
+  recurring_cost_id: string;
+  name: string;
+  vendor: string | null;
+  category_id: string | null;
+  cadence: BillingCadence;
+  amount_inr: number | null;
+  amount_usd: number | null;
+  month: string;
+  due_on: string;
+};
+
+/** sales.monthly_costs — committed against actually paid, per month. */
+export type MonthlyCosts = {
+  month: string;
+  commitments_due: number;
+  committed_inr: number;
+  committed_usd: number;
+  committed_without_rupees: number;
+  commitments_paid: number;
+  commitments_unpaid: number;
+  expense_rows: number;
+  spent_inr: number;
+  spent_on_recurring_inr: number;
+  spent_one_off_inr: number;
+  spent_without_rupees: number;
+};
+
+/** sales.recurring_run_rate — one row, the smoothed monthly commitment. */
+export type RunRate = {
+  running: number;
+  /** Paise a month, with yearly and quarterly plans spread rather than lumped. */
+  monthly_inr: number;
+  monthly_usd: number;
+  without_rupees: number;
+};

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "n8n": {
+      "command": "node",
+      "args": ["Sysora Stack Internal Build/n8n-mcp/src/index.js"],
+      "env": {
+        "N8N_BASE_URL": "https://n8n-production-db72.up.railway.app",
+        "N8N_API_KEY": "${N8N_API_KEY}"
+      }
+    }
+  }
+}

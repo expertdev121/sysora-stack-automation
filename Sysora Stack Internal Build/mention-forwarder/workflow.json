@@ -1,0 +1,96 @@
+{
+  "name": "Slack Mention Forwarder",
+  "nodes": [
+    {
+      "parameters": {
+        "trigger": [
+          "message"
+        ],
+        "watchWorkspace": false,
+        "channelId": {
+          "__rl": true,
+          "value": "C0BS56L7V1A",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "watch-ops-team",
+      "name": "Watch ops-team",
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        -260,
+        0
+      ],
+      "webhookId": "c9e3f2a4-5d6b-4c8e-9a3f-1b2d4e6a8c53",
+      "notes": "#ops-team is PRIVATE: needs groups:history, and the bot must be invited to the channel."
+    },
+    {
+      "parameters": {
+        "jsCode": "// ── Match Mention ────────────────────────────────────────────────────────────\n// Slack fires an event for EVERY message in the watched channel. This node is\n// the gate: it drops everything that is not a real human tagging you, and\n// formats the ones that survive. Returning [] stops the workflow, so the\n// Slack send node only runs on a genuine hit.\n\nconst WATCH_FOR = 'U09KNBVTGG0'; // Expert Dev — whoever \"me\" is\nconst SOURCE_CHANNEL = 'C0BS56L7V1A'; // #ops-team\nconst INCLUDE_BROADCASTS = false; // count @here / @channel as tagging you?\nconst ALLOW_SELF_MENTION = true; // TESTING: true lets you tag yourself and fire\n//                                  the workflow solo. Flip back to false once\n//                                  someone else has tested it, or you will get\n//                                  pinged for your own messages forever.\nconst WORKSPACE_DOMAIN = ''; // e.g. 'gsmedia' -> adds a \"Jump to message\" link\n\n// n8n's Slack Trigger FLATTENS the event — {type,user,ts,text,channel,...} at\n// the top level, not the {event:{...}} envelope from Slack's docs. Accept both.\nconst raw = $input.first().json;\nconst ev = raw.event || raw;\n\n// Order matters: cheapest rejections first.\nif (ev.type !== 'message') return [];\nif (ev.channel !== SOURCE_CHANNEL) return [];\nif (ev.subtype) return []; // joins, edits, deletions, channel_join, file_share\nif (ev.bot_id) return []; // never forward bot chatter (Jira, tldv, etc.)\nif (ev.user === WATCH_FOR && !ALLOW_SELF_MENTION) return []; // self-tag is not a ping\n\nconst text = String(ev.text || '');\nconst tagged = text.includes('<@' + WATCH_FOR + '>');\nconst broadcast = INCLUDE_BROADCASTS && /<!(here|channel)>/.test(text);\nif (!tagged && !broadcast) return [];\n\n// <@Uxxx> and <#Cxxx> render as the real name / channel link in the\n// destination, so no extra API call is needed to resolve them.\nconst lines = [\n  ':bell: You were mentioned by <@' + ev.user + '> in <#' + ev.channel + '>',\n  '',\n  text\n    .split('\\n')\n    .map((l) => '> ' + l)\n    .join('\\n'),\n];\n\nif (WORKSPACE_DOMAIN) {\n  const p = 'p' + String(ev.ts).replace('.', '');\n  lines.push(\n    '',\n    '<https://' + WORKSPACE_DOMAIN + '.slack.com/archives/' + ev.channel + '/' + p + '|Jump to message>'\n  );\n}\n\nreturn [\n  {\n    json: {\n      text: lines.join('\\n'),\n      from: ev.user,\n      ts: ev.ts,\n      sourceChannel: ev.channel,\n      threadTs: ev.thread_ts || null,\n    },\n  },\n];\n"
+      },
+      "id": "match-mention",
+      "name": "Match Mention",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -40,
+        0
+      ],
+      "notes": "Drops bots, edits, joins and self-mentions. Returns [] to halt."
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "PASTE_DESTINATION_CHANNEL_ID",
+          "mode": "id"
+        },
+        "messageType": "text",
+        "text": "={{ $json.text }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "id": "forward-to-channel",
+      "name": "Forward to Channel",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        180,
+        0
+      ],
+      "notes": "Set the destination channel ID. Bot must be a member of it too."
+    }
+  ],
+  "connections": {
+    "Watch ops-team": {
+      "main": [
+        [
+          {
+            "node": "Match Mention",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Mention": {
+      "main": [
+        [
+          {
+            "node": "Forward to Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}

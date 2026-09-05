@@ -1,0 +1,113 @@
+# Sysora Ops Bot — the general-purpose Slack app for n8n workflows.
+#
+# Broad on purpose: install once, reuse the token across every workflow, so you
+# are not reinstalling the app each time a new automation needs a scope.
+#
+# api.slack.com/apps -> Create New App -> From a manifest -> workspace -> paste.
+#
+# TWO TOKENS COME OUT OF THIS:
+#   xoxb-...  bot token   -> everything except search
+#   xoxp-...  user token  -> search.messages / search.files ONLY work with this
+#
+# Not included, on purpose:
+#   event_subscriptions / interactivity — Slack verifies the Request URL the
+#     moment you save, so the n8n workflow must be ACTIVE first. Add in the UI.
+#   admin.* scopes — Enterprise Grid + org owner only; the manifest is rejected
+#     on a normal workspace.
+
+display_information:
+  name: Sysora Ops Bot
+  description: Automation bot for Sysora n8n workflows.
+  background_color: "#1f2933"
+
+features:
+  bot_user:
+    display_name: Sysora Ops
+    always_online: true
+  app_home:
+    home_tab_enabled: true
+    messages_tab_enabled: true
+    messages_tab_read_only_enabled: false
+
+oauth_config:
+  # Required ONLY if you use n8n's "Slack OAuth2 API" credential type. Slack
+  # refuses any redirect_uri not listed here, exact match, no trailing slash.
+  # Not needed for the "Slack API" (bot token) credential type.
+  redirect_urls:
+    - https://n8n-production-db72.up.railway.app/rest/oauth2-credential/callback
+
+  scopes:
+    # ── BOT TOKEN (xoxb-) ────────────────────────────────────────────────────
+    bot:
+      # events + mentions
+      - app_mentions:read
+
+      # public channels
+      - channels:read
+      - channels:history
+      - channels:join
+      - channels:manage
+
+      # private channels
+      - groups:read
+      - groups:history
+      - groups:write
+
+      # DMs and group DMs
+      - im:read
+      - im:history
+      - im:write
+      - mpim:read
+      - mpim:history
+      - mpim:write
+
+      # sending
+      - chat:write
+      - chat:write.public      # post to public channels without joining first
+      - chat:write.customize   # override bot name/avatar per message
+      - commands               # slash commands
+
+      # people
+      - users:read
+      - users:read.email       # map Slack IDs <-> work emails
+      - users.profile:read
+      - users:write            # set bot presence
+      - dnd:read
+
+      # files
+      - files:read
+      - files:write
+
+      # message furniture
+      - reactions:read
+      - reactions:write
+      - pins:read
+      - pins:write
+      - bookmarks:read
+      - bookmarks:write
+      - links:read
+      - links:write
+      - metadata.message:read
+
+      # workspace metadata
+      - team:read
+      - emoji:read
+      - usergroups:read
+      - usergroups:write
+
+    # ── USER TOKEN (xoxp-) ───────────────────────────────────────────────────
+    # Acts AS YOU. Sees everything you can see; actions are attributed to you.
+    # Keep this list minimal — it exists because search has no bot equivalent.
+    user:
+      - search:read            # the only way to call search.messages
+      - channels:history
+      - groups:history
+      - im:history
+      - mpim:history
+      - files:read
+      - users:read
+
+settings:
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false

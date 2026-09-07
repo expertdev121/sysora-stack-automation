@@ -376,3 +376,201 @@ export async function resetStaffPassword(userId: string): Promise<ActionResult &
 
   return { ok: true, link: `${siteUrl()}/admin/set-password?token=${token}` };
 }
+
+/* ---- Services ---------------------------------------------- */
+
+/**
+ * Editing a service.
+ *
+ * Owner-only, like pricing: these rows are the public site's copy, and a
+ * bad edit is visible to everyone who lands on the page rather than to
+ * one customer.
+ *
+ * An empty price field means "get a quote", which is why price_amount is
+ * nullable here rather than defaulting to zero — a service listed at $0
+ * is a promise nobody meant to make.
+ */
+export async function saveService(
+  slug: string,
+  patch: {
+    name?: string;
+    tagline?: string | null;
+    summary?: string | null;
+    body?: string | null;
+    price_amount?: number | null;
+    price_note?: string | null;
+    highlights?: string[];
+    deliverables?: string[];
+    seo_title?: string | null;
+    seo_description?: string | null;
+    keywords?: string[];
+    is_active?: boolean;
+    sort_order?: number;
+  },
+): Promise<ActionResult> {
+  const session = await requireOwner();
+  const db = salesDb();
+
+  const { data: before } = await db
+    .from("services")
+    .select("name, price_amount, is_active, sort_order")
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (!before) return { ok: false, error: "We couldn't find that service." };
+
+  if (
+    patch.price_amount !== undefined &&
+    patch.price_amount !== null &&
+    (!Number.isInteger(patch.price_amount) || patch.price_amount < 0)
+  ) {
+    return { ok: false, error: "Price must be a whole number of cents, or blank for a quote." };
+  }
+  if (patch.name !== undefined && patch.name.trim().length === 0) {
+    return { ok: false, error: "A service needs a name." };
+  }
+
+  const { error } = await db.from("services").update(patch).eq("slug", slug);
+  if (error) return { ok: false, error: error.message };
+
+  await audit({
+    actorId: session.userId,
+    actorEmail: session.email,
+    action: "service.updated",
+    entity: "service",
+    entityId: slug,
+    before,
+    after: patch,
+  });
+
+  revalidatePath("/admin/services");
+  revalidatePath("/services");
+  revalidatePath(`/services/${slug}`);
+  return { ok: true };
+}
+
+/** A new service starts unpublished — nothing reaches the site by accident. */
+export async function createService(name: string, slug: string): Promise<ActionResult> {
+  const session = await requireOwner();
+  const db = salesDb();
+
+  const clean = slug.trim().toLowerCase();
+  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(clean)) {
+    return { ok: false, error: "The URL can only use lowercase letters, numbers and hyphens." };
+  }
+  if (name.trim().length === 0) return { ok: false, error: "A service needs a name." };
+
+  const { error } = await db
+    .from("services")
+    .insert({ name: name.trim(), slug: clean, is_active: false });
+
+  if (error) {
+    return {
+      ok: false,
+      error: error.code === "23505" ? "That URL is already taken." : error.message,
+    };
+  }
+
+  await audit({
+    actorId: session.userId,
+    actorEmail: session.email,
+    action: "service.created",
+    entity: "service",
+    entityId: clean,
+    after: { name, slug: clean },
+  });
+
+  revalidatePath("/admin/services");
+  return { ok: true };
+}
+
+export async function saveServiceFaq(
+  id: string,
+  patch: { question?: string; answer?: string; sort_order?: number },
+): Promise<ActionResult> {
+  const session = await requireOwner();
+  const db = salesDb();
+
+  if (patch.question !== undefined && patch.question.trim().length === 0) {
+    return { ok: false, error: "A question cannot be blank." };
+  }
+  if (patch.answer !== undefined && patch.answer.trim().length === 0) {
+    return { ok: false, error: "An answer cannot be blank." };
+  }
+
+  const { error } = await db.from("service_faqs").update(patch).eq("id", id);
+  if (error) return { ok: false, error: error.message };
+
+  await audit({
+    actorId: session.userId,
+    actorEmail: session.email,
+    action: "service_faq.updated",
+    entity: "service_faq",
+    entityId: id,
+    after: patch,
+  });
+
+  revalidatePath("/admin/services");
+  revalidatePath("/services");
+  return { ok: true };
+}
+
+export async function addServiceFaq(serviceId: string): Promise<ActionResult> {
+  const session = await requireOwner();
+  const db = salesDb();
+
+  // Land at the bottom rather than fighting whatever order exists.
+  const { data: last } = await db
+    .from("service_faqs")
+    .select("sort_order")
+    .eq("service_id", serviceId)
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const { error } = await db.from("service_faqs").insert({
+    service_id: serviceId,
+    question: "New question",
+    answer: "The answer.",
+    sort_order: ((last?.sort_order as number | undefined) ?? 0) + 10,
+  });
+  if (error) return { ok: false, error: error.message };
+
+  await audit({
+    actorId: session.userId,
+    actorEmail: session.email,
+    action: "service_faq.created",
+    entity: "service_faq",
+    entityId: serviceId,
+  });
+
+  revalidatePath("/admin/services");
+  return { ok: true };
+}
+
+export async function deleteServiceFaq(id: string): Promise<ActionResult> {
+  const session = await requireOwner();
+  const db = salesDb();
+
+  const { data: before } = await db
+    .from("service_faqs")
+    .select("question, answer, service_id")
+    .eq("id", id)
+    .maybeSingle();
+
+  const { error } = await db.from("service_faqs").delete().eq("id", id);
+  if (error) return { ok: false, error: error.message };
+
+  await audit({
+    actorId: session.userId,
+    actorEmail: session.email,
+    action: "service_faq.deleted",
+    entity: "service_faq",
+    entityId: id,
+    before,
+  });
+
+  revalidatePath("/admin/services");
+  revalidatePath("/services");
+  return { ok: true };
+}

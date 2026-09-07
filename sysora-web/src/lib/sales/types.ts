@@ -155,3 +155,41 @@ export type AnswerInput = {
 export type SubmitResult =
   | { ok: true; reference: string; requiresPayment: boolean; redirectTo: string }
   | { ok: false; error: string; fieldErrors?: Record<string, string> };
+
+/* ---- Services ---------------------------------------------- */
+
+/**
+ * One row is one public /services/<slug> page.
+ *
+ * Distinct from Offer: an offer is a checkout path with a survey and a
+ * Stripe price behind it, a service is a page describing something we do.
+ * A service can link to an offer later; it does not need one to exist.
+ */
+export type Service = {
+  id: string;
+  slug: string;
+  name: string;
+  tagline: string | null;
+  summary: string | null;
+  /** Paragraphs separated by blank lines. */
+  body: string | null;
+  /** Minor units. Null means "get a quote", not free. */
+  price_amount: number | null;
+  currency: string;
+  price_note: string | null;
+  highlights: string[];
+  deliverables: string[];
+  seo_title: string | null;
+  seo_description: string | null;
+  keywords: string[];
+  is_active: boolean;
+  sort_order: number;
+};
+
+export type ServiceFaq = {
+  id: string;
+  service_id: string;
+  question: string;
+  answer: string;
+  sort_order: number;
+};

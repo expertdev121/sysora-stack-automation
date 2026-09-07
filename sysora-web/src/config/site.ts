@@ -14,6 +14,8 @@ export const routes = {
   buildRequest: "/build-request",
   /** On-Demand Systems Team, from $2,000/month. */
   systemsTeam: "/systems-team",
+  /** The services catalogue — one page per service. */
+  services: "/services",
   contact: "/contact",
   about: "/about",
   /** In-page anchor to the "Three ways to start" section. */
@@ -32,5 +34,6 @@ export const navLinks = [
   { label: "The problem", href: "/#problem" },
   { label: "How we work", href: "/#how" },
   { label: "Proof", href: "/#proof" },
+  { label: "Services", href: "/services" },
   { label: "Ways to start", href: "/#start" },
 ] as const;

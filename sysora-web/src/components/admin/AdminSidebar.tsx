@@ -53,6 +53,13 @@ const icons = {
       <path d="M18 14.5a6 6 0 0 1 3 5.5" />
     </Icon>
   ),
+  services: (
+    <Icon>
+      <path d="M3 8.5l9-4.5 9 4.5-9 4.5z" />
+      <path d="M3 13l9 4.5 9-4.5" />
+      <path d="M3 17.5L12 22l9-4.5" />
+    </Icon>
+  ),
   plans: (
     <Icon>
       <rect x="3" y="6" width="18" height="12" rx="2" />
@@ -125,6 +132,7 @@ const primary: NavItem[] = [
 ];
 
 const configure: NavItem[] = [
+  { href: "/admin/services", label: "Services", icon: "services" },
   { href: "/admin/plans", label: "Plans", icon: "plans" },
   { href: "/admin/surveys", label: "Questions", icon: "questions" },
   { href: "/admin/settings", label: "Settings", icon: "settings" },

@@ -31,9 +31,10 @@ export const servicesPage = {
 
   hero: {
     imageAlt: "Hero image — team or systems dashboard shot",
-    // Both already stated on the landing page; kept identical on purpose so
-    // the same claim is never phrased two different ways on one site.
-    ratingEyebrow: "Rated on 17 contracts",
+    // Labelled as the Upwork delivery record rather than as Sysora client
+    // results, because that is what it is. The figures themselves match the
+    // landing page so one claim is never phrased two ways on one site.
+    ratingEyebrow: "Upwork delivery record · 17 contracts",
     ratingLine: "Every project 5.0",
   },
 

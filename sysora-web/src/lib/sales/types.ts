@@ -169,6 +169,8 @@ export type Service = {
   id: string;
   slug: string;
   name: string;
+  /** Compliance, Build, Automation... the chip above the name. */
+  category: string | null;
   tagline: string | null;
   summary: string | null;
   /** Paragraphs separated by blank lines. */
@@ -182,6 +184,14 @@ export type Service = {
   seo_title: string | null;
   seo_description: string | null;
   keywords: string[];
+  /** What the price means: "Starting at", "Per workflow, from", "One time". */
+  price_label: string;
+  /** At most one service leads the page. */
+  is_featured: boolean;
+  featured_label: string | null;
+  image_url: string | null;
+  /** Alt text, and the placeholder caption until an image exists. */
+  image_alt: string | null;
   is_active: boolean;
   sort_order: number;
 };

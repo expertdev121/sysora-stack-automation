@@ -39,6 +39,12 @@ export function ServiceEditor({
   const [pending, startTransition] = useTransition();
 
   const [name, setName] = useState(service.name);
+  const [category, setCategory] = useState(service.category ?? "");
+  const [priceLabelText, setPriceLabelText] = useState(service.price_label);
+  const [featured, setFeatured] = useState(service.is_featured);
+  const [featuredLabel, setFeaturedLabel] = useState(service.featured_label ?? "");
+  const [imageUrl, setImageUrl] = useState(service.image_url ?? "");
+  const [imageAlt, setImageAlt] = useState(service.image_alt ?? "");
   const [tagline, setTagline] = useState(service.tagline ?? "");
   const [summary, setSummary] = useState(service.summary ?? "");
   const [body, setBody] = useState(service.body ?? "");
@@ -74,6 +80,12 @@ export function ServiceEditor({
     startTransition(async () => {
       const result = await saveService(service.slug, {
         name: name.trim(),
+        category: category.trim() || null,
+        price_label: priceLabelText.trim() || "Starting at",
+        is_featured: featured,
+        featured_label: featuredLabel.trim() || null,
+        image_url: imageUrl.trim() || null,
+        image_alt: imageAlt.trim() || null,
         tagline: tagline.trim() || null,
         summary: summary.trim() || null,
         body: body.trim() || null,
@@ -131,6 +143,31 @@ export function ServiceEditor({
             onChange={(e) => setName(e.target.value)}
           />,
         )}
+        <div className="grid grid-cols-2 gap-4 to-520:grid-cols-1">
+          {field(
+            "Category",
+            <input
+              className={inputClass}
+              value={category}
+              placeholder="Build"
+              disabled={!canEdit}
+              onChange={(e) => setCategory(e.target.value)}
+            />,
+            "The chip above the name.",
+          )}
+          {field(
+            "Price label",
+            <input
+              className={inputClass}
+              value={priceLabelText}
+              placeholder="Starting at"
+              disabled={!canEdit}
+              onChange={(e) => setPriceLabelText(e.target.value)}
+            />,
+            "“Starting at”, “Per workflow, from”, “One time”.",
+          )}
+        </div>
+
         {field(
           "Tagline",
           <input
@@ -201,6 +238,51 @@ export function ServiceEditor({
             {field("Keywords", area(keywords, setKeywords, 4), "One per line.")}
           </div>
         </div>
+
+        {field(
+          "Image caption",
+          <input
+            className={inputClass}
+            value={imageAlt}
+            placeholder="Screenshot: approved A2P campaign"
+            disabled={!canEdit}
+            onChange={(e) => setImageAlt(e.target.value)}
+          />,
+          "Alt text once an image is set, and the placeholder caption until then.",
+        )}
+        {field(
+          "Image URL",
+          <input
+            className={inputClass}
+            value={imageUrl}
+            placeholder="https://…"
+            disabled={!canEdit}
+            onChange={(e) => setImageUrl(e.target.value)}
+          />,
+          "Leave blank to show the captioned placeholder.",
+        )}
+
+        <label className="flex items-center gap-2.5 text-[13.5px] font-semibold text-[var(--ink-700)]">
+          <input
+            type="checkbox"
+            checked={featured}
+            disabled={!canEdit}
+            onChange={(e) => setFeatured(e.target.checked)}
+          />
+          Lead the services page
+        </label>
+        {featured &&
+          field(
+            "Badge",
+            <input
+              className={inputClass}
+              value={featuredLabel}
+              placeholder="Most requested"
+              disabled={!canEdit}
+              onChange={(e) => setFeaturedLabel(e.target.value)}
+            />,
+            "Only one service can lead the page at a time.",
+          )}
 
         <label className="mt-2 flex items-center gap-2.5 text-[13.5px] font-semibold text-[var(--ink-700)]">
           <input

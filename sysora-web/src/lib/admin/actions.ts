@@ -394,6 +394,12 @@ export async function saveService(
   slug: string,
   patch: {
     name?: string;
+    category?: string | null;
+    price_label?: string;
+    is_featured?: boolean;
+    featured_label?: string | null;
+    image_url?: string | null;
+    image_alt?: string | null;
     tagline?: string | null;
     summary?: string | null;
     body?: string | null;

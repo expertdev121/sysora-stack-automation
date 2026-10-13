@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { SysoraLogo } from "@/components/ui/Logo";
 import { navLinks, routes } from "@/config/site";
+import { cn } from "@/lib/cn";
 
 /**
  * Sticky site header. The desktop layout matches the source design exactly;
@@ -14,6 +15,7 @@ import { navLinks, routes } from "@/config/site";
  */
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [stuck, setStuck] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -24,27 +26,50 @@ export function SiteHeader() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  // Once the page has moved at all, the header earns a shadow.
+  useEffect(() => {
+    const onScroll = () => setStuck(window.scrollY > 12);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-[20px] border-b-[1.5px] border-[var(--border-faint)]">
-      <div className="max-w-[1200px] mx-auto px-6 py-3 flex items-center justify-between gap-6">
+    <header
+      className={cn(
+        "sticky top-0 z-30 backdrop-blur-[20px] saturate-[140%] border-b-[1.5px] border-[var(--border-faint)]",
+        "transition-[box-shadow,background] duration-[250ms] ease-out",
+        stuck
+          ? "bg-white/95 shadow-[0_1px_0_var(--border-faint),0_14px_34px_rgba(0,80,50,0.08)]"
+          : "bg-white/90",
+      )}
+    >
+      <div className="max-w-[1200px] mx-auto px-6 py-[15px] flex items-center justify-between gap-7">
         <Link href={routes.home} className="flex items-center" aria-label="Sysora home">
           <SysoraLogo className="h-8 w-auto block" />
         </Link>
 
-        <nav className="flex items-center gap-[30px] to-860:hidden">
+        <nav className="flex items-center gap-[26px] to-980:gap-5 to-860:hidden">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-[14px] font-medium text-[var(--text-muted)] hover:text-[var(--accent-strong)] transition-colors duration-150"
+              className="relative py-2 px-[2px] text-[14px] font-medium text-[var(--text-muted)] transition-colors duration-[180ms] hover:text-[var(--ink-900)] after:content-[''] after:absolute after:inset-x-0 after:-bottom-px after:h-[2px] after:rounded-[2px] after:bg-[var(--accent)] after:origin-left after:scale-x-0 after:transition-transform after:duration-[220ms] hover:after:scale-x-100"
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
-          <Button size="sm" href={routes.waysToStart} className="to-520:hidden">
+        <div className="flex items-center gap-4 flex-none">
+          <Link
+            href={routes.waysToStart}
+            className="text-[14px] font-semibold text-[var(--ink-700)] hover:text-[var(--accent-strong)] to-980:hidden"
+          >
+            Ways to start
+          </Link>
+
+          <Button size="sm" arrow href={routes.systemsReview} className="to-520:hidden">
             Start with the $49 review
           </Button>
 
@@ -94,7 +119,7 @@ export function SiteHeader() {
               size="md"
               arrow
               fullWidth
-              href={routes.waysToStart}
+              href={routes.systemsReview}
               className="mt-3"
               onClick={() => setOpen(false)}
             >

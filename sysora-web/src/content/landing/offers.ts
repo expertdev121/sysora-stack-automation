@@ -1,69 +1,78 @@
 import { routes } from "@/config/site";
 
 export type Offer = {
-  number: string;
-  badge?: string;
-  featured?: boolean;
+  n: string;
+  /** Empty unless the card carries a ribbon. */
+  badge: string;
   title: string;
   price: string;
-  priceNote: string;
-  summary: string;
-  items: string[];
-  footnote?: string;
-  cta: { label: string; href: string; variant: "primary" | "ghost"; arrow?: boolean };
+  forWhen: string;
+  points: string[];
+  /** The honest limit of the offer. Empty where there isn't one. */
+  boundary: string;
+  cta: string;
+  href: string;
+  /** Reassurance under the button. Empty where there isn't any. */
+  support: string;
+};
+
+export type CompareRow = {
+  label: string;
+  a: string;
+  b: string;
 };
 
 export const offers = {
-  eyebrow: "Three ways to start",
+  eyebrow: "Three ways to work with us",
   headline: "Pick the one that matches where you are.",
-  plans: [
+  cards: [
     {
-      number: "01",
+      n: "01",
+      badge: "",
       title: "Submit a Build Request",
-      price: "Free",
-      priceNote: "to submit, scoped per project",
-      summary: "For when you already know what you want built.",
-      items: [
+      price: "Free to submit, scoped per project",
+      forWhen:
+        "For when you already know what you want built and it is not on the services list.",
+      points: [
         "Tell us the project and the problem behind it",
         "We review your requirements and current setup",
         "A call if the scope needs clarifying",
         "A proposal with recommended scope, timeline, and investment",
         "You approve it, we build",
       ],
-      cta: { label: "Submit a Build Request", href: routes.buildRequest, variant: "ghost" },
+      boundary: "",
+      cta: "Get a Free Build Quote",
+      href: routes.buildRequest,
+      support:
+        "Tell us what you want built. You get a scope, a timeline and a price, at no cost.",
     },
     {
-      number: "02",
+      n: "02",
       badge: "Best seller",
-      featured: true,
       title: "Business Systems Review",
-      price: "$49",
-      priceNote: "one time",
-      summary:
-        "For when something is clearly inefficient and you're not sure what to fix first.",
-      items: [
+      price: "$49 one time",
+      forWhen:
+        "For when something is clearly inefficient and you are not sure what to fix first. Also for when nothing is built yet and you want to know what should be.",
+      points: [
         "A short questionnaire about your business, tools, and workflow",
         "The single area where automation, AI, or better design pays off most",
         "A clear recommended direction",
-        "What we'd do next if it were our business",
+        "What we would do next if it were our business",
       ],
-      footnote:
-        "A lightweight diagnostic, not a full technical audit. Bigger or messier operations may need a deeper systems diagnosis, and we'll say so. There is no obligation to hire us.",
-      cta: {
-        label: "Get your Business Systems Review",
-        href: routes.systemsReview,
-        variant: "primary",
-        arrow: true,
-      },
+      boundary:
+        "A lightweight diagnostic, not a full technical audit. Bigger or messier operations may need a deeper systems diagnosis, and we will say so. There is no obligation to hire us.",
+      cta: "Get your Business Systems Review",
+      href: routes.systemsReview,
+      support: "",
     },
     {
-      number: "03",
+      n: "03",
+      badge: "",
       title: "On-Demand Systems Team",
-      price: "$2,000",
-      priceNote: "/month and up, tailored",
-      summary:
+      price: "$2,000/month and up, tailored",
+      forWhen:
         "For when your business runs on technology and needs someone to keep it running.",
-      items: [
+      points: [
         "Monitoring, maintenance, and troubleshooting",
         "CRM and workflow improvements",
         "Integration support and AI workflow upgrades",
@@ -71,33 +80,73 @@ export const offers = {
         "A monthly systems review with recommendations",
         "You send requests, we prioritise them with you",
       ],
-      footnote:
-        "Scope and capacity are agreed per client. Larger projects get their own proposal. We don't promise unlimited development, and any team that does is either overcharging you or about to under-deliver.",
-      cta: { label: "Build your Systems Team", href: routes.systemsTeam, variant: "ghost" },
+      boundary:
+        "Scope and capacity are agreed per client. Larger projects get their own proposal. We do not promise unlimited development, and any team that does is either overcharging you or about to under-deliver.",
+      cta: "Build your Systems Team",
+      href: routes.systemsTeam,
+      support: "",
     },
   ] as Offer[],
+
+  compare: {
+    eyebrow: "Cheaper than the hire it replaces",
+    headline: "A team that already knows the work, for less than one junior hire.",
+    columnA: "A junior operations hire",
+    columnB: "On-Demand Systems Team",
+    rows: [
+      {
+        label: "Monthly cost",
+        a: "More than $2,000 for one junior hire",
+        b: "From $2,000 for a team",
+      },
+      {
+        label: "Recruiting and onboarding",
+        a: "Yours to run, before any work starts",
+        b: "None. We start on the approved list",
+      },
+      {
+        label: "Skill coverage",
+        a: "One person expected to cover automation, CRM architecture, integrations, and software",
+        b: "A team that already covers all four",
+      },
+      {
+        label: "Ramp-up",
+        a: "Weeks of learning your business",
+        b: "Systems mapped in the first stage",
+      },
+      {
+        label: "Monitoring and documentation",
+        a: "Whatever they get around to",
+        b: "Built in, plus a monthly systems review",
+      },
+    ] as CompareRow[],
+    cta: "Build your Systems Team",
+  },
+
   chooser: {
-    /** Set to false to hide the "Not sure which one" helper block. */
-    show: true,
-    title: "Not sure which one",
+    headline: "Not sure which one",
     lead: "Find the sentence that sounds like your week.",
     cards: [
       {
-        quote: '"We\'re doing too much manually and I don\'t know where to start."',
-        answer: "Business Systems Review",
-        price: "$49, one time",
+        quote: '"I am starting out and I do not know what to build first."',
+        name: "Business Systems Review",
+        note: "$49, one time",
+        href: routes.systemsReview,
       },
       {
-        quote: '"I already know what I want built."',
-        answer: "Submit a Build Request",
-        price: "Free to submit",
+        quote: '"I know exactly what I need built."',
+        name: "Submit a Build Request",
+        note: "Free to submit",
+        href: routes.buildRequest,
       },
       {
-        quote: '"I need this maintained and improved by people who know it."',
-        answer: "On-Demand Systems Team",
-        price: "From $2,000/month",
+        quote:
+          '"I need this maintained and improved by people who know it."',
+        name: "On-Demand Systems Team",
+        note: "From $2,000/month",
+        href: routes.systemsTeam,
       },
     ],
-    cta: { label: "Talk to our team", href: routes.contact },
+    cta: "Talk to our team",
   },
 } as const;

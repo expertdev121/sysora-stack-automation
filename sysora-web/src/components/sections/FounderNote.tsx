@@ -2,43 +2,32 @@ import { Eyebrow } from "@/components/ui/Eyebrow";
 import { founderNote } from "@/content/landing/proof";
 
 export function FounderNote() {
-  if (!founderNote.show) return null;
-
   return (
-    <section className="px-6 py-[clamp(104px,13vh,152px)]">
-      <div className="max-w-[820px] mx-auto">
-        <Eyebrow>{founderNote.eyebrow}</Eyebrow>
-        <h2 className="mt-0 mb-8 text-[clamp(34px,4.4vw,54px)] font-extrabold leading-[1.2] tracking-[-0.8px] text-[var(--ink-900)]">
+    <section id="founder" className="px-6 py-[clamp(78px,10vh,126px)]">
+      <div className="max-w-[880px] mx-auto">
+        <Eyebrow className="text-[var(--mint-700)]">{founderNote.eyebrow}</Eyebrow>
+        <h2 className="text-[clamp(30px,3.6vw,46px)] font-black leading-[1.1] tracking-[-1px] text-[var(--ink-900)]">
           {founderNote.headline}
         </h2>
 
-        <div className="flex flex-col gap-5 text-[19px] leading-[1.75] text-[var(--ink-600)]">
-          {founderNote.paragraphs.map((paragraph) => (
-            <p key={paragraph.slice(0, 40)} className="m-0">
-              {paragraph}
-            </p>
-          ))}
-
-          <p className="m-0 px-[30px] py-[26px] rounded-[18px] bg-[var(--mint-50)] border-[1.5px] border-[var(--border-default)] text-[20px] font-semibold leading-[1.5] text-[var(--ink-900)]">
+        <div className="flex flex-col gap-5 mt-[26px] pl-[clamp(0px,2.4vw,28px)] border-l-[3px] border-[var(--mint-300)]">
+          <p className="m-0 text-[17.5px] leading-[1.8] text-[var(--ink-600)]">
+            {founderNote.paragraphs[0]}
+          </p>
+          <p className="m-0 text-[17.5px] leading-[1.8] text-[var(--ink-600)]">
+            {founderNote.paragraphs[1]}
+          </p>
+          <p className="m-0 text-[19.5px] font-bold leading-[1.7] text-[var(--ink-900)]">
             {founderNote.highlight}
           </p>
-
-          <p className="m-0">{founderNote.closing}</p>
-
-          <div className="flex items-center gap-[14px] mt-3 pt-[26px] border-t-[1.5px] border-[var(--border-faint)]">
-            <span className="w-10 h-10 rounded-full bg-[var(--mint-100)] border-[1.5px] border-[var(--border-default)] inline-flex items-center justify-center font-mono text-[15px] font-semibold text-[var(--mint-700)]">
-              {founderNote.signature.initial}
-            </span>
-            <span className="flex flex-col">
-              <span className="text-[15px] font-bold text-[var(--ink-900)]">
-                {founderNote.signature.name}
-              </span>
-              <span className="text-[13px] text-[var(--text-muted)]">
-                {founderNote.signature.role}
-              </span>
-            </span>
-          </div>
+          <p className="m-0 text-[17.5px] leading-[1.8] text-[var(--ink-600)]">
+            {founderNote.closing}
+          </p>
         </div>
+
+        <p className="mt-7 mb-0 pt-[22px] border-t-[1.5px] border-[var(--border-faint)] text-[14.5px] font-semibold text-[var(--ink-800)]">
+          {founderNote.signature}
+        </p>
       </div>
     </section>
   );

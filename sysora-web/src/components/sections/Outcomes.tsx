@@ -1,109 +1,82 @@
-import { CrossIcon } from "@/components/ui/Icon";
+import { CheckIcon, CrossIcon } from "@/components/ui/Icon";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { outcomes } from "@/content/landing/outcomes";
 
-const { comparison } = outcomes;
-
 export function Outcomes() {
+  const { compare } = outcomes;
+
   return (
-    <section className="px-6 py-[clamp(104px,13vh,152px)]">
+    <section
+      id="outcome"
+      className="px-6 py-[clamp(78px,10vh,126px)] bg-[var(--surface-1)] border-y-[1.5px] border-[var(--border-faint)]"
+    >
       <div className="max-w-[1200px] mx-auto">
         <div className="max-w-[740px]">
-          <Eyebrow>{outcomes.eyebrow}</Eyebrow>
-          <h2 className="mt-0 mb-[22px] text-[clamp(34px,4.4vw,54px)] font-extrabold leading-[1.2] tracking-[-0.8px] text-[var(--ink-900)]">
+          <Eyebrow className="text-[var(--mint-700)]">{outcomes.eyebrow}</Eyebrow>
+          <h2 className="text-[clamp(30px,3.6vw,46px)] font-black leading-[1.1] tracking-[-1px] text-[var(--ink-900)]">
             {outcomes.headline}
           </h2>
         </div>
 
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-5 mt-12 items-stretch">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6 mt-11 items-stretch">
           {outcomes.cards.map((card) => (
-            <div
+            <article
               key={card.title}
-              className="p-card flex flex-col p-8 rounded-[20px] bg-[var(--surface-0)] border-[1.5px] border-[var(--border-faint)] shadow-[0_2px_4px_rgba(0,80,50,0.04),0_20px_44px_rgba(0,80,50,0.07)]"
+              className="sx-card p-8 rounded-[18px] bg-[var(--surface-0)] border-[1.5px] border-[var(--border-default)] shadow-[0_2px_6px_rgba(0,80,50,0.05),0_16px_36px_rgba(0,80,50,0.07)]"
             >
-              <span className="inline-flex items-center justify-center w-[38px] h-[38px] rounded-[11px] bg-[var(--mint-100)] text-[var(--mint-700)]">
-                <svg
-                  width="19"
-                  height="19"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M20 6L9 17l-5-5" />
-                </svg>
-              </span>
-              <h3 className="mt-5 mb-3 text-[17px] font-bold tracking-[-0.3px] leading-[1.2] text-[var(--ink-900)]">
+              <span aria-hidden="true" className="sx-accent-bar" />
+              <h3 className="mt-[22px] mb-[10px] text-[19.5px] font-bold leading-[1.3] text-[var(--ink-900)]">
                 {card.title}
               </h3>
               <p className="m-0 text-[15.5px] leading-[1.75] text-[var(--ink-500)]">{card.body}</p>
-            </div>
+            </article>
           ))}
         </div>
 
-        <div className="p-card grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-0 mt-8 rounded-[20px] bg-[var(--surface-0)] border-[1.5px] border-[var(--border-default)] shadow-[0_2px_4px_rgba(0,80,50,0.04),0_20px_44px_rgba(0,80,50,0.07)] overflow-hidden to-860:grid-cols-1 to-860:gap-8">
-          {/* Today, by hand */}
-          <div className="px-8 py-[34px] bg-[var(--surface-1)] border-r-[1.5px] border-[var(--border-faint)]">
-            <p className="mt-0 mb-[6px] font-mono text-[10px] tracking-[1.4px] uppercase text-[var(--ink-200)]">
-              {comparison.before.label}
-            </p>
-            <p className="mt-0 mb-[22px] text-[20px] font-extrabold tracking-[-0.3px] text-[var(--ink-900)]">
-              {comparison.before.title}
-            </p>
-            <div className="flex flex-col gap-[14px]">
-              {comparison.before.steps.map((step) => (
-                <div key={step} className="flex items-start gap-3">
-                  <span className="flex-none mt-[3px] w-4 h-4 rounded-full border-[1.5px] border-[var(--line-slate)] inline-flex items-center justify-center text-[var(--ink-100)]">
-                    <CrossIcon />
-                  </span>
-                  <span className="text-[15px] leading-[1.65] text-[var(--ink-500)]">{step}</span>
-                </div>
+        <div className="mt-7 rounded-[20px] border-[1.5px] border-[var(--border-default)] bg-[var(--surface-0)] shadow-[0_2px_6px_rgba(0,80,50,0.05),0_18px_40px_rgba(0,80,50,0.07)] overflow-hidden">
+          <div className="grid grid-cols-2 to-860:grid-cols-1">
+            <div className="p-8 border-r-[1.5px] border-[var(--border-faint)] bg-[var(--surface-1)] to-860:border-r-0 to-860:border-b-[1.5px]">
+              <p className="mt-0 mb-5 font-mono text-[10.5px] tracking-[1.3px] uppercase text-[var(--ink-300)]">
+                {compare.todayLabel}
+              </p>
+              {compare.today.map((row) => (
+                <p
+                  key={row}
+                  className="mt-0 mb-3 flex gap-[10px] text-[15px] leading-[1.6] text-[var(--ink-500)]"
+                >
+                  <CrossIcon
+                    size={15}
+                    strokeWidth={1.75}
+                    className="flex-none mt-1 text-[var(--ink-300)]"
+                  />
+                  <span>{row}</span>
+                </p>
               ))}
             </div>
-            <p className="mt-6 mb-0 pt-[18px] border-t-[1.5px] border-[var(--border-faint)] font-mono text-[13px] text-[var(--ink-300)]">
-              {comparison.before.metricLabel}
-              <span className="text-[var(--ink-900)]">{comparison.before.metricValue}</span>
-            </p>
+
+            <div className="p-8 bg-[var(--mint-50)]">
+              <p className="mt-0 mb-5 font-mono text-[10.5px] tracking-[1.3px] uppercase text-[var(--mint-700)]">
+                {compare.withUsLabel}
+              </p>
+              {compare.withUs.map((row) => (
+                <p
+                  key={row}
+                  className="mt-0 mb-3 flex gap-[10px] text-[15px] leading-[1.6] text-[var(--ink-700)]"
+                >
+                  <CheckIcon
+                    size={15}
+                    strokeWidth={2.2}
+                    className="flex-none mt-1 text-[var(--accent-strong)]"
+                  />
+                  <span>{row}</span>
+                </p>
+              ))}
+            </div>
           </div>
 
-          {/* With Sysora */}
-          <div className="px-8 py-[34px] bg-[var(--mint-50)]">
-            <p className="mt-0 mb-[6px] font-mono text-[10px] tracking-[1.4px] uppercase text-[var(--mint-700)]">
-              {comparison.after.label}
-            </p>
-            <p className="mt-0 mb-[22px] text-[20px] font-extrabold tracking-[-0.3px] text-[var(--ink-900)]">
-              {comparison.after.title}
-            </p>
-            <div className="flex flex-col gap-[14px]">
-              {comparison.after.steps.map((step) => (
-                <div key={step} className="flex items-start gap-3">
-                  <span className="flex-none mt-[3px] w-4 h-4 rounded-full bg-[var(--accent)] inline-flex items-center justify-center text-white">
-                    <svg
-                      width="9"
-                      height="9"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M20 6L9 17l-5-5" />
-                    </svg>
-                  </span>
-                  <span className="text-[15px] leading-[1.65] text-[var(--ink-700)]">{step}</span>
-                </div>
-              ))}
-            </div>
-            <p className="mt-6 mb-0 pt-[18px] border-t-[1.5px] border-[var(--border-default)] font-mono text-[13px] text-[var(--ink-500)]">
-              {comparison.after.metricLabel}
-              <span className="text-[var(--accent-strong)]">{comparison.after.metricValue}</span>
-            </p>
-          </div>
+          <p className="m-0 px-8 py-[13px] border-t-[1.5px] border-[var(--border-faint)] bg-[var(--surface-1)] font-mono text-[10px] tracking-[1px] uppercase text-[var(--ink-300)]">
+            {compare.disclaimer}
+          </p>
         </div>
       </div>
     </section>

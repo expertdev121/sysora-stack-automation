@@ -3,7 +3,15 @@
  * SVG in the source design, including size, stroke width and cap style.
  */
 
-export function CheckIcon({ size = 11 }: { size?: number }) {
+export function CheckIcon({
+  size = 11,
+  strokeWidth = 3,
+  className,
+}: {
+  size?: number;
+  strokeWidth?: number;
+  className?: string;
+}) {
   return (
     <svg
       width={size}
@@ -11,9 +19,10 @@ export function CheckIcon({ size = 11 }: { size?: number }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="3"
+      strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
+      className={className}
       aria-hidden="true"
     >
       <path d="M20 6L9 17l-5-5" />
@@ -21,7 +30,15 @@ export function CheckIcon({ size = 11 }: { size?: number }) {
   );
 }
 
-export function CrossIcon({ size = 9 }: { size?: number }) {
+export function CrossIcon({
+  size = 9,
+  strokeWidth = 3,
+  className,
+}: {
+  size?: number;
+  strokeWidth?: number;
+  className?: string;
+}) {
   return (
     <svg
       width={size}
@@ -29,8 +46,9 @@ export function CrossIcon({ size = 9 }: { size?: number }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="3"
+      strokeWidth={strokeWidth}
       strokeLinecap="round"
+      className={className}
       aria-hidden="true"
     >
       <path d="M18 6L6 18M6 6l12 12" />
@@ -56,17 +74,28 @@ export function CrossMutedIcon({ size = 16 }: { size?: number }) {
   );
 }
 
-export function ArrowRightIcon({ size = 18 }: { size?: number }) {
+export function ArrowRightIcon({
+  size = 18,
+  stroke = "var(--accent-strong)",
+  strokeWidth = 2.2,
+  className,
+}: {
+  size?: number;
+  stroke?: string;
+  strokeWidth?: number;
+  className?: string;
+}) {
   return (
     <svg
       width={size}
       height={size}
       viewBox="0 0 24 24"
       fill="none"
-      stroke="var(--accent-strong)"
-      strokeWidth="2.2"
+      stroke={stroke}
+      strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
+      className={className}
       aria-hidden="true"
     >
       <path d="M5 12h14M13 6l6 6-6 6" />

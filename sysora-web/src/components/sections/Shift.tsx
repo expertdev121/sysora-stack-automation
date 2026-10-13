@@ -3,50 +3,57 @@ import { shift } from "@/content/landing/shift";
 
 export function Shift() {
   return (
-    <section className="px-6 py-[clamp(104px,13vh,152px)] bg-[linear-gradient(165deg,#153826,#194430)]">
-      <div className="max-w-[1200px] mx-auto grid grid-cols-[minmax(260px,0.85fr)_minmax(320px,1.15fr)] gap-14 items-start to-860:grid-cols-1 to-860:gap-8">
-        <div>
-          <Eyebrow>{shift.eyebrow}</Eyebrow>
-          <h2 className="mt-0 mb-[22px] text-[clamp(34px,4.4vw,54px)] font-extrabold leading-[1.2] tracking-[-0.8px] text-white">
+    <section id="shift" className="px-6 py-[clamp(78px,10vh,126px)]">
+      <div className="max-w-[1200px] mx-auto">
+        <div className="max-w-[800px]">
+          <Eyebrow className="text-[var(--mint-700)]">{shift.eyebrow}</Eyebrow>
+          <h2 className="text-[clamp(30px,3.8vw,48px)] font-black leading-[1.1] tracking-[-1px] text-[var(--ink-900)]">
             {shift.headline}
           </h2>
-          <p className="m-0 text-[15px] leading-[1.75] text-[var(--text-on-dark-muted)]">
+          <p className="mt-[18px] mb-0 text-[17px] leading-[1.75] text-[var(--ink-500)]">
             {shift.lead}
           </p>
-          <div className="flex flex-wrap gap-[9px] mt-6">
-            {shift.tools.map((tool) => (
-              <span
-                key={tool}
-                className="px-[14px] py-[7px] rounded-full border-[1.5px] border-white/[0.16] text-[13px] font-semibold text-white/80"
-              >
-                {tool}
-              </span>
-            ))}
-          </div>
         </div>
 
-        <div className="flex flex-col gap-[18px]">
-          <div className="px-7 py-[26px] rounded-2xl bg-white/[0.035] border-[1.5px] border-white/[0.09]">
-            <p className="mt-0 mb-2 font-mono text-[12px] tracking-[1px] uppercase text-white/[0.42]">
-              {shift.wrongQuestion.label}
+        <div className="flex flex-wrap gap-[9px] mt-[26px]">
+          {shift.tools.map((tool) => (
+            <span
+              key={tool}
+              className="px-[15px] py-2 rounded-full bg-[var(--surface-1)] border-[1.5px] border-[var(--line-slate)] text-[13px] font-medium text-[var(--ink-600)]"
+            >
+              {tool}
+            </span>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-6 mt-10 items-stretch">
+          <div className="relative p-[34px] rounded-[18px] bg-[var(--surface-1)] border-[1.5px] border-[var(--line-slate)]">
+            <p className="mt-0 mb-[14px] font-mono text-[10.5px] tracking-[1.3px] uppercase text-[var(--ink-300)]">
+              {shift.before.label}
             </p>
-            <p className="m-0 text-[17px] leading-[1.65] text-white/[0.72]">
-              {shift.wrongQuestion.body}
+            <p className="m-0 text-[21px] font-bold leading-[1.5] text-[var(--ink-500)]">
+              {shift.before.quote}
+            </p>
+            <p className="mt-4 mb-0 text-[15.5px] leading-[1.75] text-[var(--ink-500)]">
+              {shift.before.body}
             </p>
           </div>
 
-          <div className="px-7 py-[26px] rounded-2xl bg-[rgba(0,200,150,0.09)] border-[1.5px] border-[rgba(0,200,150,0.30)]">
-            <p className="mt-0 mb-2 font-mono text-[12px] tracking-[1px] uppercase text-[var(--accent)]">
-              {shift.rightQuestion.label}
+          <div className="sx-card relative p-[34px] rounded-[18px] bg-[var(--mint-50)] border-[1.5px] border-[var(--border-default)] shadow-[0_3px_8px_rgba(0,80,50,0.06),0_22px_48px_rgba(0,80,50,0.10)]">
+            <span
+              aria-hidden="true"
+              className="absolute top-0 left-[34px] right-[34px] h-1 rounded-b bg-[linear-gradient(90deg,var(--accent),rgba(0,200,150,0))]"
+            />
+            <p className="mt-0 mb-[14px] font-mono text-[10.5px] tracking-[1.3px] uppercase text-[var(--mint-700)]">
+              {shift.after.label}
             </p>
-            <p className="m-0 text-[17px] font-semibold leading-[1.65] text-white">
-              {shift.rightQuestion.body}
+            <p className="m-0 text-[21px] font-bold leading-[1.5] text-[var(--ink-900)]">
+              {shift.after.quote}
+            </p>
+            <p className="mt-4 mb-0 text-[15.5px] leading-[1.75] text-[var(--ink-600)]">
+              {shift.after.body}
             </p>
           </div>
-
-          <p className="mt-[6px] mb-0 text-[15px] leading-[1.75] text-[var(--text-on-dark-muted)]">
-            {shift.closing}
-          </p>
         </div>
       </div>
     </section>

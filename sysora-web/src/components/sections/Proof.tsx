@@ -1,272 +1,199 @@
 "use client";
 
-import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Eyebrow } from "@/components/ui/Eyebrow";
-import { CrownIcon, StarIcon, StarSoftIcon } from "@/components/ui/Icon";
+import { StarIcon } from "@/components/ui/Icon";
 import { proof } from "@/content/landing/proof";
-import { VISIBLE_REVIEWS, reviews, type Review } from "@/content/landing/reviews";
+import { reviews } from "@/content/landing/reviews";
 import { cn } from "@/lib/cn";
 
-const { founder } = proof;
-
-function Stars({ className }: { className?: string }) {
-  return (
-    <span className={cn("flex gap-[2px]", className)}>
-      {Array.from({ length: 5 }, (_, i) => (
-        <StarIcon key={i} />
-      ))}
-    </span>
-  );
-}
-
-function Tag({ variant, children }: { variant: "mint" | "slate"; children: string }) {
-  return (
-    <span
-      className={cn(
-        "px-3 py-[6px] rounded-full border-[1.5px] text-[12px] font-semibold text-[var(--ink-500)]",
-        variant === "mint"
-          ? "bg-[var(--mint-50)] border-[var(--border-default)]"
-          : "bg-[var(--surface-2)] border-[var(--line-slate)]",
-      )}
-    >
-      {children}
-    </span>
-  );
-}
-
-function ReviewCard({ review, last }: { review: Review; last: boolean }) {
-  return (
-    <div
-      className={cn(
-        "px-8 py-[30px]",
-        !last && "border-b-[1.5px] border-[var(--border-faint)]",
-      )}
-    >
-      <p className="m-0 text-[18px] font-bold leading-[1.2] tracking-[-0.3px] text-[var(--ink-900)]">
-        {review.title}
-      </p>
-      <div className="flex flex-wrap items-center gap-3 mt-[11px]">
-        <Stars className="text-[#F97316]" />
-        <span className="font-mono text-[13.5px] font-semibold text-[var(--ink-800)]">
-          {review.rating}
-        </span>
-        <span className="w-px h-[14px] bg-[var(--line-slate)]" />
-        <span className="text-[13px] text-[var(--ink-300)]">{review.date}</span>
-      </div>
-
-      {review.quotes.map((quote, i) => (
-        <p
-          key={i}
-          className={cn(
-            "mb-0 text-[15.5px] italic leading-[1.65] text-[var(--ink-600)]",
-            i === 0 ? "mt-4" : "mt-[13px]",
-          )}
-        >
-          {quote}
-        </p>
-      ))}
-
-      {review.endorsements.length > 0 && (
-        <>
-          <p className="mt-5 mb-[9px] text-[13.5px] font-semibold text-[var(--ink-500)]">
-            Endorsed by client
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {review.endorsements.map((tag) => (
-              <Tag key={tag} variant="mint">
-                {tag}
-              </Tag>
-            ))}
-          </div>
-        </>
-      )}
-
-      {review.contractTags.length > 0 && (
-        <>
-          <p className="mt-[18px] mb-[9px] text-[13.5px] font-semibold text-[var(--ink-500)]">
-            Identified from contract
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {review.contractTags.map((tag) => (
-              <Tag key={tag} variant="slate">
-                {tag}
-              </Tag>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
+/**
+ * The review carousel. It advances itself every seven seconds, and stops
+ * doing that for anyone who has asked for reduced motion. The arrows and
+ * dots work either way.
+ */
 export function Proof() {
-  const [showAll, setShowAll] = useState(false);
-  const visible = showAll ? reviews : reviews.slice(0, VISIBLE_REVIEWS);
+  const [idx, setIdx] = useState(0);
+  const review = reviews[idx];
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = setInterval(() => setIdx((i) => (i + 1) % reviews.length), 7000);
+    return () => clearInterval(id);
+  }, []);
+
+  const prev = () => setIdx((i) => (i - 1 + reviews.length) % reviews.length);
+  const next = () => setIdx((i) => (i + 1) % reviews.length);
 
   return (
     <section
       id="proof"
-      className="px-6 py-[clamp(104px,13vh,152px)] bg-[var(--surface-tint)] border-t-[1.5px] border-b-[1.5px] border-[var(--border-default)]"
+      className="px-6 py-[clamp(78px,10vh,126px)] bg-[var(--surface-1)] border-y-[1.5px] border-[var(--border-faint)]"
     >
       <div className="max-w-[1200px] mx-auto">
         <div className="max-w-[780px]">
-          <Eyebrow>{proof.eyebrow}</Eyebrow>
-          <h2 className="mt-0 mb-[22px] text-[clamp(34px,4.4vw,54px)] font-extrabold leading-[1.2] tracking-[-0.8px] text-[var(--ink-900)]">
+          <Eyebrow className="text-[var(--mint-700)]">{proof.eyebrow}</Eyebrow>
+          <h2 className="text-[clamp(30px,3.6vw,46px)] font-black leading-[1.1] tracking-[-1px] text-[var(--ink-900)]">
             {proof.headline}
-            <span className="text-[var(--accent-strong)]">{proof.headlineAccent}</span>
           </h2>
-          {proof.showDisclaimer && (
-            <p className="m-0 text-[15px] leading-[1.75] text-[var(--ink-300)]">
-              {proof.disclaimer}
-            </p>
-          )}
+          <p className="mt-[18px] mb-0 text-[17px] leading-[1.75] text-[var(--ink-500)]">
+            {proof.lead}
+          </p>
         </div>
 
-        {/* Reviews */}
-        <div className="p-card mt-12 rounded-[20px] bg-[var(--surface-0)] border-[1.5px] border-[var(--border-default)] shadow-[0_2px_4px_rgba(0,80,50,0.04),0_20px_44px_rgba(0,80,50,0.07)] overflow-hidden">
-          <div className="flex flex-wrap items-center justify-between gap-3 px-8 py-[14px] bg-[var(--surface-1)] border-b-[1.5px] border-[var(--border-faint)]">
-            <span className="font-mono text-[10.5px] tracking-[1.2px] uppercase text-[var(--ink-200)]">
-              {proof.reviewsHeader.left}
+        <div className="sx-card mt-11 rounded-[20px] bg-[var(--surface-0)] border-[1.5px] border-[var(--border-default)] shadow-[0_3px_8px_rgba(0,80,50,0.05),0_22px_48px_rgba(0,80,50,0.09)] overflow-hidden">
+          <div className="flex flex-wrap items-center justify-between gap-3 px-[30px] py-[15px] bg-[var(--surface-1)] border-b-[1.5px] border-[var(--border-faint)]">
+            <span className="font-mono text-[10.5px] tracking-[1.2px] uppercase text-[var(--ink-300)]">
+              {proof.carousel.label}
             </span>
             <span className="text-[12.5px] font-semibold text-[var(--mint-700)]">
-              {proof.reviewsHeader.right}
+              {proof.carousel.rating}
             </span>
           </div>
 
-          {visible.map((review, i) => (
-            <ReviewCard key={review.title} review={review} last={i === visible.length - 1} />
-          ))}
+          <div className="px-[30px] py-8 min-h-[230px]">
+            <p className="m-0 text-[18px] font-bold leading-[1.35] text-[var(--ink-900)]">
+              {review.title}
+            </p>
 
-          <div className="flex justify-center px-8 py-5 border-t-[1.5px] border-[var(--border-faint)] bg-[var(--surface-1)]">
-            <button
-              type="button"
-              onClick={() => setShowAll((v) => !v)}
-              className="px-[22px] py-[11px] rounded-[10px] border-[1.5px] border-[var(--border-default)] bg-[var(--surface-0)] font-[inherit] text-[14px] font-semibold leading-[normal] text-[var(--mint-700)] cursor-pointer transition-colors duration-150 hover:bg-[var(--mint-50)]"
-            >
-              {showAll ? proof.showLess : proof.showMore}
-            </button>
-          </div>
-        </div>
-
-        {/* Founder profile + pull quote */}
-        <div className="grid grid-cols-[minmax(300px,1.15fr)_minmax(280px,0.85fr)] gap-5 mt-8 items-stretch to-860:grid-cols-1 to-860:gap-8">
-          <div className="p-card flex flex-col rounded-[20px] border-[1.5px] border-[var(--border-neutral)] bg-[var(--surface-0)] shadow-[0_2px_4px_rgba(0,80,50,0.04),0_20px_44px_rgba(0,80,50,0.07)] overflow-hidden">
-            <div className="flex items-center justify-between gap-3 px-5 py-3 border-b-[1.5px] border-[var(--line-slate-2)] bg-[var(--surface-1)]">
-              <span className="font-mono text-[10.5px] tracking-[1.2px] uppercase text-[var(--ink-200)]">
-                {founder.cardLabel}
+            <div className="flex flex-wrap items-center gap-3 mt-[11px]">
+              <span className="flex gap-[2px] text-[#F97316]">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <StarIcon key={i} size={14} />
+                ))}
               </span>
-              <span className="inline-flex items-center gap-[7px] text-[12.5px] font-semibold text-[#14A800]">
-                <span className="w-[7px] h-[7px] rounded-full bg-[#14A800]" />
-                {founder.availability}
+              <span className="font-mono text-[13.5px] font-semibold text-[var(--ink-800)]">
+                5.0
               </span>
+              <span className="w-px h-[14px] bg-[var(--line-slate)]" />
+              <span className="text-[13px] text-[var(--ink-300)]">{review.dates}</span>
             </div>
 
-            <div className="flex items-start gap-[18px] px-7 pt-[26px] pb-[22px]">
-              <span className="relative flex-none w-[76px] h-[76px] rounded-full overflow-hidden border-[1.5px] border-[var(--line-slate)]">
-                {founder.avatar ? (
-                  <Image
-                    src={founder.avatar}
-                    alt={founder.name}
-                    fill
-                    sizes="76px"
-                    // Portrait source: anchoring the crop to the top keeps the
-                    // face centred in the circle instead of high in the frame.
-                    className="object-cover object-top"
-                  />
-                ) : (
-                  <span className="absolute inset-0 flex items-center justify-center bg-[#f2f1ef] text-[#6e6c66] text-[11px] select-none">
-                    {founder.avatarPlaceholder}
-                  </span>
-                )}
-              </span>
+            {review.quote.map((para, i) => (
+              <p
+                key={i}
+                className="mt-[15px] mb-0 text-[15.5px] italic leading-[1.8] text-[var(--ink-600)]"
+              >
+                {para}
+              </p>
+            ))}
 
-              <div className="flex-1 min-w-0">
-                <p className="m-0 flex items-center gap-2 text-[22px] font-extrabold tracking-[-0.3px] text-[var(--ink-900)]">
-                  {founder.name}
-                  <span className="inline-flex items-center justify-center w-[19px] h-[19px] rounded-full bg-[#1D4ED8] text-white">
-                    <svg
-                      width="11"
-                      height="11"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M20 6L9 17l-5-5" />
-                    </svg>
-                  </span>
+            {review.note && (
+              <div className="mt-4 px-5 py-[18px] rounded-[14px] bg-[var(--mint-50)] border-[1.5px] border-[var(--border-default)]">
+                <p className="m-0 text-[15px] leading-[1.75] text-[var(--ink-700)]">
+                  {review.note}
                 </p>
-                <div className="flex flex-wrap items-center gap-[18px] mt-[14px]">
-                  {founder.badges.map((badge) => (
+                <div className="flex flex-wrap gap-[7px] mt-[14px]">
+                  {review.stack.map((s) => (
                     <span
-                      key={badge.label}
-                      className="inline-flex items-center gap-[9px] text-[13.5px] font-bold text-[var(--ink-800)]"
+                      key={s}
+                      className="px-[11px] py-[5px] rounded-full bg-[var(--surface-0)] border-[1.5px] border-[var(--border-default)] font-mono text-[11px] text-[var(--mint-700)]"
                     >
-                      {badge.kind === "jss" ? (
-                        <span className="inline-flex items-center justify-center w-[26px] h-[26px] rounded-full border-2 border-[#1D4ED8] text-[#1D4ED8]">
-                          <CrownIcon />
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center justify-center w-[26px] h-[26px] rounded-[7px] bg-[#1D4ED8] text-white">
-                          <StarSoftIcon />
-                        </span>
-                      )}
-                      {badge.label}
+                      {s}
                     </span>
                   ))}
                 </div>
               </div>
-            </div>
+            )}
+          </div>
 
-            <div className="grid grid-cols-3 gap-0 border-t-[1.5px] border-b-[1.5px] border-[var(--line-slate-2)]">
-              {founder.stats.map((stat, i) => (
-                <div
-                  key={stat.label}
+          <div className="flex flex-wrap items-center justify-between gap-[14px] px-[30px] py-4 border-t-[1.5px] border-[var(--border-faint)]">
+            <span className="flex items-center gap-2">
+              {reviews.map((r, i) => (
+                <button
+                  key={r.title}
+                  type="button"
+                  aria-label={`Show review ${i + 1}`}
+                  aria-current={i === idx}
+                  onClick={() => setIdx(i)}
                   className={cn(
-                    "px-6 py-5",
-                    i < founder.stats.length - 1 &&
-                      "border-r-[1.5px] border-[var(--line-slate-2)]",
+                    "h-2 p-0 rounded-full border-none cursor-pointer transition-all duration-200",
+                    i === idx
+                      ? "w-[22px] bg-[var(--accent-strong)]"
+                      : "w-2 bg-[var(--line-slate)]",
                   )}
+                />
+              ))}
+            </span>
+
+            <span className="flex items-center gap-[14px]">
+              <span className="font-mono text-[12px] text-[var(--ink-300)]">
+                {idx + 1} of {reviews.length}
+              </span>
+              <span className="flex gap-2">
+                <button
+                  type="button"
+                  aria-label="Previous review"
+                  onClick={prev}
+                  className="sx-tab inline-flex items-center justify-center w-[38px] h-[38px] rounded-[10px] bg-[var(--surface-0)] border-[1.5px] border-[var(--border-default)]"
                 >
-                  <p className="m-0 font-mono text-[21px] font-semibold tracking-[-0.6px] text-[var(--ink-900)]">
-                    {stat.value}
-                  </p>
-                  <p className="mt-[5px] mb-0 text-[12.5px] text-[var(--text-muted)]">
-                    {stat.label}
-                  </p>
-                </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-700)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M19 12H5M11 18l-6-6 6-6" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  aria-label="Next review"
+                  onClick={next}
+                  className="sx-tab inline-flex items-center justify-center w-[38px] h-[38px] rounded-[10px] bg-[var(--accent-strong)] border-[1.5px] border-[var(--accent-strong)]"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </button>
+              </span>
+            </span>
+          </div>
+
+          <p className="m-0 px-[30px] py-[14px] bg-[var(--surface-1)] text-[12.5px] leading-[1.6] text-[var(--ink-300)]">
+            {proof.carousel.footnote}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-[minmax(300px,1fr)_minmax(0,1.25fr)] gap-6 mt-6 items-stretch to-860:grid-cols-1">
+          <div className="sx-card p-[30px] rounded-[20px] bg-[var(--surface-0)] border-[1.5px] border-[var(--border-default)] shadow-[0_2px_6px_rgba(0,80,50,0.05),0_18px_40px_rgba(0,80,50,0.07)]">
+            <p className="mt-0 mb-5 font-mono text-[10.5px] tracking-[1.2px] uppercase text-[var(--ink-300)]">
+              {proof.profile.label}
+            </p>
+            <div className="grid grid-cols-2 gap-[18px]">
+              {proof.profile.figures.map((f) => (
+                <span key={f.label} className="flex flex-col gap-1">
+                  <span
+                    className={cn(
+                      "font-mono text-[24px] font-semibold tracking-[-0.8px]",
+                      "accent" in f && f.accent
+                        ? "text-[var(--mint-700)]"
+                        : "text-[var(--ink-900)]",
+                    )}
+                  >
+                    {f.value}
+                  </span>
+                  <span className="text-[12.5px] text-[var(--text-muted)]">{f.label}</span>
+                </span>
               ))}
             </div>
-
-            <div className="px-7 pt-6 pb-[26px]">
-              <p className="m-0 text-[17px] font-bold leading-[1.2] tracking-[-0.3px] text-[var(--ink-900)]">
-                {founder.headline}
-              </p>
-              <div className="flex flex-wrap gap-2 mt-4">
-                {founder.skills.map((skill) => (
-                  <Tag key={skill} variant="slate">
-                    {skill}
-                  </Tag>
-                ))}
-              </div>
-              <div className="flex items-center gap-[10px] mt-5 pt-[18px] border-t-[1.5px] border-[var(--line-slate-2)]">
-                <Stars className="text-[#14A800]" />
-                <span className="text-[13px] text-[var(--ink-500)]">{founder.ratingLine}</span>
-              </div>
+            <div className="flex flex-wrap gap-[7px] mt-6 pt-[22px] border-t-[1.5px] border-[var(--border-faint)]">
+              {proof.profile.skills.map((skill) => (
+                <span
+                  key={skill}
+                  className="px-3 py-[6px] rounded-full bg-[var(--surface-2)] border-[1.5px] border-[var(--line-slate)] text-[12px] font-semibold text-[var(--ink-500)]"
+                >
+                  {skill}
+                </span>
+              ))}
             </div>
           </div>
 
-          <div className="p-8 rounded-[20px] bg-[linear-gradient(150deg,#153826,#194430)] flex flex-col justify-center gap-4">
-            <p className="m-0 text-[20px] font-bold leading-[1.2] text-white">
-              {proof.pullQuote.title}
+          <div className="sx-card flex flex-col justify-center p-[34px] rounded-[20px] bg-[var(--forest-hero)] border-[1.5px] border-[rgba(0,200,150,0.24)]">
+            <p className="mt-0 mb-[14px] font-mono text-[10.5px] tracking-[1.3px] uppercase text-[var(--accent)]">
+              {proof.pattern.label}
             </p>
-            <p className="m-0 text-[15px] leading-[1.75] text-[var(--text-on-dark-muted)]">
-              {proof.pullQuote.body}
+            <p className="m-0 text-[19px] font-bold leading-[1.55] text-white">
+              {proof.pattern.lead}
+            </p>
+            <p className="mt-4 mb-0 text-[15.5px] leading-[1.8] text-white/[0.68]">
+              {proof.pattern.body}
             </p>
           </div>
         </div>

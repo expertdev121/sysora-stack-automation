@@ -18,8 +18,8 @@ export const routes = {
   services: "/services",
   contact: "/contact",
   about: "/about",
-  /** In-page anchor to the "Three ways to start" section. */
-  waysToStart: "/#start",
+  /** In-page anchor to the "Three ways to work with us" section. */
+  waysToStart: "/#offers",
 } as const;
 
 export const siteConfig = {
@@ -33,7 +33,8 @@ export const siteConfig = {
 export const navLinks = [
   { label: "The problem", href: "/#problem" },
   { label: "How we work", href: "/#how" },
-  { label: "Proof", href: "/#proof" },
+  { label: "What we build", href: "/#build" },
+  { label: "Engineering", href: "/#engineering" },
   { label: "Services", href: "/services" },
-  { label: "Ways to start", href: "/#start" },
+  { label: "Proof", href: "/#proof" },
 ] as const;

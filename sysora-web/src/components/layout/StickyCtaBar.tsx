@@ -9,21 +9,21 @@ import { cn } from "@/lib/cn";
 
 /**
  * Appears once the reader is past the hero, and steps aside while the
- * "Three ways to start" section is on screen. Hidden below 700px.
+ * "Three ways to work with us" section is on screen. Hidden below 700px.
  */
 export function StickyCtaBar() {
   const [on, setOn] = useState(false);
 
   useEffect(() => {
     const onScroll = () => {
-      const start = document.getElementById("start");
+      const offers = document.getElementById("offers");
       const y = window.scrollY || document.documentElement.scrollTop;
       let nearOffer = false;
-      if (start) {
-        const rect = start.getBoundingClientRect();
+      if (offers) {
+        const rect = offers.getBoundingClientRect();
         nearOffer = rect.top < window.innerHeight * 0.9 && rect.bottom > 0;
       }
-      setOn(y > 1400 && !nearOffer);
+      setOn(y > 1200 && !nearOffer);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -34,7 +34,7 @@ export function StickyCtaBar() {
   return (
     <div
       className={cn(
-        "cta-bar fixed left-0 right-0 bottom-0 z-40 px-6 py-[14px] bg-[rgba(10,31,20,0.92)] backdrop-blur-[18px] border-t-[1.5px] border-[rgba(0,200,150,0.22)]",
+        "cta-bar fixed left-0 right-0 bottom-0 z-40 px-6 py-[14px] bg-[rgba(10,31,20,0.96)] backdrop-blur-[18px] border-t-[1.5px] border-[rgba(0,200,150,0.24)]",
         on && "is-on",
       )}
     >
@@ -44,10 +44,10 @@ export function StickyCtaBar() {
           <span className="text-[13px] text-white/55">{stickyBar.subtitle}</span>
         </span>
         <span className="flex flex-wrap gap-[10px]">
-          <Button arrow href={routes.systemsReview}>
+          <Button size="sm" arrow href={routes.systemsReview}>
             {stickyBar.primary}
           </Button>
-          <Button variant="outlineWhite" href={routes.buildRequest}>
+          <Button size="sm" variant="outlineWhite" href={routes.buildRequest}>
             {stickyBar.secondary}
           </Button>
         </span>

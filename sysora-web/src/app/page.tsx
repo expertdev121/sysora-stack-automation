@@ -1,50 +1,61 @@
+import type { Metadata } from "next";
+
 import { ScrollReveal } from "@/components/layout/ScrollReveal";
-import { SiteFooter } from "@/components/layout/SiteFooter";
-import { SiteHeader } from "@/components/layout/SiteHeader";
-import { StickyCtaBar } from "@/components/layout/StickyCtaBar";
-import { CommandCenter } from "@/components/sections/CommandCenter";
-import { Faq } from "@/components/sections/Faq";
-import { FounderNote } from "@/components/sections/FounderNote";
-import { Hero } from "@/components/sections/Hero";
-import { LastWord } from "@/components/sections/LastWord";
-import { MathSection } from "@/components/sections/Math";
-import { Offers } from "@/components/sections/Offers";
-import { Outcomes } from "@/components/sections/Outcomes";
-import { Problem } from "@/components/sections/Problem";
-import { Process } from "@/components/sections/Process";
-import { Proof } from "@/components/sections/Proof";
-import { Services } from "@/components/sections/Services";
-import { Shift } from "@/components/sections/Shift";
-import { Urgency } from "@/components/sections/Urgency";
-import { WhyUs } from "@/components/sections/WhyUs";
+import { Audiences } from "@/components/sales/Audiences";
+import { Calculator } from "@/components/sales/Calculator";
+import { Costs } from "@/components/sales/Costs";
+import { FinalCta } from "@/components/sales/FinalCta";
+import { HowItRuns } from "@/components/sales/HowItRuns";
+import { MoreReviews } from "@/components/sales/MoreReviews";
+import { Packages } from "@/components/sales/Packages";
+import { RefundGuarantee } from "@/components/sales/RefundGuarantee";
+import { ReviewMarquee } from "@/components/sales/ReviewMarquee";
+import { Safeguards } from "@/components/sales/Safeguards";
+import { SalesFaq } from "@/components/sales/SalesFaq";
+import { SalesFooter } from "@/components/sales/SalesFooter";
+import { SalesHeader } from "@/components/sales/SalesHeader";
+import { SalesHero } from "@/components/sales/SalesHero";
+import { SalesProvider } from "@/components/sales/SalesProvider";
+import { Support } from "@/components/sales/Support";
+import { TrackRecord } from "@/components/sales/TrackRecord";
+import { WhoBuilt } from "@/components/sales/WhoBuilt";
+import { Work } from "@/components/sales/Work";
+import { meta } from "@/content/landing/sales";
+
+export const metadata: Metadata = {
+  title: meta.title,
+  description: meta.description,
+};
 
 export default function Home() {
   return (
-    <div
-      id="page"
-      className="font-sans text-[var(--text-body)] bg-[var(--surface-0)] overflow-x-hidden"
-    >
-      <ScrollReveal rootId="page" />
-      <SiteHeader />
+    <SalesProvider>
+      <div
+        id="page"
+        className="font-sans text-[var(--ink-600)] bg-[var(--surface-0)] overflow-x-clip"
+      >
+        <ScrollReveal rootId="page" />
+        <SalesHeader />
 
-      <Hero />
-      <CommandCenter />
-      <Problem />
-      <Shift />
-      <Outcomes />
-      <Process />
-      <Services />
-      <Proof />
-      <FounderNote />
-      <WhyUs />
-      <Offers />
-      <MathSection />
-      <Urgency />
-      <Faq />
-      <LastWord />
+        <SalesHero />
+        <ReviewMarquee />
+        <Packages />
+        <Safeguards />
+        <TrackRecord />
+        <Work />
+        <Audiences />
+        <Support />
+        <HowItRuns />
+        <MoreReviews />
+        <WhoBuilt />
+        <RefundGuarantee />
+        <Costs />
+        <Calculator />
+        <SalesFaq />
+        <FinalCta />
 
-      <StickyCtaBar />
-      <SiteFooter />
-    </div>
+        <SalesFooter />
+      </div>
+    </SalesProvider>
   );
 }

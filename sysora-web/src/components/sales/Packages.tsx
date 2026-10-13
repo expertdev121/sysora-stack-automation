@@ -121,7 +121,7 @@ export function Packages() {
               <path d="M12 5v14M5 12h14" />
             </svg>
             {packages.customLead}{" "}
-            <Link href={routes.buildRequest} className="font-semibold">
+            <Link href={routes.requestEstimate} className="font-semibold">
               {packages.customCta}
             </Link>
           </span>

@@ -49,7 +49,7 @@ export function SalesHero() {
             <Button size="lg" arrow href="#packages">
               {hero.primaryCta}
             </Button>
-            <Button size="lg" variant="ghost" href={routes.buildRequest}>
+            <Button size="lg" variant="ghost" href={routes.requestEstimate}>
               {hero.secondaryCta}
             </Button>
           </div>

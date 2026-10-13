@@ -3,7 +3,8 @@ import Link from "next/link";
 import { SysoraLogo } from "@/components/ui/Logo";
 import { footer } from "@/content/landing/sales";
 
-export function SalesFooter() {
+/** `anchorBase` works as it does on the header: "/" on an inner page. */
+export function SalesFooter({ anchorBase = "" }: { anchorBase?: string }) {
   return (
     <footer className="px-6 pt-[clamp(56px,8vh,80px)] bg-[#0F3A2C] text-white/[0.68]">
       <div className="max-w-[1160px] mx-auto">
@@ -35,7 +36,7 @@ export function SalesFooter() {
                 {column.links.map((link) => (
                   <li key={link.label}>
                     {link.href.startsWith("#") ? (
-                      <a className="sx-ft-a" href={link.href}>
+                      <a className="sx-ft-a" href={`${anchorBase}${link.href}`}>
                         {link.label}
                       </a>
                     ) : (

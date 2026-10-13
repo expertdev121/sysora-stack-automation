@@ -553,7 +553,7 @@ export const footer = {
       links: [
         { label: "Services", href: "/services" },
         { label: "How it runs", href: "#how" },
-        { label: "Request an estimate", href: "/build-request" },
+        { label: "Request an estimate", href: "/request-estimate" },
         { label: "About Sysora", href: "/about" },
       ],
     },

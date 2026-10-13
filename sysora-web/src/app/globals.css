@@ -1320,3 +1320,147 @@
     transform: none;
   }
 }
+
+/* ============================================================
+   Estimate form
+   ============================================================ */
+
+.sx-lbl {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-800);
+}
+
+.sx-fld {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border-default);
+  background: var(--surface-0);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  color: var(--ink-900);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sx-fld:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.14);
+}
+
+.sx-err {
+  margin: 7px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--danger, #dc2626);
+}
+
+/* Multi-select pills for the kinds of work. */
+.sx-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border-default);
+  background: var(--surface-0);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-600);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.sx-tool:hover {
+  border-color: var(--mint-300);
+}
+
+.sx-tool[data-on="1"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* Single-select boxes for timing. */
+.sx-opt {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border-default);
+  background: var(--surface-0);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-700);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.sx-opt:hover {
+  border-color: var(--mint-300);
+}
+
+.sx-opt[data-on="1"] {
+  border-color: var(--accent);
+  background: var(--mint-50);
+  color: var(--ink-900);
+  box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.12);
+}
+
+.sx-step-in {
+  animation: sxStepIn 0.45s var(--ease-out) both;
+}
+
+@keyframes sxStepIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.sx-chk-ring {
+  stroke-dasharray: 190;
+  stroke-dashoffset: 190;
+  animation: sxDraw 0.8s 0.1s var(--ease-out) forwards;
+}
+
+.sx-chk-tick {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: sxDraw 0.45s 0.7s ease forwards;
+}
+
+@keyframes sxDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.sx-spin {
+  animation: sxSpin 0.8s linear infinite;
+}
+
+@keyframes sxSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sx-step-in,
+  .sx-chk-ring,
+  .sx-chk-tick {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

@@ -25,7 +25,7 @@ export function FinalCta() {
           <Button size="lg" arrow href="#packages">
             {finalCta.primaryCta}
           </Button>
-          <Button size="lg" variant="outlineWhite" href={routes.buildRequest}>
+          <Button size="lg" variant="outlineWhite" href={routes.requestEstimate}>
             {finalCta.secondaryCta}
           </Button>
         </div>

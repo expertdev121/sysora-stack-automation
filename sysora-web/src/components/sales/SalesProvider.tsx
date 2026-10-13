@@ -43,7 +43,7 @@ export const money = (n: number) => "$" + n.toLocaleString("en-US");
 
 /** Where a "buy N hours" click goes, carrying the choice with it. */
 export function checkoutHref(hours: number, billing: Billing) {
-  return `/build-request?hours=${hours}&billing=${billing}`;
+  return `/checkout/hours?hours=${hours}&billing=${billing}`;
 }
 
 /** Bar width for a pack, scaled across the $10–$19 range like the design. */

@@ -13,7 +13,12 @@ import { cn } from "@/lib/cn";
  * the offer, and one CTA. Below 960px the links collapse into a drawer
  * rather than disappearing, which is what the source design did.
  */
-export function SalesHeader() {
+/**
+ * @param anchorBase prefix for the in-page anchors. Empty on the home page,
+ * where the sections are on the same document; "/" on an inner page, where
+ * they are not.
+ */
+export function SalesHeader({ anchorBase = "" }: { anchorBase?: string }) {
   const [stuck, setStuck] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -50,7 +55,7 @@ export function SalesHeader() {
           {nav.map((item) => (
             <a
               key={item.href}
-              href={item.href}
+              href={`${anchorBase}${item.href}`}
               className="relative py-2 px-[2px] text-[14px] font-medium text-[var(--text-muted)] transition-colors duration-[180ms] hover:text-[var(--ink-900)] after:content-[''] after:absolute after:inset-x-0 after:-bottom-px after:h-[2px] after:rounded-[2px] after:bg-[var(--accent)] after:origin-left after:scale-x-0 after:transition-transform after:duration-[220ms] hover:after:scale-x-100"
             >
               {item.label}
@@ -59,7 +64,7 @@ export function SalesHeader() {
         </nav>
 
         <div className="flex items-center gap-2 flex-none">
-          <Button size="sm" arrow href="#packages" className="to-520:hidden">
+          <Button size="sm" arrow href={`${anchorBase}#packages`} className="to-520:hidden">
             Choose Your Hours
           </Button>
           <button
@@ -97,7 +102,7 @@ export function SalesHeader() {
             {nav.map((item) => (
               <a
                 key={item.href}
-                href={item.href}
+                href={`${anchorBase}${item.href}`}
                 onClick={() => setOpen(false)}
                 className="py-3 px-2 rounded-[10px] text-[15px] font-semibold text-[var(--ink-800)] hover:bg-[var(--mint-50)] hover:text-[var(--accent-strong)] transition-colors duration-150"
               >
@@ -108,7 +113,7 @@ export function SalesHeader() {
               size="md"
               arrow
               fullWidth
-              href="#packages"
+              href={`${anchorBase}#packages`}
               className="mt-3"
               onClick={() => setOpen(false)}
             >

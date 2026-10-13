@@ -16,6 +16,8 @@ export const routes = {
   systemsTeam: "/systems-team",
   /** The services catalogue — one page per service. */
   services: "/services",
+  /** Scope-first estimate form; feeds the same pipeline as a build request. */
+  requestEstimate: "/request-estimate",
   contact: "/contact",
   about: "/about",
   /** In-page anchor to the "Three ways to work with us" section. */

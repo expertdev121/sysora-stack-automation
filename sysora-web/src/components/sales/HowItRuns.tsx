@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { howItRuns } from "@/content/landing/sales";
 
 export function HowItRuns() {
@@ -33,6 +35,18 @@ export function HowItRuns() {
                 <h3 className="text-[18px] font-bold text-[var(--ink-900)]">{step.title}</h3>
                 <p className="mt-[6px] text-[15px] leading-[1.7] text-[var(--ink-500)]">
                   {step.body}
+                  {/* Step 01 ends mid-sentence with a link to contact. */}
+                  {"contactLink" in step && step.contactLink ? (
+                    <>
+                      <Link
+                        href="/contact"
+                        className="font-medium text-[var(--accent-strong)] underline decoration-[var(--line-300)] underline-offset-[3px] hover:decoration-[var(--accent-strong)]"
+                      >
+                        {step.contactLink}
+                      </Link>
+                      {"bodyTail" in step ? step.bodyTail : null}
+                    </>
+                  ) : null}
                 </p>
               </div>
             </li>

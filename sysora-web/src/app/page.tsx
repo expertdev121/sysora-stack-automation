@@ -24,7 +24,10 @@ import { Work } from "@/components/sales/Work";
 import { meta } from "@/content/landing/sales";
 
 export const metadata: Metadata = {
-  title: meta.title,
+  // `absolute` because the root layout's "%s — Sysora Stack" template was
+  // not being applied to this segment, so the brand was missing from the
+  // one title that matters most. Stating it outright is deterministic.
+  title: { absolute: `${meta.title} — Sysora Stack` },
   description: meta.description,
   alternates: { canonical: "/" },
   // Was inherited from the root layout, which still sold the retired $49

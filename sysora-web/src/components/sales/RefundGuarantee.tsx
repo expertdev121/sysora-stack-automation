@@ -67,11 +67,26 @@ export function RefundGuarantee() {
                     : "border-b-[1.5px] border-[var(--border-faint)]")
                 }
               >
-                <span className="text-[15px] font-semibold text-[var(--ink-900)]">
+                <span className="flex items-baseline gap-[10px] text-[15px] font-semibold text-[var(--ink-900)]">
+                  <span className="font-mono text-[12.5px] font-semibold text-[var(--accent-strong)]">
+                    {rule.n}
+                  </span>
                   {rule.label}
                 </span>
                 <span className="text-[15px] leading-[1.7] text-[var(--ink-600)]">
                   {rule.body}
+                  {/* "How to ask" carries the support address as a mailto. */}
+                  {"email" in rule && rule.email ? (
+                    <>
+                      <a
+                        href={`mailto:${rule.email}`}
+                        className="font-medium text-[var(--accent-strong)] underline decoration-[var(--line-300)] underline-offset-[3px] hover:decoration-[var(--accent-strong)]"
+                      >
+                        {rule.email}
+                      </a>
+                      {"bodyTail" in rule ? rule.bodyTail : null}
+                    </>
+                  ) : null}
                 </span>
               </div>
             ))}

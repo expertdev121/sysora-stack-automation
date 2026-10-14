@@ -28,7 +28,7 @@ export const packs: Pack[] = [
 export const DEFAULT_PACK = 3;
 
 export const meta = {
-  title: "GoHighLevel Help From $13/hr, No Contract",
+  title: "GoHighLevel and Automation Hours From $13/hr, No Contract",
   description:
     "Buy a block of hours and an 11-person technical team works through your GoHighLevel, automation, integration and development backlog. $19 an hour, down to $13 at volume. Unused hours are refundable.",
 } as const;
@@ -81,24 +81,30 @@ export const reviews = {
   eyebrow: "Client reviews",
   headline: "What clients say after the list is done",
   rating: "on every completed job",
+  /**
+   * The quotes used to carry square brackets around every substituted
+   * name and pronoun, and this line explained the convention. The design
+   * dropped the brackets — they made three testimonials read like a
+   * redacted document — so the explanation changed with them.
+   */
   intro:
-    "Upwork reviews of work delivered by Sysora Stack’s founder before the company carried the name. Clients are not named on the platform, so each one is credited to its job. Square brackets mark where a person’s name or pronoun was changed to the company.",
+    "Upwork reviews of work our founder delivered before the company carried the Sysora Stack name. Clients are not named on the platform, so each one is credited to its job. Where a client wrote a person’s name, we have written the company instead, and the original wording is live on the Upwork profile.",
   cards: [
     {
       quote:
-        "“[Sysora Stack] was so good, I hired [them] again. [They are] now my official [team] for all my CRM/Tech and web needs.”",
+        "“Sysora Stack was so good, I hired them again. They are now my official team for all my CRM/Tech and web needs.”",
       tag: "GHL",
       job: "GHL client accounts, automations and funnel build, repeat client",
     },
     {
       quote:
-        "“[Sysora Stack has] been one of the best [teams] I have found on UpWork. [They go] above and beyond, I don’t have to hold [their] hand through every little thing, [they bring] strategy, [make] decisions, and [their] work ethic is unmatched. I will be using [them] for all my future projects.”",
+        "“Sysora Stack has been one of the best teams I have found on UpWork. They go above and beyond, I don’t have to hold their hand through every little thing, they bring strategy, make decisions, and their work ethic is unmatched. I will be using them for all my future projects.”",
       tag: "OPS",
       job: "Tech Operations Specialist engagement, $6,550 over 640 hours",
     },
     {
       quote:
-        "“[Sysora Stack] was THE BEST to work with. Super efficient, communicated well and came to the table with ideas to make my website even better. I love when I don’t have to hand hold people through everything and [they took] the lead and crushed what I wanted.”",
+        "“Sysora Stack was THE BEST to work with. Super efficient, communicated well and came to the table with ideas to make my website even better. I love when I don’t have to hand hold people through everything and they took the lead and crushed what I wanted.”",
       tag: "WEB",
       job: "GHL UI updates, automations and checkout integration, $697.50 over 53 hours",
     },
@@ -159,7 +165,7 @@ export const trackRecord = {
   disclaimer:
     "Upwork profile of Sysora Stack’s founder. Freelance-platform delivery record, not company-branded client results.",
   closingLead:
-    "19 jobs, 1,220 hours, and not one of them rated below 5.0. Three of those clients came back with bigger work than they first hired for, including the 640-hour engagement and a 357-hour build. ",
+    "19 jobs, 1,220 hours, and not one rated below 5.0. Three of those clients came back with bigger work than they first hired for, including the 640-hour engagement and a 357-hour build. ",
   closingBold: "That is what the hourly rate is buying.",
   closingCta: "Choose Your Hours",
 } as const;
@@ -173,7 +179,16 @@ export const work = {
       illustration: "/illustrations/work-ghl.svg",
       illustrationAlt: "A GoHighLevel sales pipeline with leads moving across new, contacted and booked",
       title: "GoHighLevel",
-      body: "Account and subaccount setup. Onboarding. Snapshots and templates. Pipelines, opportunities, forms, surveys, calendars, booking and lead routing. Funnels, landing pages, websites and checkout setup. Workflows, triggers, email and SMS configuration, troubleshooting and cleanup. CRM migrations, data imports, permissions. SaaS-mode configuration. Messaging and A2P registration work.",
+      items: [
+        "Account and subaccount setup, onboarding",
+        "Snapshots and templates",
+        "Pipelines, opportunities, forms, surveys, calendars, booking and lead routing",
+        "Funnels, landing pages, websites and checkout setup",
+        "Workflows, triggers, email and SMS configuration, troubleshooting and cleanup",
+        "CRM migrations, data imports, permissions",
+        "SaaS-mode configuration",
+        "Messaging and A2P registration work",
+      ],
     },
     {
       icon: "nodes",
@@ -181,7 +196,12 @@ export const work = {
       illustrationAlt:
         "A lead follow-up workflow: form submitted, wait two minutes, send SMS, update the CRM",
       title: "Automation and integration",
-      body: "n8n, Zapier and Make workflow design, build, repair and maintenance. Webhooks, REST APIs, data sync and error-handling workflows. AI-assisted workflows and agents where they fit the job. Custom integrations between GoHighLevel and the systems around it.",
+      items: [
+        "n8n, Zapier and Make workflow design, build, repair and maintenance",
+        "Webhooks, REST APIs, data sync and error-handling workflows",
+        "AI-assisted workflows and agents where they fit the job",
+        "Custom integrations between GoHighLevel and the systems around it",
+      ],
     },
     {
       icon: "code",
@@ -189,14 +209,24 @@ export const work = {
       illustrationAlt:
         "A booking page beside the deployed code that syncs each lead to the CRM",
       title: "Websites, apps and software",
-      body: "Website and funnel implementation, fixes and maintenance. Custom apps, dashboards, portals, scripts and software integrations. Hosting, deployment and infrastructure help, as scoped. Custom development, estimated in writing before substantial work begins.",
+      items: [
+        "Website and funnel implementation, fixes and maintenance",
+        "Custom apps, dashboards, portals, scripts and software integrations",
+        "Hosting, deployment and infrastructure help, as scoped",
+        "Custom development, estimated in writing before substantial work begins",
+      ],
     },
   ] as {
     icon: "grid" | "nodes" | "code";
     illustration: string;
     illustrationAlt: string;
     title: string;
-    body: string;
+    /**
+     * One line per capability. These were a single paragraph of
+     * full stops; the design lists them, which is how someone
+     * scanning for "does it do CRM migrations" actually reads it.
+     */
+    items: readonly string[];
   }[],
   callout:
     "A clever automation that breaks every week is not a good system. Error handling and monitoring are part of the build, not a follow-up ticket.",
@@ -327,7 +357,7 @@ export const support = {
   notPromisedBody:
     " unlimited free calls, a dedicated engineer, a response-time target, or a guaranteed resolution window.",
   teamNote:
-    "The team is 11 people with US shift coverage, which is what makes the overnight intake possible.",
+    "The team is 11 people, which is what makes the overnight intake possible.",
 } as const;
 
 export const howItRuns = {
@@ -339,7 +369,14 @@ export const howItRuns = {
     {
       n: "01",
       title: "Payment and receipt",
-      body: "Your hour balance is created immediately.",
+      /**
+       * `bodyTail` and `contactLink` exist because the design puts a
+       * link mid-sentence here. Splitting the copy at the link beats
+       * putting markup in a content string.
+       */
+      body: "Your hour balance is created immediately and a confirmation email arrives within minutes. Not in your inbox? Check spam, or ",
+      contactLink: "contact us",
+      bodyTail: ".",
     },
     {
       n: "02",
@@ -378,22 +415,23 @@ export const howItRuns = {
 export const moreReviews = {
   eyebrow: "The small jobs too",
   headline: "An eight-hour job gets the same process",
+  /** One shared attribution, rather than repeating it under each card. */
+  intro:
+    "Same source as above. Upwork reviews of founder-led work, with the company written in where a client named a person.",
   cards: [
     {
       quote:
         '"Excellent Technical skills, Speed of delivery, Prompt and clear communications, flexible and co-operative. Recommended"',
-      source:
-        "Upwork review, WhatsApp API integration via PHP, 8 hours. Founder-led delivery before Sysora Stack carried the name.",
+      source: "Upwork review, WhatsApp API integration via PHP, 8 hours",
     },
     {
       quote:
-        "“[Sysora Stack] did the work exactly as I wanted. Very good and very knowledgeable. Excellent [team]. Will be using again.”",
-      source:
-        "Upwork review, website feature changes, fixed-price job. Founder-led delivery before Sysora Stack carried the name. Wording edited only where it named a person.",
+        '"Sysora Stack did the work exactly as I wanted. Very good and very knowledgeable. Excellent team. Will be using again."',
+      source: "Upwork review, website feature changes, fixed-price job",
     },
   ],
   closing:
-    "Both of those were small fixed-price jobs. The 5-hour pack at $95 exists for exactly that kind of work, and it is how most of the longer engagements on this page started.",
+    "Both of those were small fixed-price jobs. The 5-hour pack at $95 exists for that kind of work, and it is how most of the longer engagements on this page started.",
 } as const;
 
 export const whoBuilt = {
@@ -410,7 +448,7 @@ export const whoBuilt = {
     "Laravel",
   ],
   paragraphs: [
-    "Sysora Stack is an 11-person technical team working across GoHighLevel, n8n, Make, Zapier, React, Node.js, Next.js and Laravel, with US shift coverage. It was founded by Nikhil, and the early years of this work were delivered freelance under his name, which is where the reviews on this page come from. Those jobs kept running longer than they were booked for. A webinar funnel build scheduled for one week ran close to two months, because both sides kept testing for what would fail under load. A small tech operations project turned into 640 hours.",
+    "Sysora Stack is an 11-person technical team working across GoHighLevel, n8n, Make, Zapier, React, Node.js, Next.js and Laravel. It was founded by Nikhil, and the early years of this work were delivered freelance under his name, which is where the reviews on this page come from. Those jobs kept running longer than they were booked for. A webinar funnel build scheduled for one week ran close to two months, because both sides kept testing for what would fail under load. A small tech operations project turned into 640 hours.",
   ],
   patternLead:
     "The pattern held every time. Nobody was hiring for an automation. They were hiring because nobody in the building could answer one question, which was ",
@@ -431,33 +469,49 @@ export const refund = {
     { bought: "150 hours, $1,950", used: "40 hours", maths: "110 × $13 = ", total: "$1,430" },
   ],
   rulesTitle: "The rules, at the same size as the promise",
+  /** Numbered, as the design has them: eight rules you can cite by number. */
   rules: [
     {
+      n: "01",
       label: "What is refundable",
       body: "Prepaid hours you have not used, at the rate you paid for that pack",
     },
     {
+      n: "02",
       label: "What is not",
       body: "Hours already worked and logged. Third-party subscriptions, messaging and usage fees, hosting, domains and taxes",
     },
-    { label: "When to ask, one-time pack", body: "Before the 60-day expiry" },
+    { n: "03", label: "When to ask, one-time pack", body: "Before the 60-day expiry" },
     {
+      n: "04",
       label: "When to ask, monthly plan",
       body: "Before the current cycle resets. Only the current paid cycle is in scope",
     },
     {
+      n: "05",
       label: "How to ask",
-      body: "Tell our 24/7 chat or ticket support that you want to cancel and refund your unused hours",
+      /**
+       * Split at the address so the email renders as a mailto link, the
+       * way the design has it. A refund route nobody can click is a
+       * refund route nobody uses.
+       */
+      body: "Message support from your dashboard, or email ",
+      email: "support@sysorastack.com",
+      bodyTail:
+        ", and say you want to cancel and refund your unused hours. Either one reaches a person at any hour.",
     },
     {
+      n: "06",
       label: "What happens next",
       body: "We pause new billable work on that pack, send an itemized ledger of hours used and unused, confirm the amount, and refund it to the original payment method with written confirmation",
     },
     {
+      n: "07",
       label: "Cancelling a monthly plan",
       body: "Stops future renewals. The unused part of the cycle you already paid for is refundable under the same rules",
     },
     {
+      n: "08",
       label: "If you disagree with the logged time",
       body: "We review it against the task log with you. Time is never quietly deducted after a refund request",
     },
@@ -499,9 +553,9 @@ export const calculator = {
   cta: "Continue to checkout",
   ctaNote:
     "These are the seven published packages. For a number of hours that is not listed, pick the nearest package or ask for a custom estimate.",
-  quote: "“Genuinely top notch work from [Sysora Stack]! I recommend 10 out of 10.”",
+  quote: '"Genuinely top notch work from Sysora Stack! I recommend 10 out of 10."',
   quoteSource:
-    "Upwork review, funnel layout design in GoHighLevel, 30 hours. Founder-led delivery before Sysora Stack carried the name. Wording edited only where it named a person.",
+    "Upwork review, funnel layout design in GoHighLevel, 30 hours. Founder-led work, with the company written in place of the name.",
 } as const;
 
 export const faq = {
@@ -538,7 +592,7 @@ export const faq = {
     },
     {
       q: "How do I cancel a monthly plan?",
-      a: "Tell our chat or ticket support. Cancelling stops future renewals. The unused hours in the cycle you have already paid for can be refunded, as long as you ask before that cycle resets.",
+      a: "Message support from your dashboard or email support@sysorastack.com. Cancelling stops future renewals. The unused hours in the cycle you have already paid for can be refunded, as long as you ask before that cycle resets.",
     },
     {
       q: "Can you take over an account somebody else built?",
@@ -554,7 +608,7 @@ export const faq = {
     },
     {
       q: "Are the reviews on this page Sysora Stack client reviews?",
-      a: "They are Upwork reviews of work our founder delivered before the company carried the Sysora Stack name, and the people who delivered it run delivery here now. Each review appears once on this page, credited to the job it came from. Where a client wrote a person’s name or a pronoun, the substitution sits in square brackets, and the unedited wording stays live on the Upwork profile. We are not going to show you a corporate client roster we do not have yet.",
+      a: "They are Upwork reviews of work our founder delivered before the company carried the Sysora Stack name, and the people who delivered it run delivery here now. Each review appears once on this page, credited to the job it came from. Where a client wrote a person’s name or a pronoun, we have written the company instead, and the unedited wording stays live on the Upwork profile. We are not going to show you a corporate client roster we do not have yet.",
     },
     {
       q: "What if my project is too big for a package?",
@@ -669,14 +723,15 @@ export const footer = {
         { label: "What we do", href: "#work" },
         { label: "How it runs", href: "#how" },
         { label: "Request an estimate", href: "/request-estimate" },
+        { label: "Checkout", href: "/checkout/hours" },
         { label: "Contact", href: "/contact" },
       ],
     },
     {
       title: "Legal",
       links: [
+        { label: "Terms and conditions", href: "/terms" },
         { label: "Privacy policy", href: "/privacy-policy" },
-        { label: "Terms", href: "/terms" },
         { label: "Refund policy", href: "#refund" },
       ],
     },

@@ -19,6 +19,10 @@ export function MoreReviews() {
           <h2 className="mt-[14px] text-[clamp(30px,3.6vw,44px)] font-black tracking-[-1.1px] leading-[1.1] text-[var(--ink-900)]">
             {moreReviews.headline}
           </h2>
+          {/* One attribution for both cards, rather than the same sentence twice. */}
+          <p className="mt-4 text-[13px] leading-[1.7] text-[var(--ink-400)]">
+            {moreReviews.intro}
+          </p>
         </div>
 
         <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6 mt-11 items-stretch">

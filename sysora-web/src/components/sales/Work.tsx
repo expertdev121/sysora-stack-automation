@@ -63,7 +63,17 @@ export function Work() {
               <h3 className="mt-[18px] text-[21px] font-bold text-[var(--ink-900)]">
                 {card.title}
               </h3>
-              <p className="mt-3 text-[15px] leading-[1.75] text-[var(--ink-500)]">{card.body}</p>
+              <ul className="mt-3 flex flex-col gap-2 text-[15px] leading-[1.6] text-[var(--ink-500)]">
+                {card.items.map((item) => (
+                  <li key={item} className="relative pl-[18px]">
+                    <span
+                      aria-hidden="true"
+                      className="absolute left-0 top-[9px] h-[5px] w-[5px] rounded-full bg-[var(--accent)]"
+                    />
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </article>
           ))}
         </div>

@@ -43,6 +43,18 @@ export function Work() {
               className="sx-card flex flex-col p-[30px] rounded-[18px] bg-[var(--surface-0)] border-[1.5px] border-[var(--border-default)] shadow-[0_2px_6px_rgba(0,80,50,0.05),0_18px_40px_rgba(0,80,50,0.07)]"
             >
               <span className="sx-accent-bar" />
+
+              <div className="mt-[18px] aspect-[16/9] rounded-xl overflow-hidden border-[1.5px] border-[var(--border-default)] bg-[#F7F9F7] shadow-[0_8px_20px_rgba(0,80,50,0.08)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={card.illustration}
+                  alt={card.illustrationAlt}
+                  width={400}
+                  height={225}
+                  className="block w-full h-full object-cover"
+                />
+              </div>
+
               <span className="flex items-center justify-center w-[46px] h-[46px] mt-[22px] rounded-xl bg-[var(--mint-50)] border-[1.5px] border-[var(--border-default)]">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-strong)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   {icons[card.icon]}

@@ -19,16 +19,6 @@ function Pill({ pill }: { pill: StartPill }) {
   );
 }
 
-/** Stands in for the photograph until there is one. */
-function Media({ placeholder }: { placeholder: string }) {
-  return (
-    <span className="absolute inset-0 grid place-items-center bg-[var(--mint-50)] px-6 text-center">
-      <span className="font-mono text-[11px] leading-[1.6] tracking-[0.6px] text-[var(--mint-700)]/70">
-        {placeholder}
-      </span>
-    </span>
-  );
-}
 
 export function Audiences() {
   return (
@@ -60,7 +50,14 @@ export function Audiences() {
                 className="absolute -top-[18px] right-[18px] bottom-[18px] -left-[18px] rounded-[26px] bg-[linear-gradient(135deg,var(--mint-100),rgba(135,195,143,0.18))] z-0"
               />
               <div className="relative z-[1] aspect-[5/4] rounded-[22px] overflow-hidden border-[1.5px] border-[var(--border-default)] bg-[var(--surface-0)] shadow-[0_4px_10px_rgba(0,80,50,0.06),0_34px_70px_rgba(0,80,50,0.16)]">
-                <Media placeholder={audience.media.placeholder} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={audience.media.src}
+                  alt={audience.media.alt}
+                  width={500}
+                  height={400}
+                  className="block w-full h-full object-cover"
+                />
               </div>
 
               <div className="absolute z-[2] top-[22px] -right-[14px] flex items-center gap-[10px] px-4 py-3 rounded-[14px] bg-[var(--surface-0)] border-[1.5px] border-[var(--border-default)] shadow-[0_16px_36px_rgba(0,80,50,0.16)]">

@@ -165,20 +165,34 @@ export const work = {
   cards: [
     {
       icon: "grid",
+      illustration: "/illustrations/work-ghl.svg",
+      illustrationAlt: "A GoHighLevel sales pipeline with leads moving across new, contacted and booked",
       title: "GoHighLevel",
       body: "Account and subaccount setup. Onboarding. Snapshots and templates. Pipelines, opportunities, forms, surveys, calendars, booking and lead routing. Funnels, landing pages, websites and checkout setup. Workflows, triggers, email and SMS configuration, troubleshooting and cleanup. CRM migrations, data imports, permissions. SaaS-mode configuration. Messaging and A2P registration work.",
     },
     {
       icon: "nodes",
+      illustration: "/illustrations/work-automation.svg",
+      illustrationAlt:
+        "A lead follow-up workflow: form submitted, wait two minutes, send SMS, update the CRM",
       title: "Automation and integration",
       body: "n8n, Zapier and Make workflow design, build, repair and maintenance. Webhooks, REST APIs, data sync and error-handling workflows. AI-assisted workflows and agents where they fit the job. Custom integrations between GoHighLevel and the systems around it.",
     },
     {
       icon: "code",
+      illustration: "/illustrations/work-software.svg",
+      illustrationAlt:
+        "A booking page beside the deployed code that syncs each lead to the CRM",
       title: "Websites, apps and software",
       body: "Website and funnel implementation, fixes and maintenance. Custom apps, dashboards, portals, scripts and software integrations. Hosting, deployment and infrastructure help, as scoped. Custom development, estimated in writing before substantial work begins.",
     },
-  ] as { icon: "grid" | "nodes" | "code"; title: string; body: string }[],
+  ] as {
+    icon: "grid" | "nodes" | "code";
+    illustration: string;
+    illustrationAlt: string;
+    title: string;
+    body: string;
+  }[],
   callout:
     "A clever automation that breaks every week is not a good system. Error handling and monitoring are part of the build, not a follow-up ticket.",
 } as const;
@@ -196,7 +210,8 @@ export const audiences = [
     reversed: false,
     band: "bg-[linear-gradient(180deg,var(--surface-0),var(--mint-50))]",
     media: {
-      placeholder: "Agency team or client dashboard photo",
+      src: "/illustrations/agencies.svg",
+      alt: "An agency workspace: five client subaccounts in a delivery queue, hours by month, delivered white-label",
       badges: [
         { title: "Subaccounts", body: "Setup and upkeep" },
         { title: "Hours flex", body: "Up or down each month" },
@@ -241,7 +256,8 @@ export const audiences = [
     reversed: true,
     band: "bg-[var(--surface-0)] border-t-[1.5px] border-[var(--border-faint)]",
     media: {
-      placeholder: "Local business owner or storefront photo",
+      src: "/illustrations/local.svg",
+      alt: "A missed call answered by text, booked into the calendar, lead to booked call in four minutes",
       badges: [
         { title: "Missed-call text back", body: "Leads answered fast" },
         { title: "Calendars and reminders", body: "Fewer no-shows" },

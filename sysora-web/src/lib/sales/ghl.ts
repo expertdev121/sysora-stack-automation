@@ -1,0 +1,161 @@
+import "server-only";
+
+import { siteUrl } from "@/lib/site-url";
+
+/**
+ * Outbound webhook to the GoHighLevel abandoned-cart workflow.
+ *
+ * The URL is an inbound-webhook trigger: its path contains the trigger's
+ * id, which is the only thing authenticating the call. It is therefore a
+ * credential and lives in the environment, never in the repo — and it is
+ * deliberately never written to a log line, including on failure.
+ *
+ * The payload is flat and all-strings-and-numbers on purpose. GHL maps
+ * inbound JSON onto custom values key by key and does not reach into
+ * nested objects, so a `customer: { email }` would simply arrive empty.
+ * `tools` is joined into a sentence for the same reason: an array is not
+ * something a workflow email can interpolate.
+ */
+
+const TIMEOUT_MS = 10_000;
+
+export type AbandonedCart = {
+  reference: string;
+  createdAt: string;
+  email: string;
+  fullName: string | null;
+  phone: string | null;
+  company: string | null;
+  timezone: string | null;
+  amount: number;
+  currency: string;
+  title: string | null;
+  hours: number | null;
+  billing: string | null;
+  audience: string | null;
+  ghlStatus: string | null;
+  tools: string[];
+  utmSource: string | null;
+  utmMedium: string | null;
+  utmCampaign: string | null;
+  referrer: string | null;
+};
+
+export type WebhookOutcome =
+  | { ok: true; status: number }
+  | { ok: false; status: number | null; detail: string };
+
+/** True when the abandoned-cart webhook is wired up on this deployment. */
+export function isAbandonedCartWebhookConfigured(): boolean {
+  return Boolean(process.env.GHL_ABANDONED_CART_WEBHOOK_URL?.trim());
+}
+
+/**
+ * Splits a single name field into the two GHL wants.
+ *
+ * Everything after the first space is the last name, which is wrong for
+ * some names and right for most. GHL creates the contact from whichever
+ * fields arrive, so sending both beats sending neither.
+ */
+function splitName(fullName: string | null): { first: string; last: string } {
+  const name = (fullName ?? "").trim().replace(/\s+/g, " ");
+  if (!name) return { first: "", last: "" };
+
+  const gap = name.indexOf(" ");
+  if (gap === -1) return { first: name, last: "" };
+
+  return { first: name.slice(0, gap), last: name.slice(gap + 1) };
+}
+
+export function abandonedCartPayload(cart: AbandonedCart) {
+  const { first, last } = splitName(cart.fullName);
+
+  // Amounts are stored in minor units; a workflow email wants dollars.
+  const dollars = cart.amount / 100;
+  const startedAt = new Date(cart.createdAt);
+  const minutes = Math.max(0, Math.round((Date.now() - startedAt.getTime()) / 60_000));
+
+  return {
+    event: "cart_abandoned",
+
+    // Contact. GHL matches or creates on email, so it is the one field
+    // that must always be present.
+    email: cart.email,
+    name: cart.fullName ?? "",
+    first_name: first,
+    last_name: last,
+    phone: cart.phone ?? "",
+    company_name: cart.company ?? "",
+    timezone: cart.timezone ?? "",
+
+    // The cart.
+    reference: cart.reference,
+    package: cart.title ?? (cart.hours ? `${cart.hours} prepaid hours` : ""),
+    hours: cart.hours ?? "",
+    billing: cart.billing ?? "",
+    currency: cart.currency,
+    amount: dollars,
+    amount_formatted: `$${dollars.toFixed(2)}`,
+    amount_cents: cart.amount,
+
+    // What they told us on the way in — the material for a useful reply
+    // rather than a generic nudge.
+    audience: cart.audience ?? "",
+    ghl_status: cart.ghlStatus ?? "",
+    tools: cart.tools.join(", "),
+
+    // Where it came from.
+    utm_source: cart.utmSource ?? "",
+    utm_medium: cart.utmMedium ?? "",
+    utm_campaign: cart.utmCampaign ?? "",
+    referrer: cart.referrer ?? "",
+
+    // Timing, and the one link the email actually needs. The reference
+    // checkout reopens the existing order, so they land back on their own
+    // card form rather than starting over.
+    checkout_started_at: startedAt.toISOString(),
+    abandoned_at: new Date().toISOString(),
+    minutes_since_checkout_started: minutes,
+    resume_url: `${siteUrl()}/checkout/${cart.reference}`,
+  };
+}
+
+export async function sendAbandonedCart(cart: AbandonedCart): Promise<WebhookOutcome> {
+  const url = process.env.GHL_ABANDONED_CART_WEBHOOK_URL?.trim();
+  if (!url) {
+    return { ok: false, status: null, detail: "GHL_ABANDONED_CART_WEBHOOK_URL is not set" };
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(abandonedCartPayload(cart)),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      // Read a little of the body for the log: GHL explains rejections
+      // there, and without it a 400 is undiagnosable.
+      const body = await response.text().catch(() => "");
+      return {
+        ok: false,
+        status: response.status,
+        detail: body.slice(0, 200) || `HTTP ${response.status}`,
+      };
+    }
+
+    return { ok: true, status: response.status };
+  } catch (error) {
+    // Never interpolate `url` here — the trigger id is in its path.
+    const detail =
+      error instanceof Error
+        ? error.name === "TimeoutError"
+          ? `No response in ${TIMEOUT_MS / 1000}s`
+          : error.message
+        : "Unknown error";
+
+    return { ok: false, status: null, detail };
+  }
+}

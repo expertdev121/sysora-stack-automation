@@ -284,8 +284,17 @@
    ============================================================ */
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
+  /* No `scroll-behavior: smooth` here, on purpose. The landing page is
+     ~15,000px tall, and in Chrome a smooth scroll over that distance
+     never starts — every header and footer anchor silently did nothing,
+     while the same jump with `behavior: instant` worked. Reliable beats
+     smooth. */
+
+  /* Keeps a jumped-to heading clear of the sticky header. */
+  :target,
+  section[id],
+  div[id] {
+    scroll-margin-top: 92px;
   }
 
   body {

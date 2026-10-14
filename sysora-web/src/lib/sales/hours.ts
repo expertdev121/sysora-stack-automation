@@ -2,13 +2,18 @@
 
 import { salesDb } from "@/lib/supabase/admin";
 import { track, type TrackingContext } from "./actions";
+import { startPayment, completeSimulatedPayment, type PaymentSession } from "./payments";
 import { getOffer } from "./queries";
 
 /**
- * Turns a chosen hour pack into a payable request, then hands off to the
- * existing checkout. Payment itself is not re-implemented here: the caller
- * is sent to /checkout/[reference], where Stripe's Payment Element already
- * lives, so card details go straight to Stripe and never touch us.
+ * Turns a chosen hour pack into a payable request and opens the payment
+ * for it, so the card form can render in place on the checkout rather
+ * than sending the customer somewhere else to pay.
+ *
+ * The card fields themselves are Stripe's Payment Element, which draws in
+ * an iframe Stripe controls: the number never reaches our JavaScript, our
+ * server or our database. "Embedded" is about where it appears, not about
+ * who handles the card.
  */
 
 export type HoursInput = {
@@ -25,8 +30,13 @@ export type HoursInput = {
 };
 
 export type HoursResult =
-  | { ok: true; reference: string; redirectTo: string }
+  | { ok: true; reference: string; session: PaymentSession }
   | { ok: false; error: string; fieldErrors?: Record<string, string> };
+
+/** Lets the checkout finish a simulated payment without a page change. */
+export async function completeHoursSimulated(reference: string) {
+  return completeSimulatedPayment(reference);
+}
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -133,11 +143,11 @@ export async function startHourPackCheckout(input: HoursInput): Promise<HoursRes
       context,
     );
 
-    return {
-      ok: true,
-      reference: request.reference,
-      redirectTo: `/checkout/${request.reference}`,
-    };
+    // Opens the PaymentIntent now so the card form has something to
+    // render against without a second round trip.
+    const session = await startPayment(request.reference);
+
+    return { ok: true, reference: request.reference, session };
   } catch (error) {
     console.error("[startHourPackCheckout]", error);
     return {

@@ -1,15 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
+import { PaymentPanel } from "@/components/checkout/PaymentPanel";
 import { Button } from "@/components/ui/Button";
 import { CheckIcon } from "@/components/ui/Icon";
 import { SysoraLogo } from "@/components/ui/Logo";
 import { money, packs, type Billing } from "@/components/sales/SalesProvider";
 import { checkout as copy } from "@/content/landing/sales";
-import { startHourPackCheckout } from "@/lib/sales/hours";
+import { completeHoursSimulated, startHourPackCheckout } from "@/lib/sales/hours";
+import type { PaymentSession } from "@/lib/sales/payments";
 import { cn } from "@/lib/cn";
 
 /**
@@ -24,8 +25,6 @@ export function HoursCheckout({
   initialHours: number;
   initialBilling: Billing;
 }) {
-  const router = useRouter();
-
   const found = packs.findIndex((p) => p.hours === initialHours);
   const [pick, setPick] = useState(found === -1 ? 3 : found);
   const [billing, setBilling] = useState<Billing>(initialBilling);
@@ -44,12 +43,18 @@ export function HoursCheckout({
   const [formError, setFormError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
+  /** Set once the request exists and Stripe has an intent open for it. */
+  const [paying, setPaying] = useState<{
+    reference: string;
+    session: PaymentSession;
+  } | null>(null);
+
   const pack = packs[pick];
   const monthly = billing === "monthly";
 
   const go = (next: number) => {
     setStep(next);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0 });
   };
 
   const toggleTool = (label: string) =>
@@ -57,11 +62,12 @@ export function HoursCheckout({
       cur.includes(label) ? cur.filter((t) => t !== label) : [...cur, label],
     );
 
-  const submit = () => {
-    if (!agree) {
-      setFormError(copy.pay.agreeError);
-      return;
-    }
+  /**
+   * Creates the order and opens its payment, then moves to the card step.
+   * Called from step 2, so a failure (a pack missing from the catalogue,
+   * say) surfaces before the customer is looking at a card form.
+   */
+  const openPayment = () => {
     setFormError(null);
     setErrors({});
 
@@ -79,13 +85,13 @@ export function HoursCheckout({
       });
 
       if (result.ok) {
-        router.push(result.redirectTo);
+        setPaying({ reference: result.reference, session: result.session });
+        go(2);
         return;
       }
 
       setErrors(result.fieldErrors ?? {});
       setFormError(result.error);
-      if (result.fieldErrors) go(1);
     });
   };
 
@@ -310,10 +316,25 @@ export function HoursCheckout({
                   <Button variant="ghost" onClick={() => go(0)}>
                     {copy.details.back}
                   </Button>
-                  <Button size="lg" arrow onClick={() => go(2)}>
-                    {copy.details.next}
-                  </Button>
+                  {pending ? (
+                    <span className="inline-flex items-center gap-[10px] px-7 py-[15px] rounded-xl bg-[var(--accent-hover)] text-white text-[16px] font-semibold">
+                      <svg className="sx-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+                        <path d="M12 3a9 9 0 1 0 9 9" />
+                      </svg>
+                      {copy.pay.working}
+                    </span>
+                  ) : (
+                    <Button size="lg" arrow onClick={openPayment}>
+                      {copy.details.next}
+                    </Button>
+                  )}
                 </div>
+
+                {formError && (
+                  <p className="sx-err mt-4 text-[14px]" role="alert">
+                    {formError}
+                  </p>
+                )}
               </div>
             )}
 
@@ -329,18 +350,12 @@ export function HoursCheckout({
                 <p className="mt-3 text-[15px] leading-[1.7] text-[var(--ink-500)]">
                   {copy.pay.lead}
                 </p>
-                <p className="mt-3 text-[15px] leading-[1.7] text-[var(--ink-500)]">
-                  {copy.pay.handoff}
-                </p>
 
                 <label className="flex items-start gap-3 mt-6 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={agree}
-                    onChange={() => {
-                      setAgree((v) => !v);
-                      setFormError(null);
-                    }}
+                    onChange={() => setAgree((v) => !v)}
                     className="mt-1 w-[18px] h-[18px] accent-[var(--accent)]"
                   />
                   <span className="text-[14px] leading-[1.65] text-[var(--ink-600)]">
@@ -349,29 +364,42 @@ export function HoursCheckout({
                   </span>
                 </label>
 
-                <div className="flex flex-wrap items-center justify-between gap-4 mt-8 pt-6 border-t-[1.5px] border-[var(--border-faint)]">
-                  <Button variant="ghost" onClick={() => go(1)}>
-                    {copy.pay.back}
-                  </Button>
-                  {pending ? (
-                    <span className="inline-flex items-center gap-[10px] px-7 py-[15px] rounded-xl bg-[var(--accent-hover)] text-white text-[16px] font-semibold">
-                      <svg className="sx-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-                        <path d="M12 3a9 9 0 1 0 9 9" />
-                      </svg>
-                      {copy.pay.working}
-                    </span>
+                {/* The card form itself. Stripe's Payment Element draws in
+                    an iframe it owns, so the number never reaches us. */}
+                <div
+                  className={cn(
+                    "mt-6 transition-opacity",
+                    agree ? "opacity-100" : "opacity-45 pointer-events-none select-none",
+                  )}
+                  aria-disabled={!agree}
+                >
+                  {paying ? (
+                    <PaymentPanel
+                      session={paying.session}
+                      reference={paying.reference}
+                      completeSimulated={async () => completeHoursSimulated(paying.reference)}
+                    />
                   ) : (
-                    <Button size="lg" arrow onClick={submit}>
-                      {copy.pay.submit}
-                    </Button>
+                    <p className="text-[14px] text-[var(--ink-500)]">
+                      Preparing the payment form…
+                    </p>
                   )}
                 </div>
 
-                {formError && (
-                  <p className="sx-err mt-4 text-[14px]" role="alert">
-                    {formError}
+                {!agree && (
+                  <p className="mt-3 text-[13.5px] text-[var(--ink-500)]">
+                    {copy.pay.agreeError}
                   </p>
                 )}
+
+                <div className="flex items-center justify-between gap-4 mt-8 pt-6 border-t-[1.5px] border-[var(--border-faint)]">
+                  <Button variant="ghost" onClick={() => go(1)}>
+                    {copy.pay.back}
+                  </Button>
+                  <span className="font-mono text-[12px] text-[var(--ink-300)]">
+                    {paying?.reference}
+                  </span>
+                </div>
               </div>
             )}
           </div>

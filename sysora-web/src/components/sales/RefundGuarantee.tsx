@@ -77,10 +77,15 @@ export function RefundGuarantee() {
             ))}
           </div>
 
-          <p className="mt-[18px] max-w-[760px] text-[14px] leading-[1.7] text-[var(--ink-500)]">
-            <strong className="text-[var(--ink-800)]">{refund.caveatTitle}</strong>
-            {refund.caveatBody}
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-[14px] mt-[18px]">
+            <p className="max-w-[760px] text-[14px] leading-[1.7] text-[var(--ink-500)]">
+              <strong className="text-[var(--ink-800)]">{refund.caveatTitle}</strong>
+              {refund.caveatBody}
+            </p>
+            <a href="#refund" className="text-[14px] font-semibold">
+              {refund.policyLink}
+            </a>
+          </div>
         </div>
       </div>
     </section>

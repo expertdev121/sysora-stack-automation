@@ -9,8 +9,6 @@ function QuoteMark() {
 }
 
 export function MoreReviews() {
-  const { closing } = moreReviews;
-
   return (
     <section className="px-6 py-[clamp(78px,10vh,120px)] bg-[var(--surface-1)] border-y-[1.5px] border-[var(--border-faint)]">
       <div className="max-w-[1160px] mx-auto">
@@ -41,11 +39,7 @@ export function MoreReviews() {
         </div>
 
         <p className="mt-8 max-w-[760px] text-[16.5px] leading-[1.7] text-[var(--ink-700)]">
-          {closing.lead}
-          <strong className="font-mono text-[var(--ink-900)]">{closing.first}</strong>
-          {closing.middle}
-          <strong className="font-mono text-[var(--ink-900)]">{closing.second}</strong>
-          {closing.tail}
+          {moreReviews.closing}
         </p>
       </div>
     </section>

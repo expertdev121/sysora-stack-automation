@@ -72,49 +72,35 @@ export type Review = {
   tag: string;
 };
 
-/** The marquee strip under the hero. */
-export const marqueeReviews: Review[] = [
-  {
-    quote:
-      "Sysora was so good, I hired them again. They are now my official team for all my CRM/Tech and web needs.",
-    job: "GHL client accounts, automations and funnel build. Repeat client.",
-    tag: "GHL",
-  },
-  {
-    quote:
-      "Sysora has been one of the best teams I have found on Upwork. They go above and beyond. I don't have to hold their hand through every little thing. They bring strategy, make decisions, and their work ethic is unmatched.",
-    job: "Tech operations engagement, 640 hours.",
-    tag: "OPS",
-  },
-  {
-    quote:
-      "Sysora was THE BEST to work with. Super efficient, communicated well and came to the table with ideas to make my website even better. They took the lead and crushed what I wanted.",
-    job: "GHL UI updates, automations and checkout integration, 53 hours.",
-    tag: "WEB",
-  },
-  {
-    quote:
-      "Excellent technical skills, speed of delivery, prompt and clear communications, flexible and co-operative. Recommended.",
-    job: "WhatsApp API integration via PHP, 8 hours.",
-    tag: "API",
-  },
-  {
-    quote:
-      "Sysora did the work exactly as I wanted. Very good and very knowledgeable. Will be using again.",
-    job: "Website feature changes, fixed-price job.",
-    tag: "WEB",
-  },
-  {
-    quote: "Genuinely top notch work from Sysora! I recommend 10 out of 10.",
-    job: "Funnel layout design in GoHighLevel, 30 hours.",
-    tag: "GHL",
-  },
-];
-
-export const marquee = {
+export const reviews = {
   eyebrow: "Client reviews",
   headline: "What clients say after the list is done",
   rating: "on every completed job",
+  intro:
+    "Upwork reviews of work delivered by Sysora Stack’s founder before the company carried the name. Clients are not named on the platform, so each one is credited to its job. Square brackets mark where a person’s name or pronoun was changed to the company.",
+  cards: [
+    {
+      quote:
+        "“[Sysora Stack] was so good, I hired [them] again. [They are] now my official [team] for all my CRM/Tech and web needs.”",
+      tag: "GHL",
+      job: "GHL client accounts, automations and funnel build, repeat client",
+    },
+    {
+      quote:
+        "“[Sysora Stack has] been one of the best [teams] I have found on UpWork. [They go] above and beyond, I don’t have to hold [their] hand through every little thing, [they bring] strategy, [make] decisions, and [their] work ethic is unmatched. I will be using [them] for all my future projects.”",
+      tag: "OPS",
+      job: "Tech Operations Specialist engagement, $6,550 over 640 hours",
+    },
+    {
+      quote:
+        "“[Sysora Stack] was THE BEST to work with. Super efficient, communicated well and came to the table with ideas to make my website even better. I love when I don’t have to hand hold people through everything and [they took] the lead and crushed what I wanted.”",
+      tag: "WEB",
+      job: "GHL UI updates, automations and checkout integration, $697.50 over 53 hours",
+    },
+  ] as Review[],
+  closingLead:
+    "Two of those three are repeat hires, and both wrote about not having to hold the team’s hand. ",
+  closingBold: "That is what the hourly rate is buying.",
 } as const;
 
 export const packages = {
@@ -157,7 +143,7 @@ export const safeguards = {
 export const trackRecord = {
   eyebrow: "The track record underneath the price",
   headline: "The work this was built on",
-  lead: "Founder Nikhil's delivery record on Upwork. Client names are not published on the platform, so each review is credited to the job it came from.",
+  lead: "Sysora Stack’s delivery record on Upwork, built under founder Nikhil before the company carried the name. Clients are not named on the platform, so each job is credited by what it was.",
   figures: [
     { value: "100%", label: "Job Success Score" },
     { value: "Top", label: "Rated" },
@@ -166,24 +152,9 @@ export const trackRecord = {
     { value: "5.0", label: "Every job, out of 5.0", accent: true },
   ],
   disclaimer:
-    "Founder's Upwork profile, freelance-platform delivery record. Not Sysora-branded company client results.",
-  featured: [
-    {
-      quote:
-        '"He was so good, I hired him again. He is now my official guy for all my CRM/Tech and web needs."',
-      source:
-        "Upwork review, GHL client accounts, automations and funnel build, repeat client. Founder's freelance work.",
-      large: true,
-    },
-    {
-      quote:
-        '"Nikhil has been one of the best freelancers I have found on UpWork. He goes above and beyond, I don\'t have to hold his hand through every little thing, he brings strategy, makes decisions, and his work ethic is unmatched. I will be using him for all my future projects."',
-      source:
-        "Upwork review, Tech Operations Specialist engagement, $6,550 over 640 hours. Founder's freelance work.",
-      large: false,
-    },
-  ],
-  closingLead: "Two clients, unrelated projects, both wrote about not having to hold his hand. ",
+    "Upwork profile of Sysora Stack’s founder. Freelance-platform delivery record, not company-branded client results.",
+  closingLead:
+    "19 jobs, 1,220 hours, and not one of them rated below 5.0. Three of those clients came back with bigger work than they first hired for, including the 640-hour engagement and a 357-hour build. ",
   closingBold: "That is what the hourly rate is buying.",
   closingCta: "Choose Your Hours",
 } as const;
@@ -212,9 +183,25 @@ export const work = {
     "A clever automation that breaks every week is not a good system. Error handling and monitoring are part of the build, not a follow-up ticket.",
 } as const;
 
+export type StartPill = { label: string; on?: boolean };
+
+/**
+ * Each audience is a full band: a picture with two floating badges on one
+ * side, the pitch on the other. `reversed` puts the picture second, so the
+ * two bands mirror each other down the page.
+ */
 export const audiences = [
   {
     id: "agencies",
+    reversed: false,
+    band: "bg-[linear-gradient(180deg,var(--surface-0),var(--mint-50))]",
+    media: {
+      placeholder: "Agency team or client dashboard photo",
+      badges: [
+        { title: "Subaccounts", body: "Setup and upkeep" },
+        { title: "Hours flex", body: "Up or down each month" },
+      ],
+    },
     badge: "For US marketing agencies and GHL SaaS owners",
     headline: "You keep the client. We do the delivery.",
     paragraphs: [
@@ -222,18 +209,44 @@ export const audiences = [
       "Hours flex with the month. Scale up for a heavy build period and back down afterwards, without a redundancy conversation.",
     ],
     hoursLabel: "Hours go on",
-    hoursBody:
-      "Client subaccount setup and upkeep, snapshots and templates, funnels and forms and calendars and pipelines, workflow builds and cleanup of whatever the last person left, CRM migrations and imports and permissions, SaaS-mode configuration, A2P registration work, integrations to whatever your client runs on, and recurring task queues so capacity stops depending on one person's week.",
+    chips: [
+      "Client subaccount setup and upkeep",
+      "Snapshots and templates",
+      "Funnels, forms, calendars and pipelines",
+      "Workflow builds and cleanup of whatever the last person left",
+      "CRM migrations, imports and permissions",
+      "SaaS-mode configuration",
+      "A2P registration work",
+      "Integrations to whatever your client runs on",
+      "Recurring task queues so capacity stops depending on one person's week",
+    ],
     noteTitle: "White-label.",
     noteBody:
-      "We can work behind your brand. What carries your name and what stays unbranded is agreed in writing for each engagement. End-customer phone coverage and a named person assigned to your account are not included by default.",
-    startTitle: "Where agencies tend to start:",
-    startBody: "25 or 50 hours to clear a backlog, or 50, 100 or 150 monthly for standing capacity.",
+      "We work behind your brand. What carries your name and what stays unbranded is agreed in writing for each engagement, and the Sysora Stack name appears nowhere your client can see unless you ask for it. End-customer phone coverage and a named person assigned to your account are not included by default.",
+    startLabel: "Where agencies tend to start",
+    /** Pills and the prose between them, in render order. */
+    startPills: [{ label: "25h" }, { label: "50h", on: true }] as StartPill[],
+    startMid: "to clear a backlog, or",
+    startPills2: [
+      { label: "50h" },
+      { label: "100h" },
+      { label: "150h" },
+    ] as StartPill[],
+    startTail: "monthly for standing capacity.",
     link: "Agency detail on Services →",
     href: "/services#agencies",
   },
   {
     id: "local",
+    reversed: true,
+    band: "bg-[var(--surface-0)] border-t-[1.5px] border-[var(--border-faint)]",
+    media: {
+      placeholder: "Local business owner or storefront photo",
+      badges: [
+        { title: "Missed-call text back", body: "Leads answered fast" },
+        { title: "Calendars and reminders", body: "Fewer no-shows" },
+      ],
+    },
     badge: "For US local businesses",
     headline: "The leads are arriving. The follow-up is not.",
     paragraphs: [
@@ -241,13 +254,25 @@ export const audiences = [
       "Fixing that does not need an agency on a twelve-month contract. It needs someone technical for a defined number of hours, and someone to call when it breaks later.",
     ],
     hoursLabel: "Hours go on",
-    hoursBody:
-      "GoHighLevel onboarding and pipeline structure, CRM cleanup, lead forms and routing, missed-call text back, SMS and email follow-up, appointment calendars and reminders and no-show follow-up, connecting GHL to the tools you already pay for, websites and funnels, and troubleshooting when something stops firing.",
+    chips: [
+      "GoHighLevel onboarding and pipeline structure",
+      "CRM cleanup",
+      "Lead forms and routing",
+      "Missed-call text back",
+      "SMS and email follow-up",
+      "Appointment calendars, reminders and no-show follow-up",
+      "Connecting GHL to the tools you already pay for",
+      "Websites and funnels",
+      "Troubleshooting when something stops firing",
+    ],
     noteTitle: "The boundary.",
     noteBody:
       "We build the system and keep it working. We do not promise a number of leads, a conversion rate or a revenue figure, because those depend on your market and your offer, not only on the plumbing.",
-    startTitle: "Where local businesses tend to start:",
-    startBody: "10 or 25 hours, then a smaller monthly plan if you want someone on hand afterwards.",
+    startLabel: "Where local businesses tend to start",
+    startPills: [{ label: "10h" }, { label: "25h", on: true }] as StartPill[],
+    startMid: "",
+    startPills2: [] as StartPill[],
+    startTail: "then a smaller monthly plan if you want someone on hand afterwards.",
     link: "Local business detail on Services →",
     href: "/services#local-businesses",
   },
@@ -330,39 +355,29 @@ export const howItRuns = {
 } as const;
 
 export const moreReviews = {
-  eyebrow: "More from the people who hired him",
-  headline: "Smaller jobs, same pattern",
+  eyebrow: "The small jobs too",
+  headline: "An eight-hour job gets the same process",
   cards: [
-    {
-      quote:
-        '"He was THE BEST to work with. Super efficient, communicated well and came to the table with ideas to make my website even better. I love when I don\'t have to hand hold people through everything and he took the lead and crushed what I wanted."',
-      source:
-        "Upwork review, GHL UI updates, automations and checkout integration, $697.50 over 53 hours. Founder's freelance work.",
-    },
     {
       quote:
         '"Excellent Technical skills, Speed of delivery, Prompt and clear communications, flexible and co-operative. Recommended"',
       source:
-        "Upwork review, WhatsApp API integration via PHP, 8 hours. Founder's freelance work.",
+        "Upwork review, WhatsApp API integration via PHP, 8 hours. Founder-led delivery before Sysora Stack carried the name.",
     },
     {
       quote:
-        '"He did the work exactly as I wanted. Very good and very knowledgeable. Excellent freelancer. Will be using again."',
-      source: "Upwork review, website feature changes, fixed-price job. Founder's freelance work.",
+        "“[Sysora Stack] did the work exactly as I wanted. Very good and very knowledgeable. Excellent [team]. Will be using again.”",
+      source:
+        "Upwork review, website feature changes, fixed-price job. Founder-led delivery before Sysora Stack carried the name. Wording edited only where it named a person.",
     },
   ],
-  closing: {
-    lead: "Three of those clients came back with bigger work than they first hired for, including a ",
-    first: "640-hour",
-    middle: " engagement and a ",
-    second: "357-hour",
-    tail: " build.",
-  },
+  closing:
+    "Both of those were small fixed-price jobs. The 5-hour pack at $95 exists for exactly that kind of work, and it is how most of the longer engagements on this page started.",
 } as const;
 
 export const whoBuilt = {
   eyebrow: "Who built this",
-  headline: "Built by someone who did the work first",
+  headline: "The team you are buying hours from",
   stack: [
     "GoHighLevel",
     "n8n",
@@ -374,14 +389,14 @@ export const whoBuilt = {
     "Laravel",
   ],
   paragraphs: [
-    "Sysora was founded by Nikhil, a full-stack developer and automation specialist working across GoHighLevel, n8n, Make, Zapier, React, Node.js, Next.js and Laravel. Before the company existed the work was freelance, and it kept turning into something longer than it started as. A webinar funnel build booked for one week ran close to two months, because both sides kept testing for what would fail under load. A small tech operations project turned into 640 hours.",
+    "Sysora Stack is an 11-person technical team working across GoHighLevel, n8n, Make, Zapier, React, Node.js, Next.js and Laravel, with US shift coverage. It was founded by Nikhil, and the early years of this work were delivered freelance under his name, which is where the reviews on this page come from. Those jobs kept running longer than they were booked for. A webinar funnel build scheduled for one week ran close to two months, because both sides kept testing for what would fail under load. A small tech operations project turned into 640 hours.",
   ],
   patternLead:
-    "The pattern was consistent. Nobody was hiring for an automation. They were hiring because nobody in the building could answer one question, which was ",
+    "The pattern held every time. Nobody was hiring for an automation. They were hiring because nobody in the building could answer one question, which was ",
   patternBold: "how this is supposed to work.",
   disclaimer:
-    "Sysora is not an official HighLevel employee team, partner or certified provider.",
-  link: "More on the team at About Sysora →",
+    "Sysora Stack is not an official HighLevel employee team, partner or certified provider.",
+  link: "More on the team at About Sysora Stack →",
 } as const;
 
 export const refund = {
@@ -429,13 +444,14 @@ export const refund = {
   caveatTitle: "Honest caveat:",
   caveatBody:
     " This is an unused-hours guarantee, not a full money-back guarantee. Once we approve a refund, how fast it posts depends on your payment provider, which is outside our control.",
+  policyLink: "Full refund policy →",
 } as const;
 
 export const costs = {
   eyebrow: "What the price does not cover",
   headline: "Costs that stay yours",
   paragraphs: [
-    "Your hours buy Sysora labor. They do not cover third-party software subscriptions, SMS and email usage, telephony charges, AI model fees, hosting, domains, platform licensing, taxes, or any paid external tool, unless a written quote says otherwise.",
+    "Your hours buy Sysora Stack labor. They do not cover third-party software subscriptions, SMS and email usage, telephony charges, AI model fees, hosting, domains, platform licensing, taxes, or any paid external tool, unless a written quote says otherwise.",
     "A2P and messaging registration is work we can do for you, and it uses your hours. The registry and carrier fees are separate, and approval is decided by them on their timeline. Nobody can promise a first-pass approval.",
     "We do not guarantee lead volume, conversion rates, revenue outcomes or uptime. Time estimates are estimates, and when a build runs longer than scoped you hear about it before the hours are spent.",
   ],
@@ -462,9 +478,9 @@ export const calculator = {
   cta: "Continue to checkout",
   ctaNote:
     "These are the seven published packages. For a number of hours that is not listed, pick the nearest package or ask for a custom estimate.",
-  quote: '"Genuinely top notch work from Nikhil! I recommend 10 out of 10."',
+  quote: "“Genuinely top notch work from [Sysora Stack]! I recommend 10 out of 10.”",
   quoteSource:
-    "Upwork review, funnel layout design in GoHighLevel, 30 hours. Founder's freelance work.",
+    "Upwork review, funnel layout design in GoHighLevel, 30 hours. Founder-led delivery before Sysora Stack carried the name. Wording edited only where it named a person.",
 } as const;
 
 export const faq = {
@@ -512,12 +528,12 @@ export const faq = {
       a: "Yes. White-label delivery is a large share of our agency work. What carries your name and what does not is agreed per engagement, in writing.",
     },
     {
-      q: "Do you only work in GoHighLevel?",
+      q: "Does Sysora Stack only work in GoHighLevel?",
       a: "GoHighLevel is where most of our work starts. When a job needs n8n, Zapier, Make, a webhook, an API, a database or custom code, the same team builds that part.",
     },
     {
-      q: "Are the reviews on this page Sysora client reviews?",
-      a: "No, and we are not going to present them that way. They are founder Nikhil's reviews from freelance work on Upwork, completed before Sysora existed, labeled as such everywhere they appear.",
+      q: "Are the reviews on this page Sysora Stack client reviews?",
+      a: "They are Upwork reviews of work our founder delivered before the company carried the Sysora Stack name, and the people who delivered it run delivery here now. Each review appears once on this page, credited to the job it came from. Where a client wrote a person’s name or a pronoun, the substitution sits in square brackets, and the unedited wording stays live on the Upwork profile. We are not going to show you a corporate client roster we do not have yet.",
     },
     {
       q: "What if my project is too big for a package?",
@@ -554,7 +570,7 @@ export const footer = {
         { label: "Services", href: "/services" },
         { label: "How it runs", href: "#how" },
         { label: "Request an estimate", href: "/request-estimate" },
-        { label: "About Sysora", href: "/about" },
+        { label: "About Sysora Stack", href: "/about" },
       ],
     },
     {
@@ -565,7 +581,7 @@ export const footer = {
       ],
     },
   ],
-  copyright: "© 2026 Sysora. All rights reserved.",
+  copyright: "© 2026 Sysora Stack. All rights reserved.",
   disclaimer:
-    "Sysora is not an official HighLevel employee team, partner or certified provider.",
+    "Sysora Stack is not an official HighLevel employee team, partner or certified provider.",
 } as const;

@@ -9,7 +9,7 @@ import { HowItRuns } from "@/components/sales/HowItRuns";
 import { MoreReviews } from "@/components/sales/MoreReviews";
 import { Packages } from "@/components/sales/Packages";
 import { RefundGuarantee } from "@/components/sales/RefundGuarantee";
-import { ReviewMarquee } from "@/components/sales/ReviewMarquee";
+import { Reviews } from "@/components/sales/Reviews";
 import { Safeguards } from "@/components/sales/Safeguards";
 import { SalesFaq } from "@/components/sales/SalesFaq";
 import { SalesFooter } from "@/components/sales/SalesFooter";
@@ -38,7 +38,7 @@ export default function Home() {
         <SalesHeader />
 
         <SalesHero />
-        <ReviewMarquee />
+        <Reviews />
         <Packages />
         <Safeguards />
         <TrackRecord />

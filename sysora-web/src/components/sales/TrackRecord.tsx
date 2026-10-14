@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/Button";
-import { StarIcon } from "@/components/ui/Icon";
 import { trackRecord } from "@/content/landing/sales";
 
 export function TrackRecord() {
@@ -42,33 +41,6 @@ export function TrackRecord() {
           <p className="px-[26px] py-3 bg-[var(--surface-1)] border-t-[1.5px] border-[var(--border-faint)] font-mono text-[11px] tracking-[0.6px] text-[var(--ink-300)]">
             {trackRecord.disclaimer}
           </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-6 mt-6 items-stretch to-860:grid-cols-1">
-          {trackRecord.featured.map((item) => (
-            <figure
-              key={item.source}
-              className="sx-card m-0 flex flex-col p-8 rounded-[18px] bg-[var(--surface-0)] border-[1.5px] border-[var(--border-default)] shadow-[0_2px_6px_rgba(0,80,50,0.05),0_18px_40px_rgba(0,80,50,0.07)]"
-            >
-              <span className="flex gap-[2px] text-[#F97316]" aria-label="5 stars">
-                {Array.from({ length: 5 }, (_, i) => (
-                  <StarIcon key={i} size={15} />
-                ))}
-              </span>
-              <blockquote
-                className={
-                  item.large
-                    ? "mt-[18px] mb-0 flex-1 font-heading text-[22px] font-bold leading-[1.4] tracking-[-0.3px] text-[var(--ink-900)]"
-                    : "mt-[18px] mb-0 flex-1 text-[16.5px] leading-[1.75] text-[var(--ink-700)]"
-                }
-              >
-                {item.quote}
-              </blockquote>
-              <figcaption className="mt-[22px] pt-4 border-t-[1.5px] border-[var(--border-faint)] text-[13px] italic leading-[1.6] text-[var(--ink-500)]">
-                {item.source}
-              </figcaption>
-            </figure>
-          ))}
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-5 mt-8">

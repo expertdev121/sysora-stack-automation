@@ -37,7 +37,7 @@ export function FinalCta() {
           </Link>
           , and more on the team at{" "}
           <Link href={routes.about} className="font-semibold text-[var(--accent)]">
-            About Sysora
+            About Sysora Stack
           </Link>
           .
         </p>

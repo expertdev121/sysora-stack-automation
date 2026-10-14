@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Lato, Roboto, Space_Grotesk } from "next/font/google";
+
+import { siteConfig } from "@/config/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -38,23 +40,35 @@ const roboto = Roboto({
   adjustFontFallback: false,
 });
 
+/**
+ * metadataBase is the single source of every absolute URL Next generates:
+ * canonicals, OG urls, the sitemap's base. It pointed at sysora.com — a
+ * domain that is parked and for sale — which told Google the authoritative
+ * copy of all 16 pages lived somewhere we do not control. That one line is
+ * why a brand-plus-category search returned nothing from this site.
+ */
 export const metadata: Metadata = {
-  metadataBase: new URL("https://sysora.com"),
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: "Sysora — Your on-demand AI, automation and systems team",
-    template: "%s — Sysora",
+    default: "GoHighLevel, Automation & Dev Hours from $13/hr — Sysora Stack",
+    template: "%s — Sysora Stack",
   },
-  description:
-    "We design, build, fix, and manage the technology behind your operations. Your people spend less time moving information between tools, and more time on the work that moves the business forward.",
+  description: siteConfig.description,
+  alternates: { canonical: "/" },
   icons: {
     icon: "/sysora-mark.svg",
   },
   openGraph: {
-    title: "Sysora — Your on-demand AI, automation and systems team",
-    description:
-      "We design, build, fix, and manage the technology behind your operations. Start with the $49 Business Systems Review.",
+    title: "GoHighLevel, Automation & Dev Hours from $13/hr — Sysora Stack",
+    description: siteConfig.description,
+    url: "/",
     type: "website",
-    siteName: "Sysora",
+    siteName: siteConfig.name,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GoHighLevel, Automation & Dev Hours from $13/hr — Sysora Stack",
+    description: siteConfig.description,
   },
 };
 

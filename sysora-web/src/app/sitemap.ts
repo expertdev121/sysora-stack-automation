@@ -1,37 +1,54 @@
 import type { MetadataRoute } from "next";
 
-import { listPublishedServices } from "@/lib/sales/services";
+import { siteConfig } from "@/config/site";
 
 /**
- * The sitemap, including one entry per published service.
+ * The sitemap.
  *
- * Services are database rows, so a hand-maintained list would go stale
- * the first time somebody adds one from the dashboard — which is the
- * only way they get added. Drafts are excluded because the pages 404.
+ * Every URL here was previously on sysora.com — a domain this site does
+ * not own. Google discards a sitemap whose URLs sit outside the host's
+ * own domain, so the effect was not "a sitemap with some wrong links"
+ * but no working sitemap at all.
+ *
+ * It is now a short hand-written list, because the site is a short list:
+ * one offer, one estimate form, contact and the two legal pages. The
+ * previous version enumerated published services from the database;
+ * those pages are gone, and a sitemap that queries the database to list
+ * nothing is just a way to fail at request time.
+ *
+ * Deliberately absent: /checkout/* (noindex, and the ?hours= variants
+ * are seven near-duplicates), /admin/*, and the per-reference request
+ * and thank-you pages, which are private to one customer.
  */
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = "https://sysora.com";
+export default function sitemap(): MetadataRoute.Sitemap {
+  const base = siteConfig.url;
+  const lastModified = new Date();
 
-  const staticPages: MetadataRoute.Sitemap = [
-    { url: base, changeFrequency: "weekly", priority: 1 },
-    { url: `${base}/services`, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${base}/systems-review`, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${base}/systems-team`, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${base}/build-request`, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${base}/about`, changeFrequency: "monthly", priority: 0.5 },
-    { url: `${base}/contact`, changeFrequency: "monthly", priority: 0.5 },
-  ];
-
-  let services: MetadataRoute.Sitemap = [];
-  try {
-    services = (await listPublishedServices()).map((s) => ({
-      url: `${base}/services/${s.slug}`,
-      changeFrequency: "monthly" as const,
+  return [
+    { url: base, lastModified, changeFrequency: "weekly", priority: 1 },
+    {
+      url: `${base}/request-estimate`,
+      lastModified,
+      changeFrequency: "monthly",
       priority: 0.8,
-    }));
-  } catch {
-    // A sitemap that renders without the database beats a 500 at /sitemap.xml.
-  }
-
-  return [...staticPages, ...services];
+    },
+    {
+      url: `${base}/contact`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${base}/privacy-policy`,
+      lastModified,
+      changeFrequency: "yearly",
+      priority: 0.2,
+    },
+    {
+      url: `${base}/terms`,
+      lastModified,
+      changeFrequency: "yearly",
+      priority: 0.2,
+    },
+  ];
 }

@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { PaymentPanel } from "@/components/checkout/PaymentPanel";
 import { CheckoutFooter } from "@/components/layout/CheckoutFooter";
-import { SiteHeader } from "@/components/layout/SiteHeader";
+import { CheckoutHeader } from "@/components/layout/CheckoutHeader";
 import { ConfigNotice } from "@/components/ui/ConfigNotice";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { formatMoney } from "@/lib/money";
@@ -150,7 +150,7 @@ export default async function CheckoutPage({
 function CheckoutShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="font-sans text-[var(--text-body)] bg-[var(--surface-1)] min-h-screen flex flex-col overflow-x-hidden">
-      <SiteHeader />
+      <CheckoutHeader />
       <main className="flex-1 px-6 py-[clamp(48px,7vh,88px)]">
         <div className="max-w-[1060px] mx-auto">{children}</div>
       </main>

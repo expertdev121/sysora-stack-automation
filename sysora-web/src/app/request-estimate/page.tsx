@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   title: estimate.meta.title,
   description: estimate.meta.description,
   alternates: { canonical: "/request-estimate" },
+  openGraph: {
+    title: estimate.meta.title,
+    description: estimate.meta.description,
+    url: "/request-estimate",
+  },
 };
 
 export default function RequestEstimatePage() {

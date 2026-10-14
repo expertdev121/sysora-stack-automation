@@ -1,6 +1,4 @@
-import Link from "next/link";
 
-import { routes } from "@/config/site";
 import { whoBuilt } from "@/content/landing/sales";
 
 export function WhoBuilt() {
@@ -42,14 +40,8 @@ export function WhoBuilt() {
                 {whoBuilt.patternLead}
                 <strong className="text-white">{whoBuilt.patternBold}</strong>
               </p>
-              <div className="flex flex-wrap items-center justify-between gap-[14px] mt-[26px] pt-5 border-t-[1.5px] border-white/[0.14]">
+              <div className="mt-[26px] pt-5 border-t-[1.5px] border-white/[0.14]">
                 <p className="text-[12.5px] leading-[1.6] text-white/60">{whoBuilt.disclaimer}</p>
-                <Link
-                  href={routes.about}
-                  className="text-[14px] font-semibold text-[var(--accent)] hover:text-white"
-                >
-                  {whoBuilt.link}
-                </Link>
               </div>
             </div>
           </div>

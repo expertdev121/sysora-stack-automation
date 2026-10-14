@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { ScrollReveal } from "@/components/layout/ScrollReveal";
+import { HomeStructuredData } from "@/components/seo/StructuredData";
 import { Audiences } from "@/components/sales/Audiences";
 import { Calculator } from "@/components/sales/Calculator";
 import { Costs } from "@/components/sales/Costs";
@@ -25,6 +26,16 @@ import { meta } from "@/content/landing/sales";
 export const metadata: Metadata = {
   title: meta.title,
   description: meta.description,
+  alternates: { canonical: "/" },
+  // Was inherited from the root layout, which still sold the retired $49
+  // review — so every share, Slack unfurl and LinkedIn preview advertised
+  // an offer that no longer exists.
+  openGraph: {
+    title: meta.title,
+    description: meta.description,
+    url: "/",
+    type: "website",
+  },
 };
 
 export default function Home() {
@@ -35,6 +46,7 @@ export default function Home() {
         className="font-sans text-[var(--ink-600)] bg-[var(--surface-0)] overflow-x-clip"
       >
         <ScrollReveal rootId="page" />
+        <HomeStructuredData />
         <SalesHeader />
 
         <SalesHero />

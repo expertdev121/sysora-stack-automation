@@ -5,8 +5,16 @@ import { Button } from "@/components/ui/Button";
 import { routes, siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
-  title: "Contact",
-  description: "Talk to the Sysora team about your systems, automation, and AI workflows.",
+  title: "Contact — GoHighLevel & Automation Help",
+  description:
+    "Email Sysora Stack about GoHighLevel, automation and development work. Prepaid hours from $19 down to $13, no contract.",
+  alternates: { canonical: "/contact" },
+  openGraph: {
+    title: "Contact — Sysora Stack",
+    description:
+      "Email us about GoHighLevel, automation and development work. Prepaid hours from $19 down to $13.",
+    url: "/contact",
+  },
 };
 
 export default function ContactPage() {
@@ -24,8 +32,8 @@ export default function ContactPage() {
         .
       </p>
       <div className="flex flex-wrap gap-3 mt-8">
-        <Button size="lg" arrow href={routes.systemsReview}>
-          Get your Business Systems Review, $49
+        <Button size="lg" arrow href={routes.packages}>
+          See the hour packages
         </Button>
         <Button size="lg" variant="ghost" href={routes.home}>
           Back to home

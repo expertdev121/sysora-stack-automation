@@ -44,8 +44,13 @@ export const nav = [
 
 export const hero = {
   eyebrow: "Prepaid GoHighLevel, automation and development hours",
+  /**
+   * The H1 carries the search term as well as the voice. "Pay for the
+   * hours it takes" said nothing a search engine could match, which left
+   * the <title> doing the keyword work by itself.
+   */
   headline: "Send us the list. ",
-  headlineAccent: "Pay for the hours it takes.",
+  headlineAccent: "GoHighLevel and automation hours from $13.",
   lead: "$19 an hour, down to $13 at volume, and the full table is one scroll below. Buy a block of hours and an 11-person technical team works through your backlog: GoHighLevel builds, automations, integrations, websites and custom development. Real people handle chat and tickets around the clock. The hours you do not use are refundable.",
   primaryCta: "Choose Your Hours",
   secondaryCta: "Request a Project Estimate",
@@ -248,8 +253,8 @@ export const audiences = [
       { label: "150h" },
     ] as StartPill[],
     startTail: "monthly for standing capacity.",
-    link: "Agency detail on Services →",
-    href: "/services#agencies",
+    link: "See the packages →",
+    href: "#packages",
   },
   {
     id: "local",
@@ -289,8 +294,8 @@ export const audiences = [
     startMid: "",
     startPills2: [] as StartPill[],
     startTail: "then a smaller monthly plan if you want someone on hand afterwards.",
-    link: "Local business detail on Services →",
-    href: "/services#local-businesses",
+    link: "See the packages →",
+    href: "#packages",
   },
 ] as const;
 
@@ -661,16 +666,17 @@ export const footer = {
     {
       title: "Company",
       links: [
-        { label: "Services", href: "/services" },
+        { label: "What we do", href: "#work" },
         { label: "How it runs", href: "#how" },
         { label: "Request an estimate", href: "/request-estimate" },
-        { label: "About Sysora Stack", href: "/about" },
+        { label: "Contact", href: "/contact" },
       ],
     },
     {
       title: "Legal",
       links: [
-        { label: "Contact", href: "/contact" },
+        { label: "Privacy policy", href: "/privacy-policy" },
+        { label: "Terms", href: "/terms" },
         { label: "Refund policy", href: "#refund" },
       ],
     },

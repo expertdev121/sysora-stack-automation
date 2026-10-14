@@ -1,4 +1,3 @@
-import Link from "next/link";
 
 import { Button } from "@/components/ui/Button";
 import { routes } from "@/config/site";
@@ -30,17 +29,6 @@ export function FinalCta() {
           </Button>
         </div>
         <p className="mt-6 text-[14px] text-white/[0.72]">{finalCta.note}</p>
-        <p className="mt-[14px] text-[14px] text-white/[0.72]">
-          More on what we build at{" "}
-          <Link href={routes.services} className="font-semibold text-[var(--accent)]">
-            Services
-          </Link>
-          , and more on the team at{" "}
-          <Link href={routes.about} className="font-semibold text-[var(--accent)]">
-            About Sysora Stack
-          </Link>
-          .
-        </p>
       </div>
     </section>
   );

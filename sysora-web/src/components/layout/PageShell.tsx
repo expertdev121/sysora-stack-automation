@@ -1,12 +1,18 @@
 import type { ReactNode } from "react";
 
 import { SalesFooter } from "@/components/sales/SalesFooter";
-import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SalesHeader } from "@/components/sales/SalesHeader";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 
 /**
  * Shared frame for every page other than the landing page: same header,
  * same footer, same hero band. New pages only supply their own body.
+ *
+ * The header is the landing page's, with anchors prefixed so they point
+ * back at the home document. There used to be a second one carrying the
+ * old nav — "The problem", "Engineering", a "$49 review" CTA — all of
+ * which pointed at sections and pages that no longer exist. One header
+ * means a dead link is dead in one place, where it gets noticed.
  */
 export function PageShell({
   eyebrow,
@@ -21,7 +27,7 @@ export function PageShell({
 }) {
   return (
     <div className="font-sans text-[var(--text-body)] bg-[var(--surface-0)] overflow-x-hidden">
-      <SiteHeader />
+      <SalesHeader anchorBase="/" />
 
       <section className="relative overflow-hidden px-6 pt-[clamp(72px,10vh,120px)] pb-[clamp(56px,8vh,88px)] bg-[linear-gradient(180deg,var(--surface-0)_0%,var(--mint-50)_100%)]">
         <div

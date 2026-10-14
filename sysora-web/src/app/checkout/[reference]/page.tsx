@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
 import { PaymentPanel } from "@/components/checkout/PaymentPanel";
-import { SiteFooter } from "@/components/layout/SiteFooter";
+import { CheckoutFooter } from "@/components/layout/CheckoutFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ConfigNotice } from "@/components/ui/ConfigNotice";
 import { Eyebrow } from "@/components/ui/Eyebrow";
@@ -154,7 +154,7 @@ function CheckoutShell({ children }: { children: React.ReactNode }) {
       <main className="flex-1 px-6 py-[clamp(48px,7vh,88px)]">
         <div className="max-w-[1060px] mx-auto">{children}</div>
       </main>
-      <SiteFooter />
+      <CheckoutFooter />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SalesFooter } from "@/components/sales/SalesFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 
@@ -45,7 +45,7 @@ export function PageShell({
         </section>
       )}
 
-      <SiteFooter />
+      <SalesFooter anchorBase="/" />
     </div>
   );
 }

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
+import { CheckoutFooter } from "@/components/layout/CheckoutFooter";
 import { HoursCheckout } from "@/components/sales/HoursCheckout";
-import { packs, DEFAULT_PACK, footer } from "@/content/landing/sales";
+import { packs, DEFAULT_PACK } from "@/content/landing/sales";
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -37,19 +37,7 @@ export default async function HoursCheckoutPage({
         <HoursCheckout initialHours={hours} initialBilling={billing} />
       </main>
 
-      <footer className="border-t-[1.5px] border-[var(--border-faint)] bg-[var(--surface-0)]">
-        <div className="max-w-[1160px] mx-auto px-6 py-[22px] flex flex-wrap justify-between gap-3 text-[13px] text-[var(--ink-500)]">
-          <span>{footer.copyright}</span>
-          <span className="flex gap-5">
-            <Link href="/#refund" className="text-[var(--ink-500)]">
-              Refund policy
-            </Link>
-            <Link href="/contact" className="text-[var(--ink-500)]">
-              Contact
-            </Link>
-          </span>
-        </div>
-      </footer>
+      <CheckoutFooter />
     </div>
   );
 }

@@ -20,6 +20,7 @@ export type HoursInput = {
   audience: string;
   ghl: string;
   tools: string[];
+  timezone: string;
   context?: TrackingContext;
 };
 
@@ -68,7 +69,11 @@ export async function startHourPackCheckout(input: HoursInput): Promise<HoursRes
       customerId = existing.id;
       await db
         .from("customers")
-        .update({ full_name: fullName, company_name: input.company.trim() || null })
+        .update({
+          full_name: fullName,
+          company_name: input.company.trim() || null,
+          timezone: input.timezone,
+        })
         .eq("id", customerId);
     } else {
       const { data: created, error } = await db
@@ -77,6 +82,7 @@ export async function startHourPackCheckout(input: HoursInput): Promise<HoursRes
           email,
           full_name: fullName,
           company_name: input.company.trim() || null,
+          timezone: input.timezone,
           utm_source: context.utm_source ?? null,
           utm_medium: context.utm_medium ?? null,
           utm_campaign: context.utm_campaign ?? null,
@@ -111,6 +117,7 @@ export async function startHourPackCheckout(input: HoursInput): Promise<HoursRes
           audience: input.audience,
           ghl_status: input.ghl,
           tools: input.tools,
+          timezone: input.timezone,
         },
       })
       .select("reference")

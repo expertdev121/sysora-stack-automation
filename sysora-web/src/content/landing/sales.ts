@@ -566,6 +566,84 @@ export const finalCta = {
   note: "No contract. 24/7 human chat and ticket triage included. Unused prepaid hours are refundable.",
 } as const;
 
+/** Copy for the hour-pack checkout. */
+export const checkout = {
+  chrome: { title: "Secure checkout", back: "← Back to packages" },
+  steps: ["Hours", "Details", "Payment"],
+  plan: {
+    step: "Step 1 of 3",
+    headline: "Confirm your hours",
+    lead: "Same seven prices for a one-time pack or a monthly plan. You can change this before you pay.",
+    next: "Continue to your details",
+    validityOnce: "One-time pack. Your hours are valid for 60 days from purchase.",
+    validityMonthly:
+      "Monthly plan. Your balance resets each billing cycle and does not carry over. Cancel any time to stop future renewals.",
+  },
+  details: {
+    step: "Step 2 of 3",
+    headline: "Who are we working with?",
+    lead: "Your receipt and onboarding intake go to this email.",
+    name: "Full name",
+    email: "Work email",
+    company: "Company",
+    timezone: "Your US time zone",
+    timezones: [
+      "Eastern (ET)",
+      "Central (CT)",
+      "Mountain (MT)",
+      "Pacific (PT)",
+      "Alaska (AKT)",
+      "Hawaii (HT)",
+    ],
+    kind: "What best describes you?",
+    kinds: ["Marketing agency", "Local business", "SaaS or other"],
+    ghl: "Your GoHighLevel account",
+    ghlOpts: ["Not set up yet", "Live, built in-house", "Inherited from someone else"],
+    tools: "Other tools in play",
+    toolOpts: [
+      "n8n",
+      "Zapier",
+      "Make",
+      "Stripe",
+      "Calendly",
+      "WordPress",
+      "HubSpot",
+      "Twilio",
+      "Custom API",
+    ],
+    back: "Back",
+    next: "Continue to payment",
+  },
+  pay: {
+    step: "Step 3 of 3",
+    headline: "Payment",
+    lead: "Your hour balance is created the moment payment clears.",
+    /** Said plainly, because the card form lives on Stripe's side. */
+    handoff:
+      "Card details are entered on the next screen, inside Stripe. They never touch our servers.",
+    agree:
+      "I understand hours already worked are not refundable, and that unused hours can be refunded under the published refund policy.",
+    agreeMonthly: " I understand this plan renews monthly until I cancel.",
+    agreeError: "Please accept the terms to continue.",
+    back: "Back",
+    submit: "Continue to secure payment",
+    working: "Starting",
+  },
+  summary: {
+    title: "Order summary",
+    included: "24/7 human chat and ticket triage",
+    includedValue: "Included",
+    refundTitle: "Unused hours come back",
+    refundBody:
+      "Not happy with our work? Get a refund for your unused hours at the rate you paid. Hours already worked are not refundable.",
+    bullets: [
+      "You approve the scope before anything is built",
+      "No automatic overage, ever",
+      "No contract. Cancel any time",
+    ],
+  },
+} as const;
+
 export const footer = {
   blurb:
     "Prepaid GoHighLevel, automation and development hours. $19 an hour, down to $13 at volume. No contract.",

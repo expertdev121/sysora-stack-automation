@@ -117,6 +117,15 @@ export default function ServicesPage() {
               </span>
 
               <div className="relative z-[2] flex flex-col items-center gap-5 text-center">
+                <div className="relative w-[132px] h-[132px] rounded-[30px] overflow-hidden border-[1.5px] border-white/50 shadow-[0_10px_30px_rgba(0,0,0,0.35),0_0_0_10px_rgba(0,200,150,0.10),0_0_46px_rgba(0,200,150,0.30)]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={featured.panel.image}
+                    alt={featured.panel.imageAlt}
+                    className="w-full h-full object-cover block"
+                  />
+                </div>
+
                 <span className="inline-flex items-center gap-2 px-[15px] py-[7px] rounded-full bg-[rgba(0,200,150,0.14)] border-[1.5px] border-[rgba(0,200,150,0.42)] font-mono text-[10.5px] font-bold tracking-[1.3px] uppercase text-[var(--accent)]">
                   <span className="sx-dot w-[6px] h-[6px] rounded-full bg-[var(--accent)]" />
                   {featured.panel.status}

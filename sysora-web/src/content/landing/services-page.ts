@@ -49,6 +49,9 @@ export const servicesPage = {
     price: "$249",
     cta: "Get a quote",
     panel: {
+      image:
+        "https://assets.cdn.filesafe.space/5VD5QnpROyZi3omw1BP1/media/6aa7ec934c0f71e6c6c231b0.jpg",
+      imageAlt: "GoHighLevel",
       status: "A2P 10DLC registered",
       title: "Approved to send",
       body: "Brand and campaign cleared inside your GoHighLevel account.",

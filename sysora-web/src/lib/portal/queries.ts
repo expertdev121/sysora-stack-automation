@@ -317,5 +317,10 @@ export async function getCardOnFile(
     .maybeSingle();
 
   if (!data) return null;
-  return { brand: data.card_brand, last4: data.card_last4 };
+  // Stripe hands brands back lowercase ("visa"); the design writes them
+  // the way a card does, so normalise once here rather than per page.
+  const brand: string | null = data.card_brand
+    ? data.card_brand.charAt(0).toUpperCase() + data.card_brand.slice(1)
+    : null;
+  return { brand, last4: data.card_last4 };
 }

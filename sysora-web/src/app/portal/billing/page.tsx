@@ -52,7 +52,7 @@ export default async function BillingPage() {
               <p className="mt-2 font-mono text-[16px] tracking-[2px] text-[var(--ink-900)]">
                 •••• •••• •••• {card.last4}
               </p>
-              <p className="mt-2 text-[13px] uppercase text-[var(--text-muted)]">{card.brand}</p>
+              <p className="mt-2 text-[13px] text-[var(--text-muted)]">{card.brand}</p>
             </div>
           ) : (
             <p className="mt-3 text-[14px] text-[var(--text-muted)]">No card on file yet.</p>

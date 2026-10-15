@@ -101,7 +101,7 @@ export default async function InvoicesPage() {
         <h2 className="text-[15px] font-bold text-[var(--ink-900)]">Payment method</h2>
         {card?.last4 ? (
           <p className="mt-2 text-[14px] text-[var(--ink-600)]">
-            <span className="uppercase">{card.brand}</span> ending {card.last4}
+            {card.brand} ending {card.last4}
           </p>
         ) : (
           <p className="mt-2 text-[14px] text-[var(--text-muted)]">No card on file yet.</p>

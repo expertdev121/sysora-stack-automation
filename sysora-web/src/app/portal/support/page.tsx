@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { PortalShell } from "@/components/portal/PortalShell";
 import { TicketForm } from "@/components/portal/TicketForm";
 import { requireClient } from "@/lib/portal/auth";
-import { getTickets } from "@/lib/portal/queries";
+import { getTickets, getChrome } from "@/lib/portal/queries";
 
 export const metadata: Metadata = { title: "Support", robots: { index: false, follow: false } };
 
@@ -16,11 +16,17 @@ const TONE: Record<string, { label: string; bg: string; fg: string }> = {
 
 export default async function SupportPage() {
   const session = await requireClient();
+  const chrome = await getChrome(session.customerId);
   const tickets = await getTickets(session.customerId);
   const open = tickets.filter((t) => t.status !== "resolved");
 
   return (
-    <PortalShell eyebrow="Help" title="Support tickets" openTickets={open.length}>
+    <PortalShell eyebrow="Help" title="Support tickets" openTickets={chrome.openTickets}
+      remaining={chrome.remaining}
+      purchased={chrome.purchased}
+      userName={session.fullName}
+      userEmail={session.email}
+      company={chrome.company}>
       <p className="max-w-[640px] text-[14.5px] leading-[1.7] text-[var(--text-muted)]">
         A real person receives, reads and routes every ticket, at any hour. Triage is included;
         the technical work that follows comes out of your hours.

@@ -66,6 +66,36 @@ export type BuildRow = {
   createdAt: string;
 };
 
+/**
+ * What the sidebar needs on every page: hours left, the company name
+ * under the avatar, and the open-ticket count on the nav badge. One
+ * call so a page does not assemble the chrome three different ways.
+ */
+export async function getChrome(customerId: string): Promise<{
+  remaining: number;
+  purchased: number;
+  company: string | null;
+  openTickets: number;
+}> {
+  const db = salesDb();
+  const [balance, customer, tickets] = await Promise.all([
+    getBalance(customerId),
+    db.from("customers").select("company_name").eq("id", customerId).maybeSingle(),
+    db
+      .from("support_tickets")
+      .select("id")
+      .eq("customer_id", customerId)
+      .neq("status", "resolved"),
+  ]);
+
+  return {
+    remaining: balance.remaining,
+    purchased: balance.purchased,
+    company: customer.data?.company_name ?? null,
+    openTickets: (tickets.data ?? []).length,
+  };
+}
+
 export async function getBalance(customerId: string): Promise<Balance> {
   const { data } = await salesDb()
     .from("customer_hour_balance")
@@ -237,6 +267,36 @@ export async function getBuildRequests(customerId: string): Promise<BuildRow[]> 
     budgetBand: r.budget_band,
     createdAt: r.created_at,
   }));
+}
+
+/**
+ * The plan behind the current hours: the most recent entitlement, and
+ * what was paid for it. Derived rather than stored, like the balance.
+ */
+export async function getPlan(customerId: string): Promise<{
+  hours: number;
+  monthly: boolean;
+  amount: number;
+  currency: string;
+} | null> {
+  const { data } = await salesDb()
+    .from("hour_entitlements")
+    .select("hours, source, rate_amount, currency")
+    .eq("customer_id", customerId)
+    .order("starts_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (!data) return null;
+
+  const hours = Number(data.hours);
+  return {
+    hours,
+    monthly: data.source === "monthly",
+    // rate_amount is per hour in minor units; the plan price is the whole pack.
+    amount: Math.round((data.rate_amount ?? 0) * hours),
+    currency: data.currency ?? "USD",
+  };
 }
 
 /** The card on file, read from the most recent successful payment. */

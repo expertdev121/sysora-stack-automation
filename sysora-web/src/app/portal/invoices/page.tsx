@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { PortalShell } from "@/components/portal/PortalShell";
 import { requireClient } from "@/lib/portal/auth";
-import { getCardOnFile, getInvoices, getTickets } from "@/lib/portal/queries";
+import { getCardOnFile, getInvoices, getTickets, getChrome } from "@/lib/portal/queries";
 import { formatMoney } from "@/lib/money";
 
 export const metadata: Metadata = { title: "Invoices", robots: { index: false, follow: false } };
@@ -15,6 +15,7 @@ const TONE: Record<string, { bg: string; fg: string }> = {
 
 export default async function InvoicesPage() {
   const session = await requireClient();
+  const chrome = await getChrome(session.customerId);
   const [invoices, card, tickets] = await Promise.all([
     getInvoices(session.customerId),
     getCardOnFile(session.customerId),
@@ -24,7 +25,12 @@ export default async function InvoicesPage() {
   const open = tickets.filter((t) => t.status !== "resolved").length;
 
   return (
-    <PortalShell eyebrow="Billing" title="Invoices" openTickets={open}>
+    <PortalShell eyebrow="Billing" title="Invoices" openTickets={chrome.openTickets}
+      remaining={chrome.remaining}
+      purchased={chrome.purchased}
+      userName={session.fullName}
+      userEmail={session.email}
+      company={chrome.company}>
       <section className="overflow-hidden rounded-[18px] border border-[var(--line-slate)] bg-white">
         <table className="w-full border-collapse text-left text-[14px]">
           <thead>

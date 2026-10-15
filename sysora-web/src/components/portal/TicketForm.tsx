@@ -42,15 +42,24 @@ export function TicketForm() {
     >
       <h2 className="text-[15px] font-bold text-[var(--text-heading)]">Open a ticket</h2>
 
-      <div className="mt-4 grid grid-cols-[2fr_1fr] gap-4 to-640:grid-cols-1">
-        <label className="block">
-          <span className={label}>Subject</span>
-          <input name="subject" className={field} placeholder="Booking widget not showing on mobile" required />
-        </label>
+      <label className="mt-4 block">
+        <span className={label}>Subject</span>
+        <input name="subject" className={field} placeholder="Booking widget not showing on mobile" required />
+      </label>
+
+      <div className="mt-4 grid grid-cols-2 gap-4 to-640:grid-cols-1">
         <label className="block">
           <span className={label}>Category</span>
           <select name="category" className={field} defaultValue={CATEGORIES[0]}>
             {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+          </select>
+        </label>
+        <label className="block">
+          <span className={label}>Priority</span>
+          <select name="priority" className={field} defaultValue="normal">
+            <option value="normal">Normal</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent, something is down</option>
           </select>
         </label>
       </div>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { PortalShell } from "@/components/portal/PortalShell";
 import { requireClient } from "@/lib/portal/auth";
-import { getBalance, getLedger, getTickets } from "@/lib/portal/queries";
+import { getBalance, getLedger, getTickets, getChrome } from "@/lib/portal/queries";
 
 export const metadata: Metadata = { title: "Hours", robots: { index: false, follow: false } };
 
@@ -26,6 +26,7 @@ const KIND_LABEL: Record<string, string> = {
  */
 export default async function HoursPage() {
   const session = await requireClient();
+  const chrome = await getChrome(session.customerId);
   const [balance, ledger, tickets] = await Promise.all([
     getBalance(session.customerId),
     getLedger(session.customerId),
@@ -35,7 +36,12 @@ export default async function HoursPage() {
   const open = tickets.filter((t) => t.status !== "resolved").length;
 
   return (
-    <PortalShell eyebrow="Hours" title="Hours and usage" openTickets={open}>
+    <PortalShell eyebrow="Hours" title="Hours and usage" openTickets={chrome.openTickets}
+      remaining={chrome.remaining}
+      purchased={chrome.purchased}
+      userName={session.fullName}
+      userEmail={session.email}
+      company={chrome.company}>
       <div className="grid grid-cols-4 gap-4 to-860:grid-cols-2">
         {[
           ["Purchased", hrs(balance.purchased)],

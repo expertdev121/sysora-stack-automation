@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { BuildRequestForm } from "@/components/portal/BuildRequestForm";
 import { PortalShell } from "@/components/portal/PortalShell";
 import { requireClient } from "@/lib/portal/auth";
-import { getBuildRequests, getTickets } from "@/lib/portal/queries";
+import { getBuildRequests, getTickets, getChrome } from "@/lib/portal/queries";
 
 export const metadata: Metadata = {
   title: "Build requests",
@@ -19,6 +19,7 @@ const STAGE: Record<string, { label: string; bg: string; fg: string }> = {
 
 export default async function BuildRequestsPage() {
   const session = await requireClient();
+  const chrome = await getChrome(session.customerId);
   const [builds, tickets] = await Promise.all([
     getBuildRequests(session.customerId),
     getTickets(session.customerId),
@@ -27,7 +28,12 @@ export default async function BuildRequestsPage() {
   const open = tickets.filter((t) => t.status !== "resolved").length;
 
   return (
-    <PortalShell eyebrow="Projects" title="Build requests" openTickets={open}>
+    <PortalShell eyebrow="Projects" title="Build requests" openTickets={chrome.openTickets}
+      remaining={chrome.remaining}
+      purchased={chrome.purchased}
+      userName={session.fullName}
+      userEmail={session.email}
+      company={chrome.company}>
       <p className="max-w-[640px] text-[14.5px] leading-[1.7] text-[var(--text-muted)]">
         For work too big to guess at in hours. Send the scope and we come back with a written time
         estimate and a milestone plan — free, and before anything is billed.

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { HealthPill } from "@/components/admin/console/HealthPill";
@@ -37,6 +38,25 @@ export default async function ClientsPage() {
         clients={clients.map((c) => ({ id: c.customerId, label: `${c.name} — ${hrs(c.remaining)} left` }))}
       />
 
+      {/* The design's filter chips. Counts come from the same health
+          verdict the table and the overview use. */}
+      <div className="mt-6 flex flex-wrap gap-2">
+        {(["All", "Healthy", "Low balance", "Expiring", "Payment failed", "Used up"] as const).map(
+          (f) => {
+            const n = f === "All" ? clients.length : clients.filter((c) => c.health === f).length;
+            return (
+              <span
+                key={f}
+                className="inline-flex items-center gap-[6px] rounded-full border border-[var(--line-slate)] bg-white px-[13px] py-[6px] text-[12.5px] font-medium text-[var(--text-body)]"
+              >
+                {f}
+                <span className="font-semibold text-[var(--text-muted)]">{n}</span>
+              </span>
+            );
+          },
+        )}
+      </div>
+
       <Card className="mt-6">
         {sorted.length === 0 ? (
           <EmptyState>No clients yet. The first paid order creates one.</EmptyState>
@@ -56,7 +76,12 @@ export default async function ClientsPage() {
               {sorted.map((c) => (
                 <tr key={c.customerId}>
                   <Td>
-                    <span className="block font-semibold text-[var(--text-heading)]">{c.name}</span>
+                    <Link
+                      href={`/admin/clients/${c.customerId}`}
+                      className="block font-semibold text-[var(--text-heading)] hover:text-[var(--accent-strong)]"
+                    >
+                      {c.name}
+                    </Link>
                     <span className="block text-[12.5px] text-[var(--text-muted)]">{c.email}</span>
                   </Td>
                   <Td>

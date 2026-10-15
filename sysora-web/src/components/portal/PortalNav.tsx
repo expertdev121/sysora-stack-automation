@@ -13,7 +13,9 @@ const ITEMS: NavItem[] = [
   // Overview matches exactly, or it would light up on every sub-page.
   { href: "/portal", label: "Overview", exact: true },
   { href: "/portal/hours", label: "Hours" },
+  { href: "/portal/plans", label: "Plans and hours" },
   { href: "/portal/invoices", label: "Invoices" },
+  { href: "/portal/billing", label: "Payment and plan" },
   { href: "/portal/build-requests", label: "Build requests" },
   { href: "/portal/support", label: "Support" },
 ];

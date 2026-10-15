@@ -4,7 +4,7 @@ import Link from "next/link";
 import { HoursRing } from "@/components/portal/HoursRing";
 import { PortalShell } from "@/components/portal/PortalShell";
 import { requireClient } from "@/lib/portal/auth";
-import { getBalance, getLedger, getTasks, getTickets } from "@/lib/portal/queries";
+import { getBalance, getLedger, getTasks, getTickets, getChrome } from "@/lib/portal/queries";
 
 export const metadata: Metadata = {
   title: "Client portal",
@@ -22,6 +22,7 @@ const TASK_TONE: Record<string, { bg: string; fg: string; label: string }> = {
 
 export default async function PortalOverview() {
   const session = await requireClient();
+  const chrome = await getChrome(session.customerId);
   const [balance, tasks, tickets, ledger] = await Promise.all([
     getBalance(session.customerId),
     getTasks(session.customerId),
@@ -41,7 +42,12 @@ export default async function PortalOverview() {
     <PortalShell
       eyebrow="Client portal"
       title={first ? `Hello, ${first}` : "Your account"}
-      openTickets={open.length}
+      openTickets={chrome.openTickets}
+      remaining={chrome.remaining}
+      purchased={chrome.purchased}
+      userName={session.fullName}
+      userEmail={session.email}
+      company={chrome.company}
     >
       <div className="grid grid-cols-[320px_1fr] gap-6 to-980:grid-cols-1">
         <section className="rounded-[18px] border border-[var(--line-slate)] bg-white p-6">
@@ -59,8 +65,10 @@ export default async function PortalOverview() {
               </div>
             ))}
           </dl>
+          {/* Into the portal's own plan picker, not the public page: a
+              signed-in client should never retype details we hold. */}
           <Link
-            href="/#packages"
+            href="/portal/plans"
             className="mt-5 block rounded-xl bg-[var(--accent)] px-4 py-[11px] text-center text-[14px] font-semibold text-white"
           >
             Buy more hours

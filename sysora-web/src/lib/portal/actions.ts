@@ -22,6 +22,11 @@ export async function submitTicket(form: FormData): Promise<ActionResult> {
   const category = String(form.get("category") ?? "").trim() || null;
   const body = String(form.get("body") ?? "").trim();
 
+  // Whitelisted rather than passed through: priority drives our queue
+  // order, so the enum must not accept whatever the form posts.
+  const requested = String(form.get("priority") ?? "normal");
+  const priority = ["normal", "high", "urgent"].includes(requested) ? requested : "normal";
+
   if (subject.length < 4) return { ok: false, error: "Give the ticket a subject." };
   if (body.length < 10) return { ok: false, error: "A sentence or two about the problem." };
 
@@ -29,7 +34,7 @@ export async function submitTicket(form: FormData): Promise<ActionResult> {
 
   const { data: ticket, error } = await db
     .from("support_tickets")
-    .insert({ customer_id: customerId, subject, category })
+    .insert({ customer_id: customerId, subject, category, priority })
     .select("id, reference")
     .maybeSingle();
 

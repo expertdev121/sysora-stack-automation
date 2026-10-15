@@ -11,71 +11,60 @@ export function RefundGuarantee() {
             aria-hidden="true"
             className="pointer-events-none absolute -bottom-[200px] -left-[120px] w-[520px] h-[520px] rounded-full bg-[radial-gradient(closest-side,rgba(0,200,150,0.30),rgba(0,200,150,0))]"
           />
-          <div className="relative grid grid-cols-2 gap-[clamp(28px,4vw,56px)] items-center to-860:grid-cols-1">
-            <div>
-              <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[2px] uppercase text-[#A7F3D0]">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7z" />
-                </svg>
-                {refund.eyebrow}
-              </span>
-              <h2 className="mt-[14px] text-[clamp(28px,3.4vw,42px)] font-black tracking-[-1px] leading-[1.1] text-white">
-                {refund.headline}
-              </h2>
-              <p className="mt-[18px] text-[16px] leading-[1.75] text-white/[0.88]">
-                {refund.lead}
-              </p>
-            </div>
-
-            <div className="rounded-[18px] bg-white/[0.08] border-[1.5px] border-white/[0.18] overflow-hidden">
-              <div className="grid grid-cols-[1.2fr_0.8fr_1.3fr] gap-3 px-[22px] py-[14px] border-b-[1.5px] border-white/[0.14] font-mono text-[10.5px] tracking-[1.1px] uppercase text-white/70">
-                {refund.tableHead.map((head) => (
-                  <span key={head}>{head}</span>
-                ))}
-              </div>
-              {refund.examples.map((row, i) => (
-                <div
-                  key={row.bought}
-                  className={
-                    "grid grid-cols-[1.2fr_0.8fr_1.3fr] gap-3 px-[22px] py-4 text-[14.5px] text-white/90 " +
-                    (i === refund.examples.length - 1
-                      ? ""
-                      : "border-b-[1.5px] border-white/10 ") +
-                    (i === 1 ? "bg-white/[0.06]" : "")
-                  }
-                >
-                  <span>{row.bought}</span>
-                  <span>{row.used}</span>
-                  <span className="font-mono">
-                    {row.maths}
-                    <strong className="text-white">{row.total}</strong>
-                  </span>
-                </div>
-              ))}
-            </div>
+          {/* The worked-example table that used to sit on the right is
+              gone from the design: the lead paragraph already works the
+              same sum, and the card now reads as one column capped at
+              760px so the line length stays readable at full width. */}
+          <div className="relative max-w-[760px]">
+            <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[2px] uppercase text-[#A7F3D0]">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7z" />
+              </svg>
+              {refund.eyebrow}
+            </span>
+            <h2 className="mt-[14px] text-[clamp(28px,3.4vw,42px)] font-black tracking-[-1px] leading-[1.1] text-white">
+              {refund.headline}
+            </h2>
+            <p className="mt-[18px] text-[16px] leading-[1.75] text-white/[0.88]">
+              {refund.lead}
+            </p>
           </div>
         </div>
 
         <div className="mt-7">
           <h3 className="text-[20px] font-bold text-[var(--ink-900)]">{refund.rulesTitle}</h3>
-          <div className="mt-4 rounded-[18px] bg-[var(--surface-0)] border-[1.5px] border-[var(--border-default)] shadow-[0_2px_6px_rgba(0,80,50,0.05),0_18px_40px_rgba(0,80,50,0.06)] overflow-hidden">
-            {refund.rules.map((rule, i) => (
-              <div
+          {/* Eight <details>, two across, as the design has them: the
+              rules are citable by number but should not out-shout the
+              promise above, so each body stays folded until asked for. */}
+          <div className="mt-4 grid grid-cols-2 items-start gap-3 to-860:grid-cols-1">
+            {refund.rules.map((rule) => (
+              <details
                 key={rule.label}
-                className={
-                  "grid grid-cols-[minmax(200px,0.4fr)_minmax(0,1fr)] gap-6 px-[26px] py-[18px] to-860:grid-cols-1 to-860:gap-[6px] " +
-                  (i === refund.rules.length - 1
-                    ? ""
-                    : "border-b-[1.5px] border-[var(--border-faint)]")
-                }
+                className="group rounded-[14px] border-[1.5px] border-[var(--border-default)] bg-[var(--surface-0)]"
               >
-                <span className="flex items-baseline gap-[10px] text-[15px] font-semibold text-[var(--ink-900)]">
-                  <span className="font-mono text-[12.5px] font-semibold text-[var(--accent-strong)]">
+                <summary className="flex cursor-pointer list-none items-center gap-[14px] px-5 py-4 [&::-webkit-details-marker]:hidden">
+                  <span className="grid h-7 w-7 flex-none place-items-center rounded-[8px] bg-[#F0FAF6] text-[11px] font-semibold text-[var(--accent-strong)]">
                     {rule.n}
                   </span>
-                  {rule.label}
-                </span>
-                <span className="text-[15px] leading-[1.7] text-[var(--ink-600)]">
+                  <span className="flex-1 text-[15.5px] font-semibold text-[var(--ink-900)]">
+                    {rule.label}
+                  </span>
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--accent-strong)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    className="flex-none transition-transform duration-200 group-open:-rotate-180"
+                  >
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </summary>
+                <p className="pb-[18px] pl-[62px] pr-5 text-[15px] leading-[1.7] text-[var(--ink-600)]">
                   {rule.body}
                   {/* "How to ask" carries the support address as a mailto. */}
                   {"email" in rule && rule.email ? (
@@ -89,8 +78,8 @@ export function RefundGuarantee() {
                       {"bodyTail" in rule ? rule.bodyTail : null}
                     </>
                   ) : null}
-                </span>
-              </div>
+                </p>
+              </details>
             ))}
           </div>
 

@@ -38,7 +38,7 @@ export function Audiences() {
               "to-900:grid-cols-1",
             )}
           >
-            {/* ---- Picture, with two badges floating off its edges ---- */}
+            {/* ---- Picture, on its offset mint backdrop ---- */}
             <div
               className={cn(
                 "relative sticky top-[110px] to-900:static",
@@ -60,33 +60,6 @@ export function Audiences() {
                 />
               </div>
 
-              <div className="absolute z-[2] top-[22px] -right-[14px] flex items-center gap-[10px] px-4 py-3 rounded-[14px] bg-[var(--surface-0)] border-[1.5px] border-[var(--border-default)] shadow-[0_16px_36px_rgba(0,80,50,0.16)]">
-                <span className="grid place-items-center w-[34px] h-[34px] rounded-[10px] bg-[var(--mint-50)] border-[1.5px] border-[var(--border-default)]">
-                  <CheckIcon size={16} strokeWidth={2.4} className="text-[var(--accent-strong)]" />
-                </span>
-                <span>
-                  <span className="block text-[13px] font-bold text-[var(--ink-900)]">
-                    {audience.media.badges[0].title}
-                  </span>
-                  <span className="block text-[12px] text-[var(--ink-500)]">
-                    {audience.media.badges[0].body}
-                  </span>
-                </span>
-              </div>
-
-              <div className="absolute z-[2] -bottom-[18px] left-6 flex items-center gap-[10px] px-4 py-3 rounded-[14px] bg-[var(--surface-0)] border-[1.5px] border-[var(--border-default)] shadow-[0_16px_36px_rgba(0,80,50,0.16)]">
-                <span className="grid place-items-center w-[34px] h-[34px] rounded-[10px] bg-[var(--mint-50)] border-[1.5px] border-[var(--border-default)]">
-                  <CheckIcon size={16} strokeWidth={2.4} className="text-[var(--accent-strong)]" />
-                </span>
-                <span>
-                  <span className="block text-[13px] font-bold text-[var(--ink-900)]">
-                    {audience.media.badges[1].title}
-                  </span>
-                  <span className="block text-[12px] text-[var(--ink-500)]">
-                    {audience.media.badges[1].body}
-                  </span>
-                </span>
-              </div>
             </div>
 
             {/* ---- The pitch ---- */}

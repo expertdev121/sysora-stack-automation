@@ -275,10 +275,6 @@ export const audiences = [
     media: {
       src: "/illustrations/agencies.svg",
       alt: "An agency workspace: five client subaccounts in a delivery queue, hours by month, delivered white-label",
-      badges: [
-        { title: "Subaccounts", body: "Setup and upkeep" },
-        { title: "Hours flex", body: "Up or down each month" },
-      ],
     },
     badge: "For US marketing agencies and GHL SaaS owners",
     headline: "You keep the client. We do the delivery.",
@@ -321,10 +317,6 @@ export const audiences = [
     media: {
       src: "/illustrations/local.svg",
       alt: "A missed call answered by text, booked into the calendar, lead to booked call in four minutes",
-      badges: [
-        { title: "Missed-call text back", body: "Leads answered fast" },
-        { title: "Calendars and reminders", body: "Fewer no-shows" },
-      ],
     },
     badge: "For US local businesses",
     headline: "The leads are arriving. The follow-up is not.",
@@ -490,12 +482,6 @@ export const refund = {
   eyebrow: "The refund guarantee in full",
   headline: "Not happy with our work? Get a refund for your unused hours.",
   lead: "Buy 50 hours, use 12, decide we are not the right team. The 38 hours you have not used come back at the rate you paid, $646 in that example. You do not have to prove the work was poor to get an unused balance back.",
-  tableHead: ["You bought", "You used", "Refund on unused"],
-  examples: [
-    { bought: "10 hours, $190", used: "3 hours", maths: "7 × $19 = ", total: "$133" },
-    { bought: "50 hours, $850", used: "12 hours", maths: "38 × $17 = ", total: "$646" },
-    { bought: "150 hours, $1,950", used: "40 hours", maths: "110 × $13 = ", total: "$1,430" },
-  ],
   rulesTitle: "The rules, at the same size as the promise",
   /** Numbered, as the design has them: eight rules you can cite by number. */
   rules: [

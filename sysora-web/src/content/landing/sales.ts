@@ -56,6 +56,15 @@ export const legalNav = [
   { label: "Privacy", href: "/privacy-policy" },
 ] as const;
 
+/** The contact page's nav, as the design has it: the offer, then Contact. */
+export const contactNav = [
+  { label: "Home", href: "" },
+  { label: "Packages", href: "#packages" },
+  { label: "Refunds", href: "#refund" },
+  { label: "FAQ", href: "#faq" },
+  { label: "Contact", href: "/contact" },
+] as const;
+
 export const hero = {
   eyebrow: "Prepaid GoHighLevel, automation and development hours",
   /**

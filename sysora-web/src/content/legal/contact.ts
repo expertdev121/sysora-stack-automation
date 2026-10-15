@@ -6,4 +6,4 @@
  * because a refund route and a legal-notice route are allowed to differ
  * — but both inboxes have to exist for either page to be truthful.
  */
-export const LEGAL_EMAIL = "team@sysorastack.com";
+export const LEGAL_EMAIL = "support@sysorastack.com";

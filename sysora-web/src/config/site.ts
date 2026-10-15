@@ -42,7 +42,7 @@ export const siteConfig = {
    * On sysorastack.com, not sysora.com: that domain is parked and for
    * sale, so mail to the old address never arrived anywhere.
    */
-  email: "hello@sysorastack.com",
+  email: "support@sysorastack.com",
   /**
    * The canonical host. Everything server-generated — canonicals, the
    * sitemap, OG URLs — derives from this one value.

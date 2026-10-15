@@ -108,8 +108,8 @@ export default async function InvoicesPage() {
         )}
         <p className="mt-3 text-[12.5px] leading-[1.7] text-[var(--text-muted)]">
           Card details are held by Stripe, never by us. To change the card on file, email{" "}
-          <a href="mailto:team@sysorastack.com" className="font-medium text-[var(--accent-strong)] underline underline-offset-2">
-            team@sysorastack.com
+          <a href="mailto:support@sysorastack.com" className="font-medium text-[var(--accent-strong)] underline underline-offset-2">
+            support@sysorastack.com
           </a>{" "}
           and we will send a secure link.
         </p>

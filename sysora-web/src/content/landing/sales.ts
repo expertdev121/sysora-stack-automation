@@ -757,7 +757,9 @@ export const footer = {
       links: [
         { label: "Terms and conditions", href: "/terms" },
         { label: "Privacy policy", href: "/privacy-policy" },
-        { label: "Refund policy", href: "#refund" },
+        // The policy itself, not the homepage pitch for it: the Pricing
+        // column already links the section at /#refund.
+        { label: "Refund policy", href: "/terms#s-7" },
       ],
     },
   ],

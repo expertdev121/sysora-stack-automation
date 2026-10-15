@@ -16,9 +16,13 @@ import { siteConfig } from "@/config/site";
  * those pages are gone, and a sitemap that queries the database to list
  * nothing is just a way to fail at request time.
  *
- * Deliberately absent: /checkout/* (noindex, and the ?hours= variants
- * are seven near-duplicates), /admin/*, and the per-reference request
- * and thank-you pages, which are private to one customer.
+ * /checkout/hours is listed: it is the page every CTA on the homepage
+ * points at, so leaving it out of both the sitemap and robots made the
+ * site's main conversion step uncrawlable.
+ *
+ * Deliberately absent: the ?hours= variants of it, which are seven
+ * near-duplicates of one page; /checkout/[reference]; /admin/*; and the
+ * per-reference request and thank-you pages, private to one customer.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteConfig.url;
@@ -31,6 +35,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "monthly",
       priority: 0.8,
+    },
+    {
+      url: `${base}/checkout/hours`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.7,
     },
     {
       url: `${base}/contact`,

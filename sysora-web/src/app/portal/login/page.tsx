@@ -36,10 +36,10 @@ export default async function PortalLoginPage() {
         <p className="mt-6 text-[13px] leading-[1.7] text-[var(--ink-500)]">
           Need access, or forgotten your password? Email{" "}
           <a
-            href="mailto:team@sysorastack.com"
+            href="mailto:support@sysorastack.com"
             className="font-medium text-[var(--accent-strong)] underline underline-offset-[3px]"
           >
-            team@sysorastack.com
+            support@sysorastack.com
           </a>{" "}
           and we will set it up.
         </p>

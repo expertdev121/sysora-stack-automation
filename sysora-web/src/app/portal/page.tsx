@@ -142,10 +142,11 @@ export default async function PortalOverview() {
                 [hrs(pendingEst), "estimated on queued work"],
                 [plan ? money(plan.rate, currency) : "—", "/ hr"],
               ].map(([value, label]) => (
+                // dt before dd keeps the list valid; order- flips them
+                // visually, so the label is announced once, not twice.
                 <div key={label} className="flex items-baseline gap-[6px]">
-                  <dt className="sr-only">{label}</dt>
-                  <dd className="font-bold text-[var(--ink-900)]">{value}</dd>
-                  <span className="text-[var(--text-muted)]">{label}</span>
+                  <dt className="order-2 text-[var(--text-muted)]">{label}</dt>
+                  <dd className="order-1 font-bold text-[var(--ink-900)]">{value}</dd>
                 </div>
               ))}
             </dl>

@@ -6,7 +6,7 @@ import { submitTicket } from "@/lib/portal/actions";
 
 const field =
   "mt-[6px] w-full rounded-xl border-[1.5px] border-[var(--border-default)] bg-white px-4 py-[11px] text-[14.5px] text-[var(--ink-800)] outline-none transition-colors focus:border-[var(--accent)]";
-const label = "text-[13px] font-semibold text-[var(--text-heading)]";
+const label = "text-[13px] font-semibold text-[var(--ink-900)]";
 
 const CATEGORIES = [
   "GoHighLevel",
@@ -23,7 +23,7 @@ export function TicketForm() {
 
   return (
     <form
-      className="mt-6 rounded-[18px] border border-[var(--line-slate)] bg-white p-6"
+      className="mt-6 rounded-[18px] border border-[var(--line-mint)] bg-white p-6"
       onSubmit={(event) => {
         event.preventDefault();
         const el = event.currentTarget;
@@ -40,7 +40,7 @@ export function TicketForm() {
         });
       }}
     >
-      <h2 className="text-[15px] font-bold text-[var(--text-heading)]">Open a ticket</h2>
+      <h2 className="text-[15px] font-bold text-[var(--ink-900)]">Open a ticket</h2>
 
       <label className="mt-4 block">
         <span className={label}>Subject</span>

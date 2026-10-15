@@ -22,8 +22,8 @@ export function BuildCard({
   const [pending, start] = useTransition();
 
   return (
-    <article className="rounded-xl border border-[var(--line-slate)] bg-white p-[14px]">
-      <h3 className="text-[14px] font-semibold leading-snug text-[var(--text-heading)]">
+    <article className="rounded-xl border border-[var(--line-mint)] bg-white p-[14px]">
+      <h3 className="text-[14px] font-semibold leading-snug text-[var(--ink-900)]">
         {build.title}
       </h3>
       <p className="mt-1 text-[12.5px] text-[var(--text-muted)]">{build.clientName}</p>
@@ -49,7 +49,7 @@ export function BuildCard({
               await setBuildStage(form);
             });
           }}
-          className="mt-3 w-full rounded-lg border border-[var(--line-slate)] px-3 py-[7px] text-[12.5px] font-semibold text-[var(--accent-strong)] transition-colors hover:border-[var(--accent)] hover:bg-[var(--mint-50)] disabled:opacity-60"
+          className="mt-3 w-full rounded-lg border border-[var(--line-mint)] px-3 py-[7px] text-[12.5px] font-semibold text-[var(--accent-strong)] transition-colors hover:border-[var(--accent)] hover:bg-[var(--mint-50)] disabled:opacity-60"
         >
           {pending ? "Moving…" : `Move to ${nextLabel} →`}
         </button>

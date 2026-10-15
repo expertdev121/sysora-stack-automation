@@ -47,7 +47,7 @@ export default async function ClientsPage() {
             return (
               <span
                 key={f}
-                className="inline-flex items-center gap-[6px] rounded-full border border-[var(--line-slate)] bg-white px-[13px] py-[6px] text-[12.5px] font-medium text-[var(--text-body)]"
+                className="inline-flex items-center gap-[6px] rounded-full border border-[var(--line-mint)] bg-white px-[13px] py-[6px] text-[12.5px] font-medium text-[var(--ink-600)]"
               >
                 {f}
                 <span className="font-semibold text-[var(--text-muted)]">{n}</span>
@@ -78,7 +78,7 @@ export default async function ClientsPage() {
                   <Td>
                     <Link
                       href={`/admin/clients/${c.customerId}`}
-                      className="block font-semibold text-[var(--text-heading)] hover:text-[var(--accent-strong)]"
+                      className="block font-semibold text-[var(--ink-900)] hover:text-[var(--accent-strong)]"
                     >
                       {c.name}
                     </Link>

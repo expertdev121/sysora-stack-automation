@@ -43,17 +43,17 @@ export function PortalShell({
 
   return (
     <div className="flex min-h-screen bg-[var(--surface-1)] to-860:flex-col">
-      <aside className="flex w-[244px] flex-none flex-col border-r border-[var(--line-slate)] bg-white px-4 py-6 to-860:w-full to-860:border-b to-860:border-r-0">
+      <aside className="flex w-[244px] flex-none flex-col border-r border-[var(--line-mint)] bg-white px-4 py-6 to-860:w-full to-860:border-b to-860:border-r-0">
         <Link href="/" className="mb-6 block px-2" aria-label="Sysora Stack home">
           <SysoraLogo className="block h-[28px] w-auto" />
         </Link>
 
         {showHours && (
-          <div className="mb-5 rounded-[14px] border border-[var(--line-slate)] bg-[var(--surface-1)] p-4">
+          <div className="mb-5 rounded-[14px] border border-[var(--line-mint)] bg-[var(--surface-1)] p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[1px] text-[var(--text-muted)]">
               Hours left
             </p>
-            <p className="mt-1 font-display text-[26px] font-black leading-none text-[var(--text-heading)]">
+            <p className="mt-1 font-display text-[26px] font-black leading-none text-[var(--ink-900)]">
               {Math.round((remaining ?? 0) * 100) / 100}
               {typeof purchased === "number" && purchased > 0 && (
                 <span className="text-[14px] font-semibold text-[var(--text-muted)]">
@@ -73,8 +73,8 @@ export function PortalShell({
 
         <PortalNav openTickets={openTickets} />
 
-        <div className="mt-5 rounded-[14px] border border-[var(--line-slate)] bg-[var(--mint-50)] p-4">
-          <p className="text-[13px] font-bold text-[var(--text-heading)]">Support</p>
+        <div className="mt-5 rounded-[14px] border border-[var(--line-mint)] bg-[var(--mint-50)] p-4">
+          <p className="text-[13px] font-bold text-[var(--ink-900)]">Support</p>
           <p className="mt-1 text-[12px] leading-[1.6] text-[var(--text-muted)]">
             24/7 human chat and ticket triage on every active package.
           </p>
@@ -93,7 +93,7 @@ export function PortalShell({
                 {initials(userName ?? null, userEmail)}
               </span>
               <span className="min-w-0">
-                <span className="block truncate text-[13px] font-semibold text-[var(--text-heading)]">
+                <span className="block truncate text-[13px] font-semibold text-[var(--ink-900)]">
                   {userName ?? userEmail}
                 </span>
                 {company && (
@@ -107,7 +107,7 @@ export function PortalShell({
           <form action={signOut} className="px-1">
             <button
               type="submit"
-              className="text-[13px] font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--text-heading)]"
+              className="text-[13px] font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--ink-900)]"
             >
               Sign out
             </button>
@@ -120,7 +120,7 @@ export function PortalShell({
           <p className="text-[11px] font-bold uppercase tracking-[1.6px] text-[var(--accent-strong)]">
             {eyebrow}
           </p>
-          <h1 className="mt-2 font-display text-[clamp(26px,3.2vw,34px)] font-black tracking-[-0.8px] text-[var(--text-heading)]">
+          <h1 className="mt-2 font-display text-[clamp(26px,3.2vw,34px)] font-black tracking-[-0.8px] text-[var(--ink-900)]">
             {title}
           </h1>
           <div className="mt-7">{children}</div>

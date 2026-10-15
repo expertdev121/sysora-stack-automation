@@ -42,14 +42,14 @@ export default async function BillingPage() {
       userEmail={session.email}
       company={chrome.company}>
       <div className="grid grid-cols-2 gap-6 to-980:grid-cols-1">
-        <section className="rounded-[18px] border border-[var(--line-slate)] bg-white p-6">
-          <h2 className="text-[15px] font-bold text-[var(--text-heading)]">Payment method</h2>
+        <section className="rounded-[18px] border border-[var(--line-mint)] bg-white p-6">
+          <h2 className="text-[15px] font-bold text-[var(--ink-900)]">Payment method</h2>
           {card?.last4 ? (
-            <div className="mt-4 rounded-[14px] border border-[var(--line-slate)] bg-[var(--surface-1)] p-5">
+            <div className="mt-4 rounded-[14px] border border-[var(--line-mint)] bg-[var(--surface-1)] p-5">
               <p className="text-[11.5px] font-semibold uppercase tracking-[1px] text-[var(--text-muted)]">
                 Card on file
               </p>
-              <p className="mt-2 font-mono text-[16px] tracking-[2px] text-[var(--text-heading)]">
+              <p className="mt-2 font-mono text-[16px] tracking-[2px] text-[var(--ink-900)]">
                 •••• •••• •••• {card.last4}
               </p>
               <p className="mt-2 text-[13px] uppercase text-[var(--text-muted)]">{card.brand}</p>
@@ -67,19 +67,19 @@ export default async function BillingPage() {
           </p>
         </section>
 
-        <section className="rounded-[18px] border border-[var(--line-slate)] bg-white p-6">
-          <h2 className="text-[15px] font-bold text-[var(--text-heading)]">Plan</h2>
+        <section className="rounded-[18px] border border-[var(--line-mint)] bg-white p-6">
+          <h2 className="text-[15px] font-bold text-[var(--ink-900)]">Plan</h2>
           <dl className="mt-4 flex flex-col gap-3 text-[14px]">
             <div className="flex items-center justify-between">
               <dt className="text-[var(--text-muted)]">Package</dt>
-              <dd className="font-semibold text-[var(--text-heading)]">
+              <dd className="font-semibold text-[var(--ink-900)]">
                 {plan ? `${plan.hours} hours${plan.monthly ? " / month" : " pack"}` : "No active plan"}
               </dd>
             </div>
             {plan && (
               <div className="flex items-center justify-between">
                 <dt className="text-[var(--text-muted)]">Price</dt>
-                <dd className="font-semibold text-[var(--text-heading)]">
+                <dd className="font-semibold text-[var(--ink-900)]">
                   {formatMoney(plan.amount, plan.currency)}
                   {plan.monthly ? " / mo" : ""}
                 </dd>
@@ -89,13 +89,13 @@ export default async function BillingPage() {
               <dt className="text-[var(--text-muted)]">
                 {balance.nextReset ? "Next renewal" : "Expires"}
               </dt>
-              <dd className="font-semibold text-[var(--text-heading)]">
+              <dd className="font-semibold text-[var(--ink-900)]">
                 {date(balance.nextReset ?? balance.nextExpiry)}
               </dd>
             </div>
             <div className="flex items-center justify-between">
               <dt className="text-[var(--text-muted)]">Hours remaining</dt>
-              <dd className="font-semibold text-[var(--text-heading)]">
+              <dd className="font-semibold text-[var(--ink-900)]">
                 {Math.round(balance.remaining * 100) / 100}h
               </dd>
             </div>
@@ -120,9 +120,9 @@ export default async function BillingPage() {
         </section>
       </div>
 
-      <section className="mt-6 rounded-[18px] border border-[var(--line-slate)] bg-white p-6">
-        <h2 className="text-[15px] font-bold text-[var(--text-heading)]">Billing details</h2>
-        <p className="mt-3 text-[14px] font-semibold text-[var(--text-heading)]">
+      <section className="mt-6 rounded-[18px] border border-[var(--line-mint)] bg-white p-6">
+        <h2 className="text-[15px] font-bold text-[var(--ink-900)]">Billing details</h2>
+        <p className="mt-3 text-[14px] font-semibold text-[var(--ink-900)]">
           {session.fullName ?? "—"}
         </p>
         <p className="text-[13.5px] text-[var(--text-muted)]">{session.email}</p>

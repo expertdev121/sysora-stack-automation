@@ -86,7 +86,7 @@ export function Stat({
 const toneClass = {
   mint: "bg-[var(--mint-50)] border-[var(--border-default)] text-[var(--mint-700)]",
   amber: "bg-[var(--warning-bg)] border-[var(--warning-border)] text-[var(--warning)]",
-  slate: "bg-[var(--surface-2)] border-[var(--line-slate)] text-[var(--ink-300)]",
+  slate: "bg-[var(--surface-2)] border-[var(--line-mint)] text-[var(--ink-300)]",
   red: "bg-[var(--danger-bg)] border-[var(--danger-border)] text-[var(--danger-600)]",
 } as const;
 
@@ -159,4 +159,4 @@ export const inputClass =
   "text-[14px] text-[var(--ink-800)] outline-none transition-[border-color,box-shadow] duration-150 " +
   "focus:border-[var(--accent)] focus:shadow-[var(--focus-shadow)]";
 
-export const labelClass = "text-[12.5px] font-semibold text-[var(--text-heading)]";
+export const labelClass = "text-[12.5px] font-semibold text-[var(--ink-900)]";

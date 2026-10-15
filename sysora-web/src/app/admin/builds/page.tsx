@@ -39,10 +39,10 @@ export default async function BuildsPage() {
           return (
             <section
               key={stage}
-              className="rounded-[14px] border border-[var(--line-slate)] bg-[var(--surface-1)] p-3"
+              className="rounded-[14px] border border-[var(--line-mint)] bg-[var(--surface-1)] p-3"
             >
               <header className="flex items-center justify-between px-1 pb-3">
-                <h2 className="text-[13px] font-bold text-[var(--text-heading)]">{label}</h2>
+                <h2 className="text-[13px] font-bold text-[var(--ink-900)]">{label}</h2>
                 <span className="rounded-full bg-white px-2 py-[2px] text-[12px] font-semibold text-[var(--text-muted)]">
                   {items.length}
                 </span>

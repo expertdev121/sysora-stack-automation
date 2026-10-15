@@ -48,7 +48,7 @@ export default async function ClientDetailPage({
     <AdminShell session={session}>
       <Link
         href="/admin/clients"
-        className="text-[13px] font-medium text-[var(--text-muted)] hover:text-[var(--text-heading)]"
+        className="text-[13px] font-medium text-[var(--text-muted)] hover:text-[var(--ink-900)]"
       >
         ← All clients
       </Link>
@@ -71,11 +71,11 @@ export default async function ClientDetailPage({
           ["Left", hrs(client.remaining)],
           ["Lifetime value", formatMoney(client.lifetimeValue, "USD")],
         ].map(([k, v]) => (
-          <div key={k} className="rounded-[14px] border border-[var(--line-slate)] bg-white p-4">
+          <div key={k} className="rounded-[14px] border border-[var(--line-mint)] bg-white p-4">
             <p className="text-[11.5px] font-semibold uppercase tracking-[1px] text-[var(--text-muted)]">
               {k}
             </p>
-            <p className="mt-2 font-display text-[22px] font-black text-[var(--text-heading)]">{v}</p>
+            <p className="mt-2 font-display text-[22px] font-black text-[var(--ink-900)]">{v}</p>
           </div>
         ))}
       </div>
@@ -90,11 +90,11 @@ export default async function ClientDetailPage({
           {ledger.length === 0 ? (
             <EmptyState>Nothing logged against this client yet.</EmptyState>
           ) : (
-            <ul className="flex flex-col divide-y divide-[var(--line-slate-2)]">
+            <ul className="flex flex-col divide-y divide-[var(--line-mint-2)]">
               {ledger.map((l) => (
                 <li key={l.id} className="flex items-center justify-between gap-4 py-[11px]">
                   <div className="min-w-0">
-                    <p className="truncate text-[14px] text-[var(--text-heading)]">
+                    <p className="truncate text-[14px] text-[var(--ink-900)]">
                       {l.description}
                       {!l.billable && (
                         <span className="ml-2 rounded-full bg-[var(--mint-50)] px-2 py-[1px] text-[11px] font-semibold text-[var(--accent-strong)]">
@@ -108,7 +108,7 @@ export default async function ClientDetailPage({
                       {KIND_LABEL[l.kind] ?? l.kind}
                     </p>
                   </div>
-                  <span className="flex-none font-semibold text-[var(--text-heading)]">
+                  <span className="flex-none font-semibold text-[var(--ink-900)]">
                     {l.hours.toFixed(2)}
                   </span>
                 </li>
@@ -122,11 +122,11 @@ export default async function ClientDetailPage({
           {entitlements.length === 0 ? (
             <EmptyState>No hours granted yet.</EmptyState>
           ) : (
-            <ul className="flex flex-col divide-y divide-[var(--line-slate-2)]">
+            <ul className="flex flex-col divide-y divide-[var(--line-mint-2)]">
               {entitlements.map((e) => (
                 <li key={e.id as string} className="py-[11px]">
                   <div className="flex items-center justify-between">
-                    <span className="text-[14px] font-semibold text-[var(--text-heading)]">
+                    <span className="text-[14px] font-semibold text-[var(--ink-900)]">
                       {Number(e.hours)}h
                     </span>
                     <span className="text-[12px] capitalize text-[var(--text-muted)]">

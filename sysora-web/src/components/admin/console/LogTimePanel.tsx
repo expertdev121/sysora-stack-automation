@@ -51,7 +51,7 @@ export function LogTimePanel({ clients }: { clients: { id: string; label: string
   }
 
   return (
-    <section className="mt-6 rounded-[14px] border border-[var(--line-slate)] bg-white p-5">
+    <section className="mt-6 rounded-[14px] border border-[var(--line-mint)] bg-white p-5">
       <div className="flex gap-2">
         {(["log", "grant"] as const).map((t) => (
           <button
@@ -62,7 +62,7 @@ export function LogTimePanel({ clients }: { clients: { id: string; label: string
               "rounded-lg px-3 py-[7px] text-[13px] font-semibold transition-colors " +
               (tab === t
                 ? "bg-[var(--mint-50)] text-[var(--accent-strong)]"
-                : "text-[var(--text-muted)] hover:text-[var(--text-heading)]")
+                : "text-[var(--text-muted)] hover:text-[var(--ink-900)]")
             }
           >
             {t === "log" ? "Log time" : "Add hours"}

@@ -56,16 +56,16 @@ export default async function HoursPage() {
                 : "—",
           ],
         ].map(([k, v]) => (
-          <div key={k} className="rounded-[14px] border border-[var(--line-slate)] bg-white p-4">
+          <div key={k} className="rounded-[14px] border border-[var(--line-mint)] bg-white p-4">
             <p className="text-[11.5px] font-semibold uppercase tracking-[1px] text-[var(--text-muted)]">
               {k}
             </p>
-            <p className="mt-2 font-display text-[24px] font-black text-[var(--text-heading)]">{v}</p>
+            <p className="mt-2 font-display text-[24px] font-black text-[var(--ink-900)]">{v}</p>
           </div>
         ))}
       </div>
 
-      <section className="mt-6 overflow-hidden rounded-[18px] border border-[var(--line-slate)] bg-white">
+      <section className="mt-6 overflow-hidden rounded-[18px] border border-[var(--line-mint)] bg-white">
         <table className="w-full border-collapse text-left text-[14px]">
           <thead>
             <tr className="bg-[var(--surface-1)]">
@@ -84,11 +84,11 @@ export default async function HoursPage() {
               </tr>
             ) : (
               ledger.map((l) => (
-                <tr key={l.id} className="border-t border-[var(--line-slate-2)]">
+                <tr key={l.id} className="border-t border-[var(--line-mint-2)]">
                   <td className="whitespace-nowrap px-5 py-[13px] text-[var(--text-muted)]">
                     {new Date(l.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                   </td>
-                  <td className="px-5 py-[13px] text-[var(--text-body)]">
+                  <td className="px-5 py-[13px] text-[var(--ink-600)]">
                     {l.description}
                     {!l.billable && (
                       <span className="ml-2 rounded-full bg-[var(--mint-50)] px-2 py-[2px] text-[11.5px] font-semibold text-[var(--accent-strong)]">
@@ -99,7 +99,7 @@ export default async function HoursPage() {
                   <td className="px-5 py-[13px] text-[var(--text-muted)]">
                     {KIND_LABEL[l.kind] ?? l.kind}
                   </td>
-                  <td className="px-5 py-[13px] text-right font-semibold text-[var(--text-heading)]">
+                  <td className="px-5 py-[13px] text-right font-semibold text-[var(--ink-900)]">
                     {l.hours.toFixed(2)}
                   </td>
                 </tr>

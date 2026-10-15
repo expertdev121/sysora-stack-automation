@@ -123,15 +123,24 @@ const icons = {
   ),
 } as const;
 
-type NavItem = { href: string; label: string; icon: keyof typeof icons; exact?: boolean };
+type NavItem = {
+  href: string;
+  label: string;
+  icon: keyof typeof icons;
+  exact?: boolean;
+  /** Which queue count to badge this item with, if any. */
+  count?: "tickets" | "builds";
+};
+
+export type NavCounts = { tickets: number; builds: number };
 
 const primary: NavItem[] = [
   { href: "/admin", label: "Overview", icon: "overview", exact: true },
   // The delivery console: who owes us work, who needs attention.
   { href: "/admin/console", label: "Operations", icon: "overview" },
   { href: "/admin/clients", label: "Clients", icon: "contacts" },
-  { href: "/admin/tickets", label: "Tickets", icon: "questions" },
-  { href: "/admin/builds", label: "Build requests", icon: "requests" },
+  { href: "/admin/tickets", label: "Tickets", icon: "questions", count: "tickets" },
+  { href: "/admin/builds", label: "Build requests", icon: "requests", count: "builds" },
   { href: "/admin/requests", label: "Orders", icon: "requests" },
   { href: "/admin/contacts", label: "Contacts", icon: "contacts" },
 ];
@@ -143,7 +152,13 @@ const configure: NavItem[] = [
   { href: "/admin/settings", label: "Settings", icon: "settings" },
 ];
 
-export function AdminSidebar({ session }: { session: StaffSession }) {
+export function AdminSidebar({
+  session,
+  counts,
+}: {
+  session: StaffSession;
+  counts: NavCounts;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -164,7 +179,12 @@ export function AdminSidebar({ session }: { session: StaffSession }) {
       )}
     >
       {icons[item.icon]}
-      {item.label}
+      <span className="flex-1">{item.label}</span>
+      {item.count && counts[item.count] > 0 ? (
+        <span className="flex h-[20px] min-w-[20px] items-center justify-center rounded-full bg-[var(--accent)] px-[6px] text-[11px] font-bold text-white">
+          {counts[item.count]}
+        </span>
+      ) : null}
     </Link>
   );
 
@@ -231,6 +251,20 @@ export function AdminSidebar({ session }: { session: StaffSession }) {
             </>
           )}
         </nav>
+
+        <div className="px-3 pb-3">
+          {/* The client-facing side, for checking what a client sees.
+              It opens the portal sign-in: staff sessions are not client
+              sessions, and the two deliberately do not cross. */}
+          <Link
+            href="/portal"
+            target="_blank"
+            rel="noreferrer"
+            className="block rounded-[10px] border-[1.5px] border-[var(--border-default)] px-3 py-[9px] text-center text-[13px] font-semibold text-[var(--ink-600)] transition-colors hover:bg-[var(--mint-50)]"
+          >
+            View client portal
+          </Link>
+        </div>
 
         <div className="border-t-[1.5px] border-[var(--border-faint)] px-5 py-4">
           <p className="m-0 mb-1 text-[13px] font-semibold text-[var(--ink-800)] break-words">

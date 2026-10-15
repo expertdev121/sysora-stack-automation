@@ -36,7 +36,7 @@ export default async function SupportPage() {
 
       <section className="mt-6 flex flex-col gap-3">
         {tickets.length === 0 ? (
-          <p className="rounded-[18px] border border-[var(--line-slate)] bg-white px-6 py-10 text-center text-[13.5px] text-[var(--text-muted)]">
+          <p className="rounded-[18px] border border-[var(--line-mint)] bg-white px-6 py-10 text-center text-[13.5px] text-[var(--text-muted)]">
             No tickets yet.
           </p>
         ) : (
@@ -45,10 +45,10 @@ export default async function SupportPage() {
             return (
               <article
                 key={t.id}
-                className="flex items-center justify-between gap-4 rounded-[18px] border border-[var(--line-slate)] bg-white px-6 py-5"
+                className="flex items-center justify-between gap-4 rounded-[18px] border border-[var(--line-mint)] bg-white px-6 py-5"
               >
                 <div className="min-w-0">
-                  <h2 className="truncate text-[15px] font-semibold text-[var(--text-heading)]">
+                  <h2 className="truncate text-[15px] font-semibold text-[var(--ink-900)]">
                     {t.subject}
                   </h2>
                   <p className="mt-1 text-[12.5px] text-[var(--text-muted)]">

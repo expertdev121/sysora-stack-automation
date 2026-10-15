@@ -31,7 +31,7 @@ export default async function InvoicesPage() {
       userName={session.fullName}
       userEmail={session.email}
       company={chrome.company}>
-      <section className="overflow-hidden rounded-[18px] border border-[var(--line-slate)] bg-white">
+      <section className="overflow-hidden rounded-[18px] border border-[var(--line-mint)] bg-white">
         <table className="w-full border-collapse text-left text-[14px]">
           <thead>
             <tr className="bg-[var(--surface-1)]">
@@ -54,7 +54,7 @@ export default async function InvoicesPage() {
               invoices.map((inv) => {
                 const tone = TONE[inv.status] ?? TONE.Unpaid;
                 return (
-                  <tr key={inv.id} className="border-t border-[var(--line-slate-2)]">
+                  <tr key={inv.id} className="border-t border-[var(--line-mint-2)]">
                     <td className="whitespace-nowrap px-5 py-[13px] font-mono text-[12.5px] text-[var(--text-muted)]">
                       {inv.reference}
                     </td>
@@ -65,8 +65,8 @@ export default async function InvoicesPage() {
                         year: "numeric",
                       })}
                     </td>
-                    <td className="px-5 py-[13px] text-[var(--text-body)]">{inv.item}</td>
-                    <td className="px-5 py-[13px] text-right font-semibold text-[var(--text-heading)]">
+                    <td className="px-5 py-[13px] text-[var(--ink-600)]">{inv.item}</td>
+                    <td className="px-5 py-[13px] text-right font-semibold text-[var(--ink-900)]">
                       {formatMoney(inv.amount, inv.currency)}
                     </td>
                     <td className="px-5 py-[13px]">
@@ -97,10 +97,10 @@ export default async function InvoicesPage() {
         </table>
       </section>
 
-      <section className="mt-6 rounded-[18px] border border-[var(--line-slate)] bg-white p-6">
-        <h2 className="text-[15px] font-bold text-[var(--text-heading)]">Payment method</h2>
+      <section className="mt-6 rounded-[18px] border border-[var(--line-mint)] bg-white p-6">
+        <h2 className="text-[15px] font-bold text-[var(--ink-900)]">Payment method</h2>
         {card?.last4 ? (
-          <p className="mt-2 text-[14px] text-[var(--text-body)]">
+          <p className="mt-2 text-[14px] text-[var(--ink-600)]">
             <span className="uppercase">{card.brand}</span> ending {card.last4}
           </p>
         ) : (

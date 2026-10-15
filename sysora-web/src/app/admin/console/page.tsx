@@ -3,9 +3,16 @@ import Link from "next/link";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { HealthPill } from "@/components/admin/console/HealthPill";
+import { Initials } from "@/components/admin/console/Initials";
 import { Card, CardHeader, EmptyState, PageHeading } from "@/components/admin/ui";
 import { requirePipeline } from "@/lib/admin/auth";
-import { getClients, getTickets, getBuildRequests, getWeeklyHours } from "@/lib/admin/console";
+import {
+  getClients,
+  getTickets,
+  getBuildRequests,
+  getRecurring,
+  getWeeklyHours,
+} from "@/lib/admin/console";
 import { formatMoney } from "@/lib/money";
 
 export const metadata: Metadata = { title: "Operations", robots: { index: false } };
@@ -22,11 +29,12 @@ const hrs = (n: number) => `${Math.round(n * 100) / 100}h`;
  */
 export default async function ConsolePage() {
   const session = await requirePipeline();
-  const [clients, tickets, builds, week] = await Promise.all([
+  const [clients, tickets, builds, week, recurring] = await Promise.all([
     getClients(),
     getTickets(),
     getBuildRequests(),
     getWeeklyHours(),
+    getRecurring(),
   ]);
 
   const withHours = clients.filter((c) => c.purchased > 0);
@@ -40,11 +48,15 @@ export default async function ConsolePage() {
   const weekTotal = week.reduce((a, d) => a + d.hours, 0);
 
   const kpis = [
-    { k: "Clients with hours", v: String(withHours.length), d: `${clients.length} total` },
+    { k: "Active clients", v: String(withHours.length), d: `${clients.length} total` },
+    {
+      k: "Monthly recurring",
+      v: formatMoney(recurring.amount, recurring.currency),
+      d: `${recurring.plans} monthly plan${recurring.plans === 1 ? "" : "s"}`,
+    },
     { k: "Hours sold", v: hrs(sold), d: `${hrs(delivered)} delivered` },
-    { k: "Hours outstanding", v: hrs(sold - delivered), d: "Work owed" },
+    { k: "Hours outstanding", v: hrs(sold - delivered), d: "Across all balances" },
     { k: "Open tickets", v: String(openTickets.length), d: `${urgent.length} urgent` },
-    { k: "New build requests", v: String(newBuilds.length), d: "Waiting to be scoped" },
   ];
 
   return (
@@ -55,12 +67,12 @@ export default async function ConsolePage() {
         {kpis.map((kpi) => (
           <div
             key={kpi.k}
-            className="rounded-[14px] border border-[var(--line-slate)] bg-white p-4"
+            className="rounded-[14px] border border-[var(--line-mint)] bg-white p-4"
           >
             <p className="text-[11.5px] font-semibold uppercase tracking-[1px] text-[var(--text-muted)]">
               {kpi.k}
             </p>
-            <p className="mt-2 font-display text-[26px] font-black leading-none text-[var(--text-heading)]">
+            <p className="mt-2 font-display text-[26px] font-black leading-none text-[var(--ink-900)]">
               {kpi.v}
             </p>
             <p className="mt-1 text-[12px] text-[var(--text-muted)]">{kpi.d}</p>
@@ -70,15 +82,16 @@ export default async function ConsolePage() {
 
       <div className="mt-6 grid grid-cols-[1.3fr_1fr] gap-6 to-980:grid-cols-1">
         <Card>
-          <CardHeader title="Needs attention" hint="Accounts that are not healthy" />
+          <CardHeader title="Needs attention" hint="Low balance, expiring or payment issues" />
           {attention.length === 0 ? (
             <EmptyState>Every account with hours is healthy.</EmptyState>
           ) : (
-            <ul className="flex flex-col divide-y divide-[var(--line-slate-2)]">
+            <ul className="flex flex-col divide-y divide-[var(--line-mint-2)]">
               {attention.map((c) => (
-                <li key={c.customerId} className="flex items-center justify-between gap-4 py-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-[14px] font-semibold text-[var(--text-heading)]">
+                <li key={c.customerId} className="flex items-center gap-3 py-3">
+                  <Initials name={c.name} />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[14px] font-semibold text-[var(--ink-900)]">
                       {c.name}
                     </p>
                     <p className="truncate text-[12.5px] text-[var(--text-muted)]">
@@ -99,7 +112,7 @@ export default async function ConsolePage() {
         </Card>
 
         <Card>
-          <CardHeader title="Delivered this week" hint={`${hrs(weekTotal)} logged`} />
+          <CardHeader title="Hours logged, last 7 days" />
           <div className="mt-4 flex h-[150px] items-end gap-2">
             {week.map((d) => (
               <div key={d.day} className="flex flex-1 flex-col items-center gap-2">
@@ -114,11 +127,18 @@ export default async function ConsolePage() {
               </div>
             ))}
           </div>
-          {weekTotal === 0 && (
+          {weekTotal === 0 ? (
             <p className="mt-3 text-[12.5px] text-[var(--text-muted)]">
               No time logged yet. Log it from Clients and it appears here and in the client&rsquo;s
               ledger.
             </p>
+          ) : (
+            <div className="mt-4 flex items-center justify-between border-t border-[var(--line-mint-2)] pt-4">
+              <span className="text-[13px] text-[var(--text-muted)]">Total this week</span>
+              <span className="text-[14px] font-semibold text-[var(--ink-900)]">
+                {hrs(weekTotal)}
+              </span>
+            </div>
           )}
         </Card>
       </div>
@@ -129,10 +149,10 @@ export default async function ConsolePage() {
           {openTickets.length === 0 ? (
             <EmptyState>Nothing open.</EmptyState>
           ) : (
-            <ul className="flex flex-col divide-y divide-[var(--line-slate-2)]">
+            <ul className="flex flex-col divide-y divide-[var(--line-mint-2)]">
               {openTickets.slice(0, 5).map((t) => (
                 <li key={t.id} className="py-3">
-                  <p className="text-[14px] font-semibold text-[var(--text-heading)]">{t.subject}</p>
+                  <p className="text-[14px] font-semibold text-[var(--ink-900)]">{t.subject}</p>
                   <p className="text-[12.5px] text-[var(--text-muted)]">
                     {t.clientName} · {t.reference}
                   </p>
@@ -150,15 +170,15 @@ export default async function ConsolePage() {
 
         <Card>
           <CardHeader title="Lifetime value" hint="Paid orders per client" />
-          <ul className="flex flex-col divide-y divide-[var(--line-slate-2)]">
+          <ul className="flex flex-col divide-y divide-[var(--line-mint-2)]">
             {[...clients]
               .filter((c) => c.lifetimeValue > 0)
               .sort((a, b) => b.lifetimeValue - a.lifetimeValue)
               .slice(0, 5)
               .map((c) => (
                 <li key={c.customerId} className="flex items-center justify-between py-3">
-                  <span className="truncate text-[14px] text-[var(--text-heading)]">{c.name}</span>
-                  <span className="font-semibold text-[var(--text-heading)]">
+                  <span className="truncate text-[14px] text-[var(--ink-900)]">{c.name}</span>
+                  <span className="font-semibold text-[var(--ink-900)]">
                     {formatMoney(c.lifetimeValue, "USD")}
                   </span>
                 </li>

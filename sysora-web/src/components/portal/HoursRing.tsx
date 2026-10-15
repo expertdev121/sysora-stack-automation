@@ -6,6 +6,8 @@
  * which is the same threshold the console uses to call an account "Low
  * balance", so the client and the team see the same warning at the same
  * moment.
+ *
+ * Geometry is the design's: a 150 box, r=62, 14-wide stroke.
  */
 const RADIUS = 62;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
@@ -17,30 +19,30 @@ export function HoursRing({ remaining, purchased }: { remaining: number; purchas
 
   return (
     <div className="flex flex-col items-center">
-      <svg width="160" height="160" viewBox="0 0 160 160" role="img"
+      <svg width="150" height="150" viewBox="0 0 150 150" role="img"
            aria-label={`${remaining} of ${purchased} hours remaining`}>
-        <circle cx="80" cy="80" r={RADIUS} fill="none" stroke="var(--line-slate-2)" strokeWidth="13" />
+        <circle cx="75" cy="75" r={RADIUS} fill="none" stroke="var(--line-mint-2)" strokeWidth="14" />
         <circle
-          cx="80"
-          cy="80"
+          cx="75"
+          cy="75"
           r={RADIUS}
           fill="none"
           stroke={colour}
-          strokeWidth="13"
+          strokeWidth="14"
           strokeLinecap="round"
           strokeDasharray={`${(CIRCUMFERENCE * ratio).toFixed(1)} ${CIRCUMFERENCE.toFixed(1)}`}
-          transform="rotate(-90 80 80)"
+          transform="rotate(-90 75 75)"
         />
         <text
-          x="80"
+          x="75"
           y="74"
           textAnchor="middle"
-          className="fill-[var(--text-heading)] font-display"
-          style={{ fontSize: 34, fontWeight: 900 }}
+          className="fill-[var(--ink-900)]"
+          style={{ fontSize: 30, fontWeight: 600 }}
         >
           {Math.round(remaining * 10) / 10}
         </text>
-        <text x="80" y="96" textAnchor="middle" className="fill-[var(--text-muted)]" style={{ fontSize: 12.5 }}>
+        <text x="75" y="94" textAnchor="middle" className="fill-[var(--text-muted)]" style={{ fontSize: 12 }}>
           hours left
         </text>
       </svg>

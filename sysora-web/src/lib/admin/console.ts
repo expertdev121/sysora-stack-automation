@@ -293,3 +293,64 @@ export async function getClientDetail(customerId: string) {
     entitlements: entitlements.data ?? [],
   };
 }
+
+/**
+ * Committed monthly revenue: the live monthly entitlements, priced at
+ * what each one actually sells for.
+ *
+ * Counted per customer rather than per row, so a client who upgraded
+ * mid-cycle is one plan at the newer price, not two plans stacked.
+ */
+export async function getRecurring(): Promise<{
+  amount: number;
+  plans: number;
+  currency: string;
+}> {
+  const nowIso = new Date().toISOString();
+  const { data } = await salesDb()
+    .from("hour_entitlements")
+    .select("customer_id, hours, rate_amount, currency, starts_at, expires_at")
+    .eq("source", "monthly")
+    .or(`expires_at.is.null,expires_at.gt.${nowIso}`)
+    .order("starts_at", { ascending: false });
+
+  const latest = new Map<string, { amount: number; currency: string }>();
+  for (const row of data ?? []) {
+    // Ordered newest first, so the first row seen per customer wins.
+    if (latest.has(row.customer_id)) continue;
+    latest.set(row.customer_id, {
+      amount: Math.round(Number(row.hours) * (row.rate_amount ?? 0)),
+      currency: row.currency ?? "USD",
+    });
+  }
+
+  let amount = 0;
+  for (const v of latest.values()) amount += v.amount;
+
+  return {
+    amount,
+    plans: latest.size,
+    currency: [...latest.values()][0]?.currency ?? "USD",
+  };
+}
+
+/**
+ * The two counts the sidebar badges show. Kept to exact head-counts so
+ * the badge costs one cheap query each on every admin page.
+ */
+export async function getNavCounts(): Promise<{ tickets: number; builds: number }> {
+  const db = salesDb();
+  const [tickets, builds] = await Promise.all([
+    db
+      .from("support_tickets")
+      .select("id", { count: "exact", head: true })
+      .neq("status", "resolved"),
+    db
+      .from("requests")
+      .select("id", { count: "exact", head: true })
+      .eq("kind", "build_request")
+      .eq("build_stage", "new"),
+  ]);
+
+  return { tickets: tickets.count ?? 0, builds: builds.count ?? 0 };
+}

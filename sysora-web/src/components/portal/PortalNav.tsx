@@ -36,7 +36,7 @@ export function PortalNav({ openTickets }: { openTickets: number }) {
               "flex items-center justify-between rounded-lg px-3 py-[9px] text-[14px] transition-colors " +
               (active
                 ? "bg-[var(--mint-50)] font-semibold text-[var(--accent-strong)]"
-                : "font-medium text-[var(--text-body)] hover:bg-[var(--surface-1)]")
+                : "font-medium text-[var(--ink-600)] hover:bg-[var(--surface-1)]")
             }
           >
             {item.label}

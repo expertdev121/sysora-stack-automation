@@ -37,7 +37,7 @@ export function TicketStatusSelect({ ticketId, status }: { ticketId: string; sta
           if (!result.ok) setValue(previous);
         });
       }}
-      className="rounded-lg border border-[var(--line-slate)] bg-white px-2 py-[6px] text-[13px] text-[var(--text-heading)] disabled:opacity-60"
+      className="rounded-lg border border-[var(--line-mint)] bg-white px-2 py-[6px] text-[13px] text-[var(--ink-900)] disabled:opacity-60"
     >
       {OPTIONS.map(([v, l]) => (
         <option key={v} value={v}>

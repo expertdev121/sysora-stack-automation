@@ -47,8 +47,8 @@ export function PlanPicker({
 
   if (paying) {
     return (
-      <section className="mt-6 rounded-[18px] border border-[var(--line-slate)] bg-white p-6">
-        <h2 className="text-[16px] font-bold text-[var(--text-heading)]">
+      <section className="mt-6 rounded-[18px] border border-[var(--line-mint)] bg-white p-6">
+        <h2 className="text-[16px] font-bold text-[var(--ink-900)]">
           Pay for {picked} hours
         </h2>
         <p className="mt-1 text-[13px] text-[var(--text-muted)]">
@@ -65,7 +65,7 @@ export function PlanPicker({
         <button
           type="button"
           onClick={() => { setPaying(null); setPicked(null); }}
-          className="mt-4 text-[13px] font-medium text-[var(--text-muted)] hover:text-[var(--text-heading)]"
+          className="mt-4 text-[13px] font-medium text-[var(--text-muted)] hover:text-[var(--ink-900)]"
         >
           ← Pick a different package
         </button>
@@ -75,7 +75,7 @@ export function PlanPicker({
 
   return (
     <>
-      <div className="mt-6 inline-flex rounded-xl border border-[var(--line-slate)] bg-white p-1">
+      <div className="mt-6 inline-flex rounded-xl border border-[var(--line-mint)] bg-white p-1">
         {(["once", "monthly"] as const).map((b) => (
           <button
             key={b}
@@ -112,7 +112,7 @@ export function PlanPicker({
               key={p.hours}
               className={cn(
                 "flex flex-col rounded-[16px] border bg-white p-5",
-                isCurrent ? "border-[var(--accent)] ring-1 ring-[var(--accent)]" : "border-[var(--line-slate)]",
+                isCurrent ? "border-[var(--accent)] ring-1 ring-[var(--accent)]" : "border-[var(--line-mint)]",
               )}
             >
               {isCurrent && (
@@ -120,10 +120,10 @@ export function PlanPicker({
                   Your plan
                 </span>
               )}
-              <p className="font-display text-[26px] font-black leading-none text-[var(--text-heading)]">
+              <p className="font-display text-[26px] font-black leading-none text-[var(--ink-900)]">
                 {p.hours}h
               </p>
-              <p className="mt-2 text-[15px] font-semibold text-[var(--text-heading)]">
+              <p className="mt-2 text-[15px] font-semibold text-[var(--ink-900)]">
                 ${p.price.toLocaleString()}
                 {billing === "monthly" && (
                   <span className="text-[13px] font-medium text-[var(--text-muted)]"> / mo</span>

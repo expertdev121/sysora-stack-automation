@@ -13,6 +13,10 @@ import { salesDb } from "@/lib/supabase/admin";
  * minutes, finds those rows once they are past the grace period, and
  * hands each to the GoHighLevel workflow.
  *
+ * Portal-originated orders are excluded: those customers are already
+ * signed in and already paying, so the lead-nurture copy is wrong for
+ * them.
+ *
  * Why a sweeper and not a timer at checkout time: the request that would
  * hold the timer is the one that ends when the customer leaves. State in
  * the database outlives the visit; a setTimeout in a serverless function
@@ -138,6 +142,10 @@ async function sweep() {
     )
     .eq("kind", "hour_pack")
     .eq("status", "awaiting_payment")
+    // Orders started inside the client portal are not leads. The nurture
+    // workflow greets a stranger; an existing client who changed their
+    // mind on the plans page should never receive it.
+    .or("metadata->>source.is.null,metadata->>source.neq.portal")
     .is("paid_at", null)
     .is("abandoned_notified_at", null)
     .lt("abandoned_attempts", MAX_ATTEMPTS)

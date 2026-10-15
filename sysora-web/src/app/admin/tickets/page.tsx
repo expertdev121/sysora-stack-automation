@@ -64,7 +64,7 @@ export default async function TicketsPage() {
               {queue.map((t) => (
                 <tr key={t.id}>
                   <Td>
-                    <span className="block font-semibold text-[var(--text-heading)]">
+                    <span className="block font-semibold text-[var(--ink-900)]">
                       {t.subject}
                     </span>
                     <span className="block font-mono text-[12px] text-[var(--text-muted)]">
@@ -105,7 +105,7 @@ export default async function TicketsPage() {
               {resolved.slice(0, 25).map((t) => (
                 <tr key={t.id}>
                   <Td>
-                    <span className="block text-[var(--text-heading)]">{t.subject}</span>
+                    <span className="block text-[var(--ink-900)]">{t.subject}</span>
                     <span className="block font-mono text-[12px] text-[var(--text-muted)]">
                       {t.reference}
                     </span>

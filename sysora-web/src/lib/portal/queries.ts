@@ -277,6 +277,7 @@ export async function getPlan(customerId: string): Promise<{
   hours: number;
   monthly: boolean;
   amount: number;
+  rate: number;
   currency: string;
 } | null> {
   const { data } = await salesDb()
@@ -290,11 +291,13 @@ export async function getPlan(customerId: string): Promise<{
   if (!data) return null;
 
   const hours = Number(data.hours);
+  const rate = data.rate_amount ?? 0;
   return {
     hours,
     monthly: data.source === "monthly",
     // rate_amount is per hour in minor units; the plan price is the whole pack.
-    amount: Math.round((data.rate_amount ?? 0) * hours),
+    amount: Math.round(rate * hours),
+    rate,
     currency: data.currency ?? "USD",
   };
 }

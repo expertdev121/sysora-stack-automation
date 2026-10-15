@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/Button";
+import { siteConfig } from "@/config/site";
 import { trackRecord } from "@/content/landing/sales";
 
 export function TrackRecord() {
@@ -39,6 +40,14 @@ export function TrackRecord() {
             ))}
           </div>
           <p className="px-[26px] py-3 bg-[var(--surface-1)] border-t-[1.5px] border-[var(--border-faint)] font-mono text-[11px] tracking-[0.6px] text-[var(--ink-300)]">
+            <a
+              href={siteConfig.upwork}
+              target="_blank"
+              rel="noopener"
+              className="font-medium underline decoration-[var(--line-300)] underline-offset-[3px] hover:decoration-current"
+            >
+              {trackRecord.disclaimerLink}
+            </a>
             {trackRecord.disclaimer}
           </p>
         </div>

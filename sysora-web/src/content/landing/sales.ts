@@ -101,8 +101,11 @@ export const reviews = {
    * dropped the brackets — they made three testimonials read like a
    * redacted document — so the explanation changed with them.
    */
+  /** Split at the end so "Upwork profile" is a link to the real profile. */
   intro:
-    "Upwork reviews of work our founder delivered before the company carried the Sysora Stack name. Clients are not named on the platform, so each one is credited to its job. Where a client wrote a person’s name, we have written the company instead, and the original wording is live on the Upwork profile.",
+    "Upwork reviews of work our founder delivered before the company carried the Sysora Stack name. Clients are not named on the platform, so each one is credited to its job. Where a client wrote a person’s name, we have written the company instead, and the original wording is live on the ",
+  introLink: "Upwork profile",
+  introTail: ".",
   cards: [
     {
       quote:
@@ -176,8 +179,10 @@ export const trackRecord = {
     { value: "1,220", label: "Hours logged" },
     { value: "5.0", label: "Every job, out of 5.0", accent: true },
   ],
+  /** The figures above are only checkable if this is a link. */
+  disclaimerLink: "Upwork profile",
   disclaimer:
-    "Upwork profile of Sysora Stack’s founder. Freelance-platform delivery record, not company-branded client results.",
+    " of Sysora Stack’s founder. Freelance-platform delivery record, not company-branded client results.",
   closingLead:
     "19 jobs, 1,220 hours, and not one rated below 5.0. Three of those clients came back with bigger work than they first hired for, including the 640-hour engagement and a 357-hour build. ",
   closingBold: "That is what the hourly rate is buying.",

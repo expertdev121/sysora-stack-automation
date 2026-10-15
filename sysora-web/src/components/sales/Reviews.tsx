@@ -1,4 +1,5 @@
 import { StarIcon } from "@/components/ui/Icon";
+import { siteConfig } from "@/config/site";
 import { reviews } from "@/content/landing/sales";
 
 function Stars({ size = 13 }: { size?: number }) {
@@ -36,6 +37,15 @@ export function Reviews() {
 
         <p className="mt-[14px] max-w-[760px] text-[15.5px] leading-[1.7] text-[var(--ink-500)]">
           {reviews.intro}
+          <a
+            href={siteConfig.upwork}
+            target="_blank"
+            rel="noopener"
+            className="font-medium text-[var(--accent-strong)] underline decoration-[var(--line-300)] underline-offset-[3px] hover:decoration-[var(--accent-strong)]"
+          >
+            {reviews.introLink}
+          </a>
+          {reviews.introTail}
         </p>
 
         <div className="grid grid-cols-3 gap-5 mt-8 items-stretch to-860:grid-cols-1">

@@ -19,11 +19,13 @@ import { faq, packs } from "@/content/landing/sales";
  * page that 301s is a claim about something that no longer exists.
  */
 
-/** Only emit a profile link once there is one; an empty sameAs is noise. */
-const SAME_AS: string[] = [
-  // Upwork profile goes here — the one piece of third-party corroboration
-  // we have, and currently quoted in prose where no machine can follow it.
-].filter(Boolean);
+/**
+ * The profiles that corroborate this entity elsewhere. `sameAs` is how a
+ * search or AI system is told "this organization is also that profile",
+ * which is the only way the Upwork record counts as evidence rather than
+ * an unverifiable claim in our own prose.
+ */
+const SAME_AS: string[] = [siteConfig.upwork].filter(Boolean);
 
 function organization() {
   return {

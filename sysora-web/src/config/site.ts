@@ -48,6 +48,15 @@ export const siteConfig = {
    * sitemap, OG URLs — derives from this one value.
    */
   url: "https://www.sysorastack.com",
+  /**
+   * The founder's Upwork profile: the only third-party corroboration of
+   * the delivery record this site claims. It was quoted in prose and
+   * linked nowhere, which left both the reviews and the 100%/19-job
+   * figures unverifiable — by a reader or by a machine. It is now in
+   * `sameAs` on the Organization schema and linked from both places the
+   * page cites it.
+   */
+  upwork: "https://www.upwork.com/freelancers/~019b0e0fb5393a59a8",
 } as const;
 
 export const navLinks = [

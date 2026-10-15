@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/Button";
@@ -188,6 +189,14 @@ export function EstimateForm() {
       <div className="flex flex-wrap items-center justify-between gap-[14px] mt-7">
         <p className="flex-1 min-w-[220px] text-[12.5px] leading-[1.6] text-[var(--ink-500)]">
           {form.terms}
+          <Link href="/terms" className="font-medium text-[var(--accent-strong)] underline underline-offset-2">
+            {form.termsLink}
+          </Link>
+          {form.termsMid}
+          <Link href="/privacy-policy" className="font-medium text-[var(--accent-strong)] underline underline-offset-2">
+            {form.privacyLink}
+          </Link>
+          {form.termsTail}
         </p>
         {pending ? (
           <span className="inline-flex items-center gap-[10px] px-7 py-[15px] rounded-xl bg-[var(--accent-hover)] text-white text-[16px] font-semibold">

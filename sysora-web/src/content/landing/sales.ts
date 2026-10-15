@@ -42,6 +42,20 @@ export const nav = [
   { label: "FAQ", href: "#faq" },
 ] as const;
 
+/**
+ * The legal pages carry a shorter nav, as the design has it: a way back
+ * to the offer, and the two documents side by side so a reader can move
+ * between them without going via the footer.
+ */
+export const legalNav = [
+  { label: "Home", href: "" },
+  { label: "Packages", href: "#packages" },
+  { label: "Refunds", href: "#refund" },
+  { label: "FAQ", href: "#faq" },
+  { label: "Terms", href: "/terms" },
+  { label: "Privacy", href: "/privacy-policy" },
+] as const;
+
 export const hero = {
   eyebrow: "Prepaid GoHighLevel, automation and development hours",
   /**
@@ -680,8 +694,19 @@ export const checkout = {
     /** Said plainly, because the card form lives on Stripe's side. */
     handoff:
       "Card details are entered on the next screen, inside Stripe. They never touch our servers.",
+    /**
+     * Split at the two documents so each is a link. Someone ticking a box
+     * about terms should be one click from reading them, and A2P review
+     * looks for exactly that.
+     */
     agree:
-      "I understand hours already worked are not refundable, and that unused hours can be refunded under the published refund policy.",
+      "I understand hours already worked are not refundable, and that unused hours can be refunded under the ",
+    agreeRefundLink: "refund policy",
+    agreeMid: ". I agree to the ",
+    agreeTermsLink: "terms and conditions",
+    agreeAnd: " and the ",
+    agreePrivacyLink: "privacy policy",
+    agreeTail: ".",
     agreeMonthly: " I understand this plan renews monthly until I cancel.",
     agreeError: "Please accept the terms to continue.",
     back: "Back",

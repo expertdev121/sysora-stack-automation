@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { refund } from "@/content/landing/sales";
 
 export function RefundGuarantee() {
@@ -97,9 +99,14 @@ export function RefundGuarantee() {
               <strong className="text-[var(--ink-800)]">{refund.caveatTitle}</strong>
               {refund.caveatBody}
             </p>
-            <a href="#refund" className="text-[14px] font-semibold">
+            {/* Was href="#refund", i.e. a link from this section to itself.
+                The full policy is section 7 of the terms. */}
+            <Link
+              href="/terms#s-7"
+              className="text-[14px] font-semibold text-[var(--accent-strong)] hover:underline"
+            >
               {refund.policyLink}
-            </a>
+            </Link>
           </div>
         </div>
       </div>

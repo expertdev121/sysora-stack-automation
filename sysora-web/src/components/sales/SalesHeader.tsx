@@ -18,7 +18,24 @@ import { cn } from "@/lib/cn";
  * where the sections are on the same document; "/" on an inner page, where
  * they are not.
  */
-export function SalesHeader({ anchorBase = "" }: { anchorBase?: string }) {
+type NavItem = { readonly label: string; readonly href: string };
+
+/**
+ * An item whose href is already a path stands alone; an anchor gets the
+ * base prefixed so it resolves against the home document. Without this,
+ * the legal pages' "/terms" would come out as "//terms".
+ */
+function resolve(href: string, anchorBase: string): string {
+  return href.startsWith("/") ? href : `${anchorBase}${href}`;
+}
+
+export function SalesHeader({
+  anchorBase = "",
+  items = nav,
+}: {
+  anchorBase?: string;
+  items?: readonly NavItem[];
+}) {
   const [stuck, setStuck] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -52,10 +69,10 @@ export function SalesHeader({ anchorBase = "" }: { anchorBase?: string }) {
         </Link>
 
         <nav className="flex items-center gap-[26px] to-980:hidden">
-          {nav.map((item) => (
+          {items.map((item) => (
             <a
               key={item.href}
-              href={`${anchorBase}${item.href}`}
+              href={resolve(item.href, anchorBase)}
               className="relative py-2 px-[2px] text-[14px] font-medium text-[var(--text-muted)] transition-colors duration-[180ms] hover:text-[var(--ink-900)] after:content-[''] after:absolute after:inset-x-0 after:-bottom-px after:h-[2px] after:rounded-[2px] after:bg-[var(--accent)] after:origin-left after:scale-x-0 after:transition-transform after:duration-[220ms] hover:after:scale-x-100"
             >
               {item.label}
@@ -99,10 +116,10 @@ export function SalesHeader({ anchorBase = "" }: { anchorBase?: string }) {
           className="hidden to-980:block border-t-[1.5px] border-[var(--border-faint)] bg-white/95 backdrop-blur-[20px]"
         >
           <nav className="max-w-[1160px] mx-auto px-6 py-4 flex flex-col gap-1">
-            {nav.map((item) => (
+            {items.map((item) => (
               <a
                 key={item.href}
-                href={`${anchorBase}${item.href}`}
+                href={resolve(item.href, anchorBase)}
                 onClick={() => setOpen(false)}
                 className="py-3 px-2 rounded-[10px] text-[15px] font-semibold text-[var(--ink-800)] hover:bg-[var(--mint-50)] hover:text-[var(--accent-strong)] transition-colors duration-150"
               >

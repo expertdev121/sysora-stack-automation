@@ -13,6 +13,10 @@ import { completeHoursSimulated, startHourPackCheckout } from "@/lib/sales/hours
 import type { PaymentSession } from "@/lib/sales/payments";
 import { cn } from "@/lib/cn";
 
+/** Shared look for the consent line's links to the legal documents. */
+const legalLink =
+  "font-medium text-[var(--accent-strong)] underline decoration-[var(--line-300)] underline-offset-[3px] hover:decoration-[var(--accent-strong)]";
+
 /**
  * Confirm the pack, collect who we are working with, then hand off to
  * /checkout/[reference] for payment. The card form is Stripe's, not ours,
@@ -360,6 +364,18 @@ export function HoursCheckout({
                   />
                   <span className="text-[14px] leading-[1.65] text-[var(--ink-600)]">
                     {copy.pay.agree}
+                    <Link href="/#refund" className={legalLink}>
+                      {copy.pay.agreeRefundLink}
+                    </Link>
+                    {copy.pay.agreeMid}
+                    <Link href="/terms" target="_blank" className={legalLink}>
+                      {copy.pay.agreeTermsLink}
+                    </Link>
+                    {copy.pay.agreeAnd}
+                    <Link href="/privacy-policy" target="_blank" className={legalLink}>
+                      {copy.pay.agreePrivacyLink}
+                    </Link>
+                    {copy.pay.agreeTail}
                     {monthly && copy.pay.agreeMonthly}
                   </span>
                 </label>

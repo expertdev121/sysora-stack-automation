@@ -44,7 +44,12 @@ export const estimate = {
     audiences: ["Marketing agency", "Local business", "SaaS or other"],
     submit: "Send for an estimate",
     sending: "Sending",
-    terms: "By sending this you agree to our terms and privacy policy.",
+    /** Split so both documents are reachable from the consent line. */
+    terms: "By sending this you agree to our ",
+    termsLink: "terms",
+    termsMid: " and ",
+    privacyLink: "privacy policy",
+    termsTail: ".",
   },
 
   done: {

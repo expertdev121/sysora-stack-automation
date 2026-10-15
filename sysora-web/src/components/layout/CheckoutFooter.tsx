@@ -12,8 +12,16 @@ export function CheckoutFooter() {
     <footer className="border-t-[1.5px] border-[var(--border-faint)] bg-[var(--surface-0)]">
       <div className="max-w-[1160px] mx-auto px-6 py-[22px] flex flex-wrap justify-between gap-3 text-[13px] text-[var(--ink-500)]">
         <span>{footer.copyright}</span>
-        <span className="flex gap-5">
-          <Link href="/#refund" className="text-[var(--ink-500)]">
+        {/* Terms and privacy belong on a page asking for card details,
+            even though everything else is stripped out. */}
+        <span className="flex flex-wrap gap-5">
+          <Link href="/terms" className="text-[var(--ink-500)]">
+            Terms and conditions
+          </Link>
+          <Link href="/privacy-policy" className="text-[var(--ink-500)]">
+            Privacy policy
+          </Link>
+          <Link href="/terms#s-7" className="text-[var(--ink-500)]">
             Refund policy
           </Link>
           <Link href="/contact" className="text-[var(--ink-500)]">

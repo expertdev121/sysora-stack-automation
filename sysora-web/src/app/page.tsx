@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ScrollReveal } from "@/components/layout/ScrollReveal";
 import { HomeStructuredData } from "@/components/seo/StructuredData";
 import { Audiences } from "@/components/sales/Audiences";
+import { BookCall } from "@/components/sales/BookCall";
 import { Calculator } from "@/components/sales/Calculator";
 import { Costs } from "@/components/sales/Costs";
 import { FinalCta } from "@/components/sales/FinalCta";
@@ -68,6 +69,7 @@ export default function Home() {
         <Calculator />
         <SalesFaq />
         <FinalCta />
+        <BookCall />
 
         <SalesFooter />
       </div>

@@ -81,6 +81,14 @@ export function SalesHeader({
         </nav>
 
         <div className="flex items-center gap-2 flex-none">
+          {/* Sits beside the CTA rather than in the nav: the nav is the
+              offer's own sections, and this leaves the page. */}
+          <Link
+            href="/book-a-call"
+            className="px-[2px] py-2 text-[14px] font-semibold text-[var(--text-body)] transition-colors duration-[180ms] hover:text-[var(--ink-900)] to-980:hidden"
+          >
+            Book a call
+          </Link>
           <Button size="sm" arrow href={`${anchorBase}#packages`} className="to-520:hidden">
             Choose Your Hours
           </Button>
@@ -126,6 +134,15 @@ export function SalesHeader({
                 {item.label}
               </a>
             ))}
+            {/* The desktop header's "Book a call" is hidden at this width,
+                so the drawer has to carry it or it is unreachable. */}
+            <Link
+              href="/book-a-call"
+              onClick={() => setOpen(false)}
+              className="py-3 px-2 rounded-[10px] text-[15px] font-semibold text-[var(--ink-800)] hover:bg-[var(--mint-50)] hover:text-[var(--accent-strong)] transition-colors duration-150"
+            >
+              Book a call
+            </Link>
             <Button
               size="md"
               arrow

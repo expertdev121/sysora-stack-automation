@@ -728,6 +728,19 @@ export const checkout = {
   },
 } as const;
 
+/**
+ * The band between the final CTA and the footer, added to the design
+ * once /book-a-call existed: the page's last word is still "pick a
+ * size", and this is the way out for someone who cannot.
+ */
+export const bookCall = {
+  eyebrow: "Free 15-minute call",
+  title: "Not sure where to start? Book your call with us.",
+  body: "Walk us through your setup. You leave with a clear next step and no obligation to hire us.",
+  cta: "Book your call",
+  href: "/book-a-call",
+} as const;
+
 export const footer = {
   blurb:
     "Prepaid GoHighLevel, automation and development hours. $19 an hour, down to $13 at volume. No contract.",
@@ -749,6 +762,7 @@ export const footer = {
         { label: "How it runs", href: "#how" },
         { label: "Request an estimate", href: "/request-estimate" },
         { label: "Checkout", href: "/checkout/hours" },
+        { label: "Book a call", href: "/book-a-call" },
         { label: "Contact", href: "/contact" },
       ],
     },

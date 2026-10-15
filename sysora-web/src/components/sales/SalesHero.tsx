@@ -13,21 +13,29 @@ const COL_HEIGHT: Record<number, number> = {
   13: 44,
 };
 
+/**
+ * The design paints the hero as three stacked background layers: a mint
+ * glow bleeding in from above-right, a sage one from below-left, and a
+ * diagonal base that is nearly white through the middle.
+ *
+ * This was a single vertical surface-0 → mint-50 gradient with two
+ * circular glow divs approximating the radials, which read flatter and
+ * greener than the design across the whole fold. The layers are inline
+ * because they are one value from the design, and splitting them across
+ * Tailwind arbitrary classes is how they drifted in the first place.
+ */
 export function SalesHero() {
   return (
     <section
       id="top"
-      className="relative overflow-hidden px-6 pt-[clamp(64px,9vh,104px)] pb-[clamp(48px,6vh,72px)] bg-[linear-gradient(180deg,var(--surface-0)_0%,var(--mint-50)_100%)]"
+      className="relative overflow-hidden px-6 pt-[clamp(64px,9vh,104px)] pb-[clamp(48px,6vh,72px)]"
+      style={{
+        background:
+          "radial-gradient(1100px 520px at 85% -10%,rgba(0,200,150,0.14),rgba(0,200,150,0) 60%)," +
+          "radial-gradient(900px 480px at -5% 105%,rgba(135,195,143,0.20),rgba(135,195,143,0) 62%)," +
+          "linear-gradient(160deg,#F2FBF7 0%,#FFFFFF 42%,#F4FAF5 72%,#E9F6EF 100%)",
+      }}
     >
-      <div
-        aria-hidden="true"
-        className="sx-glow pointer-events-none absolute -top-[180px] -right-[120px] w-[640px] h-[640px] rounded-full bg-[radial-gradient(closest-side,rgba(0,200,150,0.16),rgba(0,200,150,0))]"
-      />
-      <div
-        aria-hidden="true"
-        className="sx-glow pointer-events-none absolute -bottom-[260px] -left-[200px] w-[620px] h-[620px] rounded-full bg-[radial-gradient(closest-side,rgba(135,195,143,0.16),rgba(135,195,143,0))]"
-        style={{ animationDelay: "-7s" }}
-      />
 
       <div className="relative max-w-[1160px] mx-auto grid grid-cols-[minmax(0,1.08fr)_minmax(320px,0.92fr)] gap-[clamp(36px,4.5vw,72px)] items-center to-980:grid-cols-1">
         <div>

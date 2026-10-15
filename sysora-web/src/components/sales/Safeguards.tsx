@@ -1,8 +1,11 @@
 import { safeguards } from "@/content/landing/sales";
 
+// #24243A is the design's value. This was #1A1A2E — which is --ink-800,
+// the heading colour, not the band colour — so the band read as
+// near-black rather than the design's deep indigo.
 export function Safeguards() {
   return (
-    <section className="relative overflow-hidden px-6 py-[clamp(78px,10vh,120px)] bg-[#1A1A2E] text-white">
+    <section className="relative overflow-hidden px-6 py-[clamp(78px,10vh,120px)] bg-[#24243A] text-white">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[length:56px_56px] [mask-image:radial-gradient(ellipse_at_50%_0%,#000_20%,transparent_70%)] [-webkit-mask-image:radial-gradient(ellipse_at_50%_0%,#000_20%,transparent_70%)]"

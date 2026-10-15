@@ -149,6 +149,61 @@ export async function startPayment(reference: string): Promise<PaymentSession> {
 }
 
 /**
+ * Grants the hours an order paid for.
+ *
+ * Without this the customer pays and their balance stays at zero, which
+ * is how the first two orders on this site ended up with no entitlement
+ * at all. A unique index on request_id makes it idempotent: the webhook
+ * and the confirmation-page reconcile both call markRequestPaid, and the
+ * loser of that race inserts nothing rather than granting twice.
+ *
+ * One-time packs expire 60 days out; monthly plans reset instead, and
+ * the reset date is set when the cycle renews rather than guessed here.
+ */
+const PACK_VALIDITY_DAYS = 60;
+
+async function grantHoursFor(requestId: string): Promise<void> {
+  const db = salesDb();
+
+  const { data: request } = await db
+    .from("requests")
+    .select("id, customer_id, kind, amount, currency, metadata, paid_at")
+    .eq("id", requestId)
+    .maybeSingle();
+
+  if (!request || request.kind !== "hour_pack") return;
+
+  const meta = (request.metadata ?? {}) as { hours?: unknown; billing?: unknown };
+  const hours = Number(meta.hours);
+  if (!Number.isFinite(hours) || hours <= 0) {
+    console.error(`[grantHoursFor] ${requestId} is an hour pack with no usable hours`);
+    return;
+  }
+
+  const monthly = meta.billing === "monthly";
+  const startsAt = request.paid_at ?? new Date().toISOString();
+  const expiresAt = monthly
+    ? null
+    : new Date(Date.parse(startsAt) + PACK_VALIDITY_DAYS * 86_400_000).toISOString();
+
+  const { error } = await db.from("hour_entitlements").insert({
+    customer_id: request.customer_id,
+    request_id: request.id,
+    hours,
+    rate_amount: Math.round(request.amount / hours),
+    currency: request.currency,
+    source: monthly ? "monthly" : "pack",
+    starts_at: startsAt,
+    expires_at: expiresAt,
+  });
+
+  // 23505 is the one-per-request index doing its job.
+  if (error && error.code !== "23505") {
+    console.error(`[grantHoursFor] ${requestId}`, error);
+  }
+}
+
+/**
  * Marks a request paid. Called by the Stripe webhook, and by the
  * simulated flow in development.
  */
@@ -203,6 +258,9 @@ export async function markRequestPaid(input: {
       .update({ status: "cancelled", metadata: { retired_reason: "request_already_paid" } })
       .eq("id", payment.id);
   }
+
+  // After the request is marked paid, so paid_at is the entitlement's start.
+  await grantHoursFor(input.requestId);
 
   await track("payment.succeeded", { request_id: input.requestId, simulated: !!input.simulated });
 }

@@ -43,9 +43,18 @@ export async function requireStaff(): Promise<StaffSession> {
   const user = await getSessionUser();
   if (!user) redirect("/admin/login");
 
+  /**
+   * A client has a session in the same table as staff, so "is signed in"
+   * no longer means "works here". Without this line a portal login would
+   * satisfy every capability predicate written as `role !== "bde"` and
+   * reach the pipeline pages.
+   */
+  if (user.role === "client") redirect("/portal");
+
   return {
     userId: user.id,
     email: user.email,
+    // Narrowed by the redirect above: everything past this point is staff.
     role: user.role,
     fullName: user.fullName,
   };

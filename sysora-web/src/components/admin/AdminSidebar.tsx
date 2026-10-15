@@ -127,7 +127,12 @@ type NavItem = { href: string; label: string; icon: keyof typeof icons; exact?: 
 
 const primary: NavItem[] = [
   { href: "/admin", label: "Overview", icon: "overview", exact: true },
-  { href: "/admin/requests", label: "Requests", icon: "requests" },
+  // The delivery console: who owes us work, who needs attention.
+  { href: "/admin/console", label: "Operations", icon: "overview" },
+  { href: "/admin/clients", label: "Clients", icon: "contacts" },
+  { href: "/admin/tickets", label: "Tickets", icon: "questions" },
+  { href: "/admin/builds", label: "Build requests", icon: "requests" },
+  { href: "/admin/requests", label: "Orders", icon: "requests" },
   { href: "/admin/contacts", label: "Contacts", icon: "contacts" },
 ];
 

@@ -2,6 +2,16 @@ import type { OfferKind, PaymentStatus, RequestStatus, ResponseStatus } from "@/
 
 export type StaffRole = "bde" | "admin" | "manager" | "owner";
 
+/**
+ * Every role the users table can hold, including portal clients.
+ *
+ * StaffRole stays the four staff roles so the role pickers and the
+ * ROLE_LABELS maps below cannot accidentally offer "client" as
+ * something to hire someone as. A session carries this wider type, and
+ * requireStaff() narrows it by turning clients away.
+ */
+export type AccountRole = StaffRole | "client";
+
 export const ROLE_LABELS: Record<StaffRole, string> = {
   bde: "BDE",
   admin: "Admin",

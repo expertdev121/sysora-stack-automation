@@ -4,7 +4,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { cookies, headers } from "next/headers";
 
 import { salesDb } from "@/lib/supabase/admin";
-import type { StaffRole } from "@/lib/admin/types";
+import type { AccountRole } from "@/lib/admin/types";
 
 /**
  * Sessions.
@@ -22,7 +22,13 @@ export type SessionUser = {
   id: string;
   email: string;
   fullName: string | null;
-  role: StaffRole;
+  role: AccountRole;
+  /**
+   * Set only for role 'client': the customer whose portal this user sees.
+   * Staff rows leave it null. Every portal query is scoped by it, so it
+   * is the one field standing between a client and someone else's hours.
+   */
+  customerId: string | null;
 };
 
 /** Tokens are hashed, never compared as plaintext. */
@@ -63,7 +69,9 @@ export async function getSessionUser(): Promise<SessionUser | null> {
 
   const { data, error } = await salesDb()
     .from("sessions")
-    .select("id, expires_at, revoked_at, users(id, email, full_name, role, is_active)")
+    .select(
+      "id, expires_at, revoked_at, users(id, email, full_name, role, is_active, customer_id)",
+    )
     .eq("token_hash", hashToken(token))
     .maybeSingle();
 
@@ -72,7 +80,14 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   if (new Date(data.expires_at) < new Date()) return null;
 
   const user = (Array.isArray(data.users) ? data.users[0] : data.users) as
-    | { id: string; email: string; full_name: string | null; role: StaffRole; is_active: boolean }
+    | {
+        id: string;
+        email: string;
+        full_name: string | null;
+        role: AccountRole;
+        is_active: boolean;
+        customer_id: string | null;
+      }
     | undefined;
 
   if (!user?.is_active) return null;
@@ -84,7 +99,13 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     .eq("id", data.id)
     .then(undefined, () => {});
 
-  return { id: user.id, email: user.email, fullName: user.full_name, role: user.role };
+  return {
+    id: user.id,
+    email: user.email,
+    fullName: user.full_name,
+    role: user.role,
+    customerId: user.customer_id ?? null,
+  };
 }
 
 export async function destroySession(): Promise<void> {

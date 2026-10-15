@@ -118,13 +118,31 @@ export default function BookACallPage() {
             </span>
           </header>
 
-          <iframe
-            src={booking.calendar.src}
-            id={booking.calendar.embedId}
-            title={booking.calendar.title}
-            scrolling="no"
-            className="block w-full min-h-[720px] border-0"
-          />
+          {/* form_embed.js parks the frame at opacity:0, left:-9999px and
+              only reveals it once the widget posts back that it is ready.
+              That message never arrives for this calendar, so the booking
+              UI loads and stays invisible. These rules win over the
+              script's inline styles; it still sets height, so the frame
+              keeps resizing between the month and time steps. */}
+          <style>{`
+            .ghl-booking iframe {
+              position: static !important;
+              left: auto !important;
+              opacity: 1 !important;
+              visibility: visible !important;
+              pointer-events: auto !important;
+            }
+          `}</style>
+
+          <div className="ghl-booking">
+            <iframe
+              src={booking.calendar.src}
+              id={booking.calendar.embedId}
+              title={booking.calendar.title}
+              scrolling="no"
+              className="block w-full min-h-[720px] border-0"
+            />
+          </div>
         </section>
       </main>
 

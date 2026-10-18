@@ -1,14 +1,16 @@
 import "server-only";
 
 import { siteUrl } from "@/lib/site-url";
+import { getWebhookUrl, postWebhook, type WebhookOutcome } from "@/lib/sales/webhooks";
 
 /**
  * Outbound webhook to the GoHighLevel abandoned-cart workflow.
  *
  * The URL is an inbound-webhook trigger: its path contains the trigger's
  * id, which is the only thing authenticating the call. It is therefore a
- * credential and lives in the environment, never in the repo — and it is
- * deliberately never written to a log line, including on failure.
+ * credential, never written to a log line, and it now lives in
+ * sales.webhooks so it can be changed from the admin without a deploy.
+ * The environment variable is still read as a fallback.
  *
  * The payload is flat and all-strings-and-numbers on purpose. GHL maps
  * inbound JSON onto custom values key by key and does not reach into
@@ -41,13 +43,11 @@ export type AbandonedCart = {
   referrer: string | null;
 };
 
-export type WebhookOutcome =
-  | { ok: true; status: number }
-  | { ok: false; status: number | null; detail: string };
+export type { WebhookOutcome };
 
 /** True when the abandoned-cart webhook is wired up on this deployment. */
-export function isAbandonedCartWebhookConfigured(): boolean {
-  return Boolean(process.env.GHL_ABANDONED_CART_WEBHOOK_URL?.trim());
+export async function isAbandonedCartWebhookConfigured(): Promise<boolean> {
+  return Boolean(await getWebhookUrl("abandoned_cart"));
 }
 
 /**
@@ -121,41 +121,10 @@ export function abandonedCartPayload(cart: AbandonedCart) {
 }
 
 export async function sendAbandonedCart(cart: AbandonedCart): Promise<WebhookOutcome> {
-  const url = process.env.GHL_ABANDONED_CART_WEBHOOK_URL?.trim();
+  const url = await getWebhookUrl("abandoned_cart");
   if (!url) {
-    return { ok: false, status: null, detail: "GHL_ABANDONED_CART_WEBHOOK_URL is not set" };
+    return { ok: false, status: null, detail: "No abandoned-cart webhook URL is configured" };
   }
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(abandonedCartPayload(cart)),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      // Read a little of the body for the log: GHL explains rejections
-      // there, and without it a 400 is undiagnosable.
-      const body = await response.text().catch(() => "");
-      return {
-        ok: false,
-        status: response.status,
-        detail: body.slice(0, 200) || `HTTP ${response.status}`,
-      };
-    }
-
-    return { ok: true, status: response.status };
-  } catch (error) {
-    // Never interpolate `url` here — the trigger id is in its path.
-    const detail =
-      error instanceof Error
-        ? error.name === "TimeoutError"
-          ? `No response in ${TIMEOUT_MS / 1000}s`
-          : error.message
-        : "Unknown error";
-
-    return { ok: false, status: null, detail };
-  }
+  return postWebhook(url, abandonedCartPayload(cart));
 }

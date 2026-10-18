@@ -122,9 +122,9 @@ function toCart(row: Row): AbandonedCart | null {
 }
 
 async function sweep() {
-  if (!isAbandonedCartWebhookConfigured()) {
+  if (!(await isAbandonedCartWebhookConfigured())) {
     return NextResponse.json(
-      { error: "GHL_ABANDONED_CART_WEBHOOK_URL is not set." },
+      { error: "No abandoned-cart webhook URL is configured. Set one in Admin → Settings." },
       { status: 503 },
     );
   }

@@ -2,6 +2,7 @@
 
 import Stripe from "stripe";
 
+import { sendPaymentConfirmation } from "@/lib/sales/confirmation";
 import { salesDb } from "@/lib/supabase/admin";
 import { track } from "./actions";
 
@@ -261,6 +262,11 @@ export async function markRequestPaid(input: {
 
   // After the request is marked paid, so paid_at is the entitlement's start.
   await grantHoursFor(input.requestId);
+
+  // After the entitlement, so the email can quote the rate and expiry.
+  // Claims the row first, so the Stripe webhook and the confirmation page
+  // racing each other still produce exactly one email.
+  await sendPaymentConfirmation(input.requestId);
 
   await track("payment.succeeded", { request_id: input.requestId, simulated: !!input.simulated });
 }

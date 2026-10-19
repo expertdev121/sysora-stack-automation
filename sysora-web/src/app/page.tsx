@@ -10,6 +10,7 @@ import { FinalCta } from "@/components/sales/FinalCta";
 import { HowItRuns } from "@/components/sales/HowItRuns";
 import { MoreReviews } from "@/components/sales/MoreReviews";
 import { Packages } from "@/components/sales/Packages";
+import { PortalPromise } from "@/components/sales/PortalPromise";
 import { RefundGuarantee } from "@/components/sales/RefundGuarantee";
 import { Reviews } from "@/components/sales/Reviews";
 import { Safeguards } from "@/components/sales/Safeguards";
@@ -62,6 +63,7 @@ export default function Home() {
         <Audiences />
         <Support />
         <HowItRuns />
+        <PortalPromise />
         <MoreReviews />
         <WhoBuilt />
         <RefundGuarantee />

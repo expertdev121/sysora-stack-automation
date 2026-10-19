@@ -388,20 +388,20 @@ export const howItRuns = {
   steps: [
     {
       n: "01",
-      title: "Payment and receipt",
+      title: "Payment and account access",
       /**
        * `bodyTail` and `contactLink` exist because the design puts a
        * link mid-sentence here. Splitting the copy at the link beats
        * putting markup in a content string.
        */
-      body: "Your hour balance is created immediately and a confirmation email arrives within minutes. Not in your inbox? Check spam, or ",
+      body: "Your hour balance is created and your account access is sent to the email you used at checkout. If it is not in your inbox, check your spam folder, or ",
       contactLink: "contact us",
       bodyTail: ".",
     },
     {
       n: "02",
-      title: "Onboarding intake",
-      body: "Agency or local business, your GoHighLevel account situation, the other tools in play, your goals and backlog, how you want to grant access, your US time zone, and who approves work and billing. We request the minimum permissions a job needs and never ask for a password in plain text.",
+      title: "Onboarding, in your account",
+      body: "Everything we need from you is on one screen in there. Agency or local business, your GoHighLevel account situation, the other tools in play, your goals and backlog, how you want to grant access, your US time zone, and who approves work and billing. Fill it in when it suits you and add the first task while you are there. We request the minimum permissions a job needs and never ask for a password in plain text, and if something is missing we come back to you by email or phone.",
     },
     {
       n: "03",
@@ -733,6 +733,40 @@ export const checkout = {
  * once /book-a-call existed: the page's last word is still "pick a
  * size", and this is the way out for someone who cannot.
  */
+/**
+ * The client-portal section, between the delivery timeline and the
+ * eight-hour walkthrough.
+ *
+ * It answers the objection the page cannot argue its way out of —
+ * prepaying a stranger — by showing that the balance is visible rather
+ * than asserted, so it sits right after the timeline that explains what
+ * happens to the money.
+ */
+export const portalPromise = {
+  eyebrow: "What you get the morning after you pay",
+  title: "Your hours are not a number you have to trust us about",
+  lead: "Prepaying a stranger for time is the hardest part of this offer, so the balance sits in your account and so does everything that moves between us.",
+  cards: [
+    {
+      icon: "clock" as const,
+      title: "Hours left",
+      body: "What you bought, what each task consumed, what is still there, and when it was logged. If you disagree with an entry, we go through the task log with you.",
+    },
+    {
+      icon: "send" as const,
+      title: "Send a task",
+      body: "Write what needs doing and a person reads it, comes back with what it takes, and nothing starts until you approve the scope.",
+    },
+    {
+      icon: "plus" as const,
+      title: "Buy more hours",
+      body: "When a stretch of work needs more than you have, order it there. Each order is priced at the tier of that order, so a 25-hour top-up is $18 an hour whatever you bought last time.",
+    },
+  ],
+  closing:
+    "Onboarding happens in there too. Filling it in costs no hours, and so does sending a task. Scoping, configuration and build work are what the hours are for. Chat and ticket triage stay open around the clock as well, at no extra charge, and that is still the route for anything urgent.",
+} as const;
+
 export const bookCall = {
   eyebrow: "Free 15-minute call",
   title: "Not sure where to start? Book your call with us.",

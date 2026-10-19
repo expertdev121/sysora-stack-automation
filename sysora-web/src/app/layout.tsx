@@ -50,8 +50,8 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: "GoHighLevel, Automation & Dev Hours from $13/hr — Sysora Stack",
-    template: "%s — Sysora Stack",
+    default: "GoHighLevel, Automation and Dev Hours from $13/hr | Sysora Stack",
+    template: "%s | Sysora Stack",
   },
   description: siteConfig.description,
   alternates: { canonical: "/" },
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
   },
   manifest: "/site.webmanifest",
   openGraph: {
-    title: "GoHighLevel, Automation & Dev Hours from $13/hr — Sysora Stack",
+    title: "GoHighLevel, Automation and Dev Hours from $13/hr | Sysora Stack",
     description: siteConfig.description,
     url: "/",
     type: "website",
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "GoHighLevel, Automation & Dev Hours from $13/hr — Sysora Stack",
+    title: "GoHighLevel, Automation and Dev Hours from $13/hr | Sysora Stack",
     description: siteConfig.description,
   },
 };

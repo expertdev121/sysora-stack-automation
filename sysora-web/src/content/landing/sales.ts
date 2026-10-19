@@ -80,7 +80,7 @@ export const hero = {
   bullets: [
     "Smallest pack, $95",
     "One-time or monthly, same seven prices",
-    "Cancel any time, nothing to give notice on",
+    "Cancel any time, up to 24 hours before a renewal",
   ],
   chart: {
     label: "Effective rate by pack",
@@ -161,7 +161,7 @@ export const safeguards = {
     {
       n: "01",
       title: "You approve the scope before anything is built",
-      body: "After checkout you get an onboarding intake and we come back with what we think each task takes. Substantial work gets a written time estimate and a milestone plan. Nothing starts until you say so.",
+      body: "After checkout you fill in the onboarding in your account and we come back with what we think each task takes. Substantial work gets a written time estimate and a milestone plan. Nothing starts until you say so, and none of that scoping comes out of your hours.",
     },
     {
       n: "02",
@@ -372,6 +372,8 @@ export const support = {
       "Configuration, building, revisions and testing",
       "Meetings, project coordination and written documentation",
     ],
+    /** The billing increment, said before anyone pays rather than only in the terms. */
+    note: "Time is logged in 15-minute increments, rounded up per task.",
   },
   notPromisedTitle: "Not promised by default:",
   notPromisedBody:
@@ -401,7 +403,7 @@ export const howItRuns = {
     {
       n: "02",
       title: "Onboarding, in your account",
-      body: "Everything we need from you is on one screen in there. Agency or local business, your GoHighLevel account situation, the other tools in play, your goals and backlog, how you want to grant access, your US time zone, and who approves work and billing. Fill it in when it suits you and add the first task while you are there. We request the minimum permissions a job needs and never ask for a password in plain text, and if something is missing we come back to you by email or phone.",
+      body: "Everything we need from you is on one screen in there. Agency or local business, your GoHighLevel account situation, the other tools in play, your goals and backlog, how you want to grant access, your US time zone, and who approves work and billing. Fill it in when it suits you and add the first task while you are there. We ask for delegated or role-based access rather than shared passwords, we request the minimum permissions a job needs, and if something is missing we come back to you by email or phone.",
     },
     {
       n: "03",
@@ -509,7 +511,7 @@ export const refund = {
        * way the design has it. A refund route nobody can click is a
        * refund route nobody uses.
        */
-      body: "Message support from your dashboard, or email ",
+      body: "Message support from your account, or email ",
       email: "support@sysorastack.com",
       bodyTail:
         ", and say you want to cancel and refund your unused hours. Either one reaches a person at any hour.",
@@ -522,7 +524,7 @@ export const refund = {
     {
       n: "07",
       label: "Cancelling a monthly plan",
-      body: "Stops future renewals. The unused part of the cycle you already paid for is refundable under the same rules",
+      body: "Ask at least 24 hours before your next renewal date. That stops future renewals, and the unused part of the cycle you already paid for is refundable under the same rules",
     },
     {
       n: "08",
@@ -581,12 +583,20 @@ export const faq = {
       a: "Larger single orders mean less scoping overhead, fewer billing cycles and more predictable scheduling for us, and the rate reflects that. It applies to the order you place, not retroactively to past or future orders.",
     },
     {
-      q: "What am I actually paying for, a person or a package?",
+      q: "Am I paying for a person or for a package?",
       a: "A team, billed by the hour against a balance you buy up front. An 11-person group covering GoHighLevel, automation, integration, web and software work, plus 24/7 human chat and ticket triage at no extra charge.",
     },
     {
       q: "How do I know the hours are real?",
-      a: "Every task carries its logged time in your ledger, visible to you. If you disagree with an entry, we go through the task log with you.",
+      a: "Every task carries its logged time in the ledger inside your account, next to the balance you have left. If you disagree with an entry, we go through the task log with you.",
+    },
+    {
+      q: "How is time rounded?",
+      a: "Time is tracked in 15-minute increments, rounded up to the nearest increment per task. A two-minute fix is logged as 15 minutes, and a task that runs 70 minutes is logged as 75. Every entry is visible to you with what it was spent on, and we do not bill you for our own mistakes or for rework caused by them.",
+    },
+    {
+      q: "Where do I see my hours and send new work?",
+      a: "In your account. Your balance, every logged entry and what it was spent on are in there, and so is onboarding. You can send a new task and buy more hours from the same place, and a new order is priced at the tier of that order.",
     },
     {
       q: "What happens if I run out mid-project?",
@@ -601,12 +611,16 @@ export const faq = {
       a: "24/7 human chat and ticket triage is included with every package, which means a real person receives, reads, triages and routes your request at any hour. Calls, diagnosis, configuration, building, testing and meetings are technical work and come out of your purchased hours.",
     },
     {
+      q: "Do I have to email you every time I need something?",
+      a: "No. Send the task from your account and it reaches the team. Chat and ticket triage stay open around the clock as well, at no extra charge, and that is the route for anything urgent or unclear. Sending a task costs you nothing, and the work it turns into is what comes out of your hours.",
+    },
+    {
       q: "How fast will you respond?",
       a: "We do not publish a response-time commitment, because we have not operationalized one, and a number we cannot hold is worse than no number. Intake is staffed around the clock.",
     },
     {
       q: "How do I cancel a monthly plan?",
-      a: "Message support from your dashboard or email support@sysorastack.com. Cancelling stops future renewals. The unused hours in the cycle you have already paid for can be refunded, as long as you ask before that cycle resets.",
+      a: "Message support from your account or email support@sysorastack.com, at least 24 hours before your next renewal date. Cancelling stops future renewals and does not refund earlier cycles. The unused hours in the cycle you have already paid for can be refunded, as long as you ask before that cycle resets.",
     },
     {
       q: "Can you take over an account somebody else built?",
@@ -615,6 +629,10 @@ export const faq = {
     {
       q: "Can you work under my agency's brand?",
       a: "Yes. White-label delivery is a large share of our agency work. What carries your name and what does not is agreed per engagement, in writing.",
+    },
+    {
+      q: "Who owns what you build?",
+      a: "You do. On full payment for the hours used to produce them, the workflows, funnels, configurations, code and documentation we built for you are yours. We keep our own reusable libraries, snapshot templates and internal tooling, and you get a perpetual licence to use those wherever they are embedded in your deliverables. We will not publish your name, your logo or your project as a case study without your written permission.",
     },
     {
       q: "Does Sysora Stack only work in GoHighLevel?",
@@ -655,9 +673,10 @@ export const checkout = {
   details: {
     step: "Step 2 of 3",
     headline: "Who are we working with?",
-    lead: "Your receipt and onboarding intake go to this email.",
+    lead: "Your account access goes to this email.",
     name: "Full name",
     email: "Work email",
+    emailHint: "Your account access is sent to this address after payment.",
     company: "Company",
     timezone: "Your US time zone",
     timezones: [
@@ -712,6 +731,9 @@ export const checkout = {
     back: "Back",
     submit: "Continue to secure payment",
     working: "Starting",
+    /** What happens after the money moves, said before it does. */
+    afterPay:
+      "Account access is sent to the email you entered. Onboarding happens in there, and nothing billable starts until you approve the scope.",
   },
   summary: {
     title: "Order summary",
@@ -719,11 +741,11 @@ export const checkout = {
     includedValue: "Included",
     refundTitle: "Unused hours come back",
     refundBody:
-      "Not happy with our work? Get a refund for your unused hours at the rate you paid. Hours already worked are not refundable.",
+      "Not happy with our work? Get a refund for your unused hours at the rate you paid. Ask before your 60-day pack expires or your monthly cycle resets. Hours already worked are not refundable.",
     bullets: [
       "You approve the scope before anything is built",
       "No automatic overage, ever",
-      "No contract. Cancel any time",
+      "No contract. Cancel up to 24 hours before renewal",
     ],
   },
 } as const;

@@ -67,6 +67,22 @@ function splitName(fullName: string | null): { first: string; last: string } {
   return { first: name.slice(0, gap), last: name.slice(gap + 1) };
 }
 
+/**
+ * The link back into checkout.
+ *
+ * Always the picker with the pack and billing mode in the query string:
+ * that is the one checkout URL shape the site publishes, and it survives
+ * an order the customer never finished. Falls back to the bare picker if
+ * either value is missing, which beats sending a half-built query.
+ */
+function resumeUrl(hours: number | null, billing: string | null): string {
+  const base = `${siteUrl()}/checkout/hours`;
+  if (!hours) return base;
+
+  const mode = billing === "monthly" ? "monthly" : "once";
+  return `${base}?hours=${hours}&billing=${mode}`;
+}
+
 export function abandonedCartPayload(cart: AbandonedCart) {
   const { first, last } = splitName(cart.fullName);
 
@@ -110,13 +126,13 @@ export function abandonedCartPayload(cart: AbandonedCart) {
     utm_campaign: cart.utmCampaign ?? "",
     referrer: cart.referrer ?? "",
 
-    // Timing, and the one link the email actually needs. The reference
-    // checkout reopens the existing order, so they land back on their own
-    // card form rather than starting over.
+    // Timing, and the one link the email needs. The pack and the billing
+    // mode travel in the query string, so the picker reopens on what they
+    // had chosen rather than on the default.
     checkout_started_at: startedAt.toISOString(),
     abandoned_at: new Date().toISOString(),
     minutes_since_checkout_started: minutes,
-    resume_url: `${siteUrl()}/checkout/${cart.reference}`,
+    resume_url: resumeUrl(cart.hours, cart.billing),
   };
 }
 

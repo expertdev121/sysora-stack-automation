@@ -11,9 +11,14 @@ export const metadata: Metadata = {
   description: booking.meta.description,
   alternates: { canonical: "/book-a-call" },
   openGraph: {
-    title: `${booking.meta.title} — Sysora Stack`,
+    title: `${booking.meta.title} | Sysora Stack`,
     description: booking.meta.description,
     url: "/book-a-call",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${booking.meta.title} | Sysora Stack`,
+    description: booking.meta.description,
   },
 };
 

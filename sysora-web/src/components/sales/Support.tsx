@@ -74,6 +74,9 @@ export function Support() {
                 </li>
               ))}
             </ul>
+            <p className="mt-[18px] text-[14px] leading-[1.6] text-[var(--ink-500)]">
+              {support.billed.note}
+            </p>
           </div>
         </div>
 

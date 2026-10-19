@@ -12,7 +12,7 @@ export const terms: LegalDoc = {
   eyebrow: "Legal",
   title: "Terms and Conditions",
   lead: "These Terms govern your purchase and use of Sysora Stack services.",
-  updated: "15 October 2026",
+  updated: "19 October 2026",
   tocTitle: "On this page",
   backToTop: "Back to top",
   intro: [
@@ -102,6 +102,10 @@ export const terms: LegalDoc = {
           k: "p",
           text: "Time estimates are estimates. We do not guarantee that a specific task will be completed inside a specific number of hours unless the scope has been reviewed in writing and we have stated otherwise.",
         },
+        {
+          k: "p",
+          text: "Onboarding, submitting a task and receiving a scope estimate do not consume hours. Hours start being consumed when we begin the work you approved.",
+        },
       ],
     },
     {
@@ -146,7 +150,7 @@ export const terms: LegalDoc = {
         { k: "h3", n: "5.4", title: "Failed payments" },
         {
           k: "p",
-          text: "If a payment fails, we may suspend work and access to your hour balance until payment is resolved. Repeated failed payment may result in cancellation of the plan.",
+          text: "If a payment fails, we may suspend work and access to your hour balance until payment is resolved. Repeated failed payment may result in cancellation of the plan. Your purchased hours are not forfeited by a failed payment, and access is restored when the payment is resolved. The 60-day validity period on a one-time pack is not extended by a suspension.",
         },
         { k: "h3", n: "5.5", title: "Price changes" },
         {
@@ -213,6 +217,10 @@ export const terms: LegalDoc = {
             "For monthly plans, we refund the unused portion of the current paid cycle only. Prior cycles are not refunded retroactively.",
             "Refunds are returned to the original payment method. Posting times depend on your bank and card issuer and are outside our control.",
           ],
+        },
+        {
+          k: "p",
+          text: "Refunds are not available for work already performed where we have suspended or terminated an engagement under Section 9.",
         },
         {
           k: "p",

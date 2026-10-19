@@ -74,7 +74,7 @@ export default async function CheckoutCompletePage({
   return (
     <PageShell
       eyebrow={`Payment received · ${request.reference}`}
-      title={survey?.title ?? "Thanks — you're in."}
+      title={survey?.title ?? "Thanks, you're in."}
       lead={
         survey?.intro ??
         `We've received ${formatMoney(request.amount, request.currency)} for ${request.offer.name}.`

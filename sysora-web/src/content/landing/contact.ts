@@ -9,7 +9,7 @@ import { LEGAL_EMAIL } from "@/content/legal/contact";
  */
 export const contact = {
   meta: {
-    title: "Contact — GoHighLevel and Automation Help",
+    title: "Contact, GoHighLevel and Automation Help",
     description:
       "Tell Sysora Stack what is eating your week. A person reads every message and replies with a straight answer about what is worth doing. No pitch deck, no discovery-call funnel.",
   },

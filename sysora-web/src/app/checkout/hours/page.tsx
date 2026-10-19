@@ -5,13 +5,25 @@ import { HoursCheckout } from "@/components/sales/HoursCheckout";
 import { packs, DEFAULT_PACK } from "@/content/landing/sales";
 
 export const metadata: Metadata = {
-  title: "Buy Prepaid GoHighLevel & Automation Hours — $19 to $13/hr",
+  title: "Buy Prepaid GoHighLevel and Automation Hours, $19 to $13/hr",
   description:
     "Pick a prepaid block of GoHighLevel, automation and development hours. Seven sizes from 5 to 150 hours, $19 an hour down to $13 at volume. One-time or monthly, no contract, unused hours refundable.",
   // The picker is a real landing page — every CTA on the homepage points
   // here — so it is indexable and canonical to itself. The per-order
   // pages under /checkout/[reference] stay noindex.
   alternates: { canonical: "/checkout/hours" },
+  openGraph: {
+    title: "Buy Prepaid GoHighLevel and Automation Hours, $19 to $13/hr | Sysora Stack",
+    description:
+      "Pick a prepaid block of GoHighLevel, automation and development hours. Seven sizes from 5 to 150 hours, $19 an hour down to $13 at volume.",
+    url: "/checkout/hours",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Buy Prepaid GoHighLevel and Automation Hours, $19 to $13/hr | Sysora Stack",
+    description:
+      "Pick a prepaid block of GoHighLevel, automation and development hours. Seven sizes from 5 to 150 hours, $19 an hour down to $13 at volume.",
+  },
 };
 
 /**

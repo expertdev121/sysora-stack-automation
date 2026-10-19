@@ -9,10 +9,15 @@ export const metadata: Metadata = {
     "How Sysora Stack collects, uses, shares and protects personal information, including the data we process inside our customers’ systems.",
   alternates: { canonical: "/privacy-policy" },
   openGraph: {
-    title: "Privacy Policy — Sysora Stack",
+    title: "Privacy Policy | Sysora Stack",
     description:
       "How Sysora Stack collects, uses, shares and protects personal information.",
     url: "/privacy-policy",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy | Sysora Stack",
+    description: "How Sysora Stack collects, uses, shares and protects personal information.",
   },
 };
 

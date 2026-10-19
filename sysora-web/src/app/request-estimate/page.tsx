@@ -10,9 +10,14 @@ export const metadata: Metadata = {
   description: estimate.meta.description,
   alternates: { canonical: "/request-estimate" },
   openGraph: {
-    title: estimate.meta.title,
+    title: `${estimate.meta.title} | Sysora Stack`,
     description: estimate.meta.description,
     url: "/request-estimate",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${estimate.meta.title} | Sysora Stack`,
+    description: estimate.meta.description,
   },
 };
 

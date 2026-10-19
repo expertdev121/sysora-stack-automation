@@ -9,10 +9,16 @@ export const metadata: Metadata = {
     "The terms governing prepaid Sysora Stack hours: the published rate table, validity and reset, the unused-hours refund guarantee, and what is not included.",
   alternates: { canonical: "/terms" },
   openGraph: {
-    title: "Terms and Conditions — Sysora Stack",
+    title: "Terms and Conditions | Sysora Stack",
     description:
       "The terms governing prepaid Sysora Stack hours, including the rate table and the unused-hours refund guarantee.",
     url: "/terms",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Terms and Conditions | Sysora Stack",
+    description:
+      "The terms governing prepaid Sysora Stack hours, including the rate table and the unused-hours refund guarantee.",
   },
 };
 

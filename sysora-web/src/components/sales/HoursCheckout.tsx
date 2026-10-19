@@ -246,7 +246,13 @@ export function HoursCheckout({
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
-                    {errors.email && <p className="sx-err">{errors.email}</p>}
+                    {errors.email ? (
+                      <p className="sx-err">{errors.email}</p>
+                    ) : (
+                      <p className="mt-[6px] text-[12.5px] leading-[1.55] text-[var(--ink-400)]">
+                        {copy.details.emailHint}
+                      </p>
+                    )}
                   </label>
                   <label>
                     <span className="sx-lbl">{copy.details.company}</span>
@@ -401,6 +407,10 @@ export function HoursCheckout({
                     </p>
                   )}
                 </div>
+
+                <p className="mt-3 text-[13.5px] leading-[1.6] text-[var(--ink-500)]">
+                  {copy.pay.afterPay}
+                </p>
 
                 {!agree && (
                   <p className="mt-3 text-[13.5px] text-[var(--ink-500)]">

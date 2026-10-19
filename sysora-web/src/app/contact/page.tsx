@@ -12,9 +12,14 @@ export const metadata: Metadata = {
   description: contact.meta.description,
   alternates: { canonical: "/contact" },
   openGraph: {
-    title: `${contact.meta.title} — Sysora Stack`,
+    title: `${contact.meta.title} | Sysora Stack`,
     description: contact.meta.description,
     url: "/contact",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${contact.meta.title} | Sysora Stack`,
+    description: contact.meta.description,
   },
 };
 

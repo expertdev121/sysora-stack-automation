@@ -18,6 +18,7 @@ const ITEMS: NavItem[] = [
   { href: "/portal/billing", label: "Payment and plan" },
   { href: "/portal/build-requests", label: "Build requests" },
   { href: "/portal/support", label: "Support" },
+  { href: "/portal/password", label: "Password" },
 ];
 
 export function PortalNav({ openTickets }: { openTickets: number }) {

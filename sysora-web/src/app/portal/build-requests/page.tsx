@@ -33,7 +33,8 @@ export default async function BuildRequestsPage() {
       purchased={chrome.purchased}
       userName={session.fullName}
       userEmail={session.email}
-      company={chrome.company}>
+      company={chrome.company}
+      mustChangePassword={chrome.mustChangePassword}>
       <p className="max-w-[640px] text-[14.5px] leading-[1.7] text-[var(--text-muted)]">
         For work too big to guess at in hours. Send the scope and we come back with a written time
         estimate and a milestone plan — free, and before anything is billed.

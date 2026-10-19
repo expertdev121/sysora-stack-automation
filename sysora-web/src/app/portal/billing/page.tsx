@@ -40,7 +40,8 @@ export default async function BillingPage() {
       purchased={chrome.purchased}
       userName={session.fullName}
       userEmail={session.email}
-      company={chrome.company}>
+      company={chrome.company}
+      mustChangePassword={chrome.mustChangePassword}>
       <div className="grid grid-cols-2 gap-6 to-980:grid-cols-1">
         <section className="rounded-[18px] border border-[var(--line-mint)] bg-white p-6">
           <h2 className="text-[15px] font-bold text-[var(--ink-900)]">Payment method</h2>

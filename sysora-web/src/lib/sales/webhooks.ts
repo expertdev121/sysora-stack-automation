@@ -19,7 +19,11 @@ import { salesDb } from "@/lib/supabase/admin";
 
 const TIMEOUT_MS = 10_000;
 
-export const WEBHOOK_KEYS = ["abandoned_cart", "payment_confirmation"] as const;
+export const WEBHOOK_KEYS = [
+  "abandoned_cart",
+  "payment_confirmation",
+  "hours_topped_up",
+] as const;
 export type WebhookKey = (typeof WEBHOOK_KEYS)[number];
 
 /** Only the cart hook ever had an environment variable. */

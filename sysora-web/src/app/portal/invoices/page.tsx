@@ -30,7 +30,8 @@ export default async function InvoicesPage() {
       purchased={chrome.purchased}
       userName={session.fullName}
       userEmail={session.email}
-      company={chrome.company}>
+      company={chrome.company}
+      mustChangePassword={chrome.mustChangePassword}>
       <section className="overflow-hidden rounded-[18px] border border-[var(--line-mint)] bg-white">
         <table className="w-full border-collapse text-left text-[14px]">
           <thead>

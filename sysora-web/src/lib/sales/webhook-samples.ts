@@ -43,7 +43,11 @@ export function sampleAbandonedCart(email: string, name: string | null) {
   });
 }
 
-export function samplePaymentConfirmation(email: string, name: string | null) {
+export function samplePaymentConfirmation(
+  email: string,
+  name: string | null,
+  created = true,
+) {
   const now = new Date();
   return paymentConfirmationPayload({
     reference: "SYS-TEST01",
@@ -63,11 +67,15 @@ export function samplePaymentConfirmation(email: string, name: string | null) {
     cardBrand: "Visa",
     cardLast4: "4242",
     receiptUrl: "https://pay.stripe.com/receipts/test",
+    // A throwaway code, so a test never prints a password that works.
+    portalPassword: created ? "000000" : null,
+    accountCreated: created,
   });
 }
 
 export function sampleFor(key: WebhookKey, email: string, name: string | null) {
-  return key === "abandoned_cart"
-    ? sampleAbandonedCart(email, name)
-    : samplePaymentConfirmation(email, name);
+  if (key === "abandoned_cart") return sampleAbandonedCart(email, name);
+  // The repeat-purchase hook is the same payload with no password, which
+  // is exactly the difference a workflow has to handle.
+  return samplePaymentConfirmation(email, name, key === "payment_confirmation");
 }

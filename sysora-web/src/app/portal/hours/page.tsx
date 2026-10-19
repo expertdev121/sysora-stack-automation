@@ -41,7 +41,8 @@ export default async function HoursPage() {
       purchased={chrome.purchased}
       userName={session.fullName}
       userEmail={session.email}
-      company={chrome.company}>
+      company={chrome.company}
+      mustChangePassword={chrome.mustChangePassword}>
       <div className="grid grid-cols-4 gap-4 to-860:grid-cols-2">
         {[
           ["Purchased", hrs(balance.purchased)],

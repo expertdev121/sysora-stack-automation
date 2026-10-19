@@ -27,6 +27,7 @@ export function PortalShell({
   userName,
   userEmail,
   company,
+  mustChangePassword = false,
   children,
 }: {
   eyebrow: string;
@@ -37,6 +38,7 @@ export function PortalShell({
   userName?: string | null;
   userEmail?: string;
   company?: string | null;
+  mustChangePassword?: boolean;
   children: React.ReactNode;
 }) {
   const showHours = typeof remaining === "number";
@@ -123,6 +125,23 @@ export function PortalShell({
           <h1 className="mt-2 font-display text-[clamp(26px,3.2vw,34px)] font-black tracking-[-0.8px] text-[var(--ink-900)]">
             {title}
           </h1>
+          {/* The checkout code is six digits and was emailed in clear
+              text, so the portal says so until it has been replaced. */}
+          {mustChangePassword && (
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-[14px] border-[1.5px] border-[#FFE0B2] bg-[#FFF8EE] px-5 py-4">
+              <p className="m-0 text-[13.5px] leading-[1.6] text-[#8A4B08]">
+                You are still using the six-digit code we emailed you. Replace it with a password
+                only you know.
+              </p>
+              <Link
+                href="/portal/password"
+                className="flex-none rounded-[10px] bg-[#C2410C] px-4 py-2 text-[13px] font-semibold text-white"
+              >
+                Change password
+              </Link>
+            </div>
+          )}
+
           <div className="mt-7">{children}</div>
         </div>
       </main>

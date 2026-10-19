@@ -40,7 +40,8 @@ export default async function PlansPage() {
       purchased={chrome.purchased}
       userName={session.fullName}
       userEmail={session.email}
-      company={chrome.company}>
+      company={chrome.company}
+      mustChangePassword={chrome.mustChangePassword}>
       <p className="max-w-[640px] text-[14.5px] leading-[1.7] text-[var(--text-muted)]">
         Same seven packages as the public rate card, billed to the details already on your
         account. Move up or down whenever you like — each order is priced at the tier you pick,

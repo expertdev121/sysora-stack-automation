@@ -107,6 +107,7 @@ export default async function PortalOverview() {
       userName={session.fullName}
       userEmail={session.email}
       company={chrome.company}
+      mustChangePassword={chrome.mustChangePassword}
     >
       <div className="flex flex-col gap-5">
         <section className="grid grid-cols-[150px_1fr] items-center gap-9 rounded-[18px] border border-[var(--line-mint)] bg-white p-[30px] to-860:grid-cols-1 to-860:justify-items-center to-860:gap-6">

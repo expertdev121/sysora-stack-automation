@@ -26,7 +26,8 @@ export default async function SupportPage() {
       purchased={chrome.purchased}
       userName={session.fullName}
       userEmail={session.email}
-      company={chrome.company}>
+      company={chrome.company}
+      mustChangePassword={chrome.mustChangePassword}>
       <p className="max-w-[640px] text-[14.5px] leading-[1.7] text-[var(--text-muted)]">
         A real person receives, reads and routes every ticket, at any hour. Triage is included;
         the technical work that follows comes out of your hours.

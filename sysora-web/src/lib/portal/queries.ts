@@ -76,9 +76,11 @@ export async function getChrome(customerId: string): Promise<{
   purchased: number;
   company: string | null;
   openTickets: number;
+  /** Still on the six-digit code we emailed at checkout. */
+  mustChangePassword: boolean;
 }> {
   const db = salesDb();
-  const [balance, customer, tickets] = await Promise.all([
+  const [balance, customer, tickets, account] = await Promise.all([
     getBalance(customerId),
     db.from("customers").select("company_name").eq("id", customerId).maybeSingle(),
     db
@@ -86,6 +88,7 @@ export async function getChrome(customerId: string): Promise<{
       .select("id")
       .eq("customer_id", customerId)
       .neq("status", "resolved"),
+    db.from("users").select("must_change_password").eq("customer_id", customerId).maybeSingle(),
   ]);
 
   return {
@@ -93,6 +96,7 @@ export async function getChrome(customerId: string): Promise<{
     purchased: balance.purchased,
     company: customer.data?.company_name ?? null,
     openTickets: (tickets.data ?? []).length,
+    mustChangePassword: Boolean(account.data?.must_change_password),
   };
 }
 

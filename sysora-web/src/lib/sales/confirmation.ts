@@ -2,6 +2,7 @@ import "server-only";
 
 import { siteUrl } from "@/lib/site-url";
 import { salesDb } from "@/lib/supabase/admin";
+import { provisionPortalAccount } from "@/lib/sales/provisioning";
 import { sendWebhook } from "@/lib/sales/webhooks";
 
 /**
@@ -37,6 +38,9 @@ export type PaidOrder = {
   cardBrand: string | null;
   cardLast4: string | null;
   receiptUrl: string | null;
+  /** Present only on the order that created the account. */
+  portalPassword: string | null;
+  accountCreated: boolean;
 };
 
 function splitName(fullName: string | null): { first: string; last: string } {
@@ -84,6 +88,14 @@ export function paymentConfirmationPayload(order: PaidOrder) {
     // When it runs out, so the email can say so.
     hours_expire_at: order.expiresAt ?? "",
 
+    // The portal login. `portal_password` is filled on the order that
+    // created the account and empty on every one after it, so a workflow
+    // can branch on account_created rather than parsing the password.
+    account_created: order.accountCreated,
+    portal_email: order.email,
+    portal_password: order.portalPassword ?? "",
+    portal_login_url: `${siteUrl()}/portal/login`,
+
     paid_at: order.paidAt,
     portal_url: `${siteUrl()}/portal`,
     order_url: `${siteUrl()}/checkout/${order.reference}/complete`,
@@ -106,7 +118,7 @@ export async function sendPaymentConfirmation(requestId: string): Promise<boolea
     .eq("status", "paid")
     .is("confirmation_notified_at", null)
     .select(
-      "id, reference, paid_at, amount, currency, title, metadata, " +
+      "id, reference, paid_at, amount, currency, title, metadata, customer_id, " +
         "customers!inner(email, full_name, phone, company_name, timezone)",
     )
     .maybeSingle();
@@ -116,6 +128,7 @@ export async function sendPaymentConfirmation(requestId: string): Promise<boolea
   const row = claimed as unknown as {
     id: string;
     reference: string;
+    customer_id: string;
     paid_at: string | null;
     amount: number;
     currency: string;
@@ -147,8 +160,15 @@ export async function sendPaymentConfirmation(requestId: string): Promise<boolea
     .limit(1)
     .maybeSingle();
 
+  // Create the portal account before the send, so the password it
+  // returns can travel in the same payload. A customer who already has
+  // an account gets no new password and the repeat-purchase hook, which
+  // is a different email in GoHighLevel.
+  const account = await provisionPortalAccount(row.customer_id);
+  const hook = account.created ? "payment_confirmation" : "hours_topped_up";
+
   const outcome = await sendWebhook(
-    "payment_confirmation",
+    hook,
     paymentConfirmationPayload({
       reference: row.reference,
       paidAt: row.paid_at ?? new Date().toISOString(),
@@ -167,6 +187,8 @@ export async function sendPaymentConfirmation(requestId: string): Promise<boolea
       cardBrand: payment?.card_brand ?? null,
       cardLast4: payment?.card_last4 ?? null,
       receiptUrl: payment?.receipt_url ?? null,
+      portalPassword: account.created ? account.password : null,
+      accountCreated: account.created,
     }),
   );
 
@@ -180,7 +202,7 @@ export async function sendPaymentConfirmation(requestId: string): Promise<boolea
       .eq("id", row.id);
 
     console.error(
-      `[payment-confirmation] ${row.reference} failed`,
+      `[${hook}] ${row.reference} failed`,
       outcome.status ?? "no status",
       outcome.detail,
     );

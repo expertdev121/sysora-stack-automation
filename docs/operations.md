@@ -150,7 +150,58 @@ each produced a failure.
 
 ## Deployment
 
-Push to `main`, Vercel builds and promotes to production. Migrations are
-applied to Supabase separately and committed to `supabase/migrations/`
-with a matching filename, so the directory is the history even though it
-is not the mechanism.
+Today: push to `main`, Vercel builds and promotes to production. CI runs
+the same checks in parallel but **does not block the deploy yet**.
+
+Migrations are applied to Supabase separately and committed to
+`supabase/migrations/` with a matching filename, so the directory is the
+history even though it is not the mechanism.
+
+### Turning on the gate
+
+`.github/workflows/deploy.yml` already runs the checks on every push to
+`main` and has a deploy job behind them. That job is switched off, so
+there is never a window where neither Vercel nor Actions is deploying.
+Three settings and one commit turn it on.
+
+1. **Create a Vercel token.** Vercel, Account Settings, Tokens. Scope it
+   to the team that owns the project.
+2. **Add three repository secrets** at GitHub, Settings, Secrets and
+   variables, Actions:
+
+   | Secret | Value |
+   | --- | --- |
+   | `VERCEL_TOKEN` | the token from step 1 |
+   | `VERCEL_ORG_ID` | `team_OeiME6VcOi2sMXmVuu5tRI71` |
+   | `VERCEL_PROJECT_ID` | `prj_I3PzPZ7ajkQDpuKt0HbbUIlHS5dw` |
+
+3. **Add a repository variable** on the same page, Variables tab:
+   `DEPLOY_VIA_ACTIONS` = `true`. This is what un-skips the deploy job.
+4. **Stop Vercel deploying on its own**, or every push deploys twice.
+   Add `vercel.json` at the repository root:
+
+   ```json
+   { "git": { "deploymentEnabled": { "main": false } } }
+   ```
+
+Do step 4 last. Between steps 3 and 4 both deploy, which is wasteful but
+harmless. Doing 4 first stops deploys entirely until the rest is done.
+
+To undo any of it, delete `vercel.json` and Vercel resumes.
+
+### After it is on
+
+A push to `main` runs typecheck, lint, tests and build. If any fail, the
+deploy job never starts and production keeps running the previous
+version. If they pass, Actions pulls the Vercel project's own
+environment, builds, deploys, then checks the homepage answers 200.
+
+Secrets stay where they are. `vercel pull` fetches the project's
+environment variables at deploy time, so the Supabase and Stripe keys
+never pass through GitHub. The only new credential is the Vercel token.
+
+### Known warning
+
+The runner reports that `actions/checkout@v4` and `actions/setup-node@v4`
+target Node 20, which is deprecated, and runs them on Node 24 anyway.
+Runs succeed. Bump both to `@v5` when convenient.

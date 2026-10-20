@@ -63,6 +63,14 @@ console. Query it directly until someone builds the page.
 exist in the design project with no implementation. `Sysora Blog.dc.html`
 is designed and also unbuilt; blogs were explicitly deferred.
 
+### The deploy gate is built but switched off
+A push to `main` runs typecheck, lint, 65 tests and a build in GitHub
+Actions, and `deploy.yml` has a deploy job behind them. The job is gated
+on a repository variable that does not exist yet, so Vercel is still the
+thing that deploys. Three settings and one commit finish it, written up
+in [operations.md](operations.md#turning-on-the-gate). Until then CI
+tells you a commit is bad, it does not stop it.
+
 ## v2, planned
 
 - Flip Stripe to live keys and set `STRIPE_WEBHOOK_SECRET`.

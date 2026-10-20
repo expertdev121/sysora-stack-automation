@@ -97,7 +97,44 @@ scrypt parameters and the stored format cannot drift, then update
 
 ## Verifying a change
 
-There is no test suite. What has worked:
+```bash
+npm run verify     # typecheck, lint, test, build. All four must pass.
+npm run test       # just the tests
+npm run test:watch # while working
+```
+
+GitHub Actions runs exactly `verify` on every push and every pull
+request, in `.github/workflows/ci.yml`. A red run means the commit is
+not fit to go live.
+
+### What the tests cover
+
+They are in `sysora-web/tests/` and run in about a second, with no
+database and no secrets.
+
+- **content-rules** enforces the house style on `src/content`: no
+  em-dashes, no semicolons in prose, no banned words. Client quotations
+  are detected by their surrounding quote marks and exempted.
+- **offer** checks the pack table prices itself correctly, that rates
+  only fall as packs grow, that the FAQ has no empty or duplicate
+  entries, and that the **24-hour cancellation notice appears in all
+  four places that describe cancelling**. Those four contradicted each
+  other once.
+- **routes** builds the route list from the app directory and asserts
+  every internal `href` in `src` resolves to one, that checkout links
+  use only the published shape, and that nothing links to a deleted
+  page. Migrations must carry a timestamp prefix.
+- **webhooks** pins the payload field lists for both hooks, asserts the
+  payloads stay flat because GoHighLevel will not read nested objects,
+  checks the password is sent only on the order that creates the
+  account, and covers the URL validator including the loopback,
+  link-local and metadata hosts it has to refuse.
+
+The suite was mutation-checked when written: breaking the cancellation
+copy, adding an em-dash, linking a deleted page and mis-pricing a pack
+each produced a failure.
+
+### Still true, and not covered by tests
 
 - `npx tsc --noEmit` then `npm run build` before every push.
 - **Measure, do not eyeball.** When matching a design, compare computed

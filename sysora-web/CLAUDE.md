@@ -34,6 +34,13 @@ Supabase Postgres, Stripe, and GoHighLevel for every email.
 
 ## Before you push
 
-`npx tsc --noEmit` and `npm run build`. There is no test suite, so
-measure rather than eyeball: computed styles for design work, rendered
-HTML for copy sweeps, SQL for anything concurrent.
+```bash
+npm run verify
+```
+
+Typecheck, lint, test, build. GitHub Actions runs the same command on
+every push, and a red run means the commit is not fit to go live.
+
+For what the tests do not cover, measure rather than eyeball: computed
+styles for design work, rendered HTML for copy sweeps, SQL for anything
+concurrent.

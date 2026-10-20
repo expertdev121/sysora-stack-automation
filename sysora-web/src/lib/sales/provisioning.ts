@@ -20,9 +20,16 @@ import { salesDb } from "@/lib/supabase/admin";
  * real one on arrival.
  */
 
+/**
+ * `existing_client` is the ordinary repeat purchase. `email_in_use`
+ * means the address already belongs to somebody who is not this
+ * customer, a staff login most often, so no portal account can be made
+ * for them. They are still a paying customer and still need telling,
+ * which is a different outcome and routes differently.
+ */
 export type Provisioned =
-  | { created: true; email: string; password: string }
-  | { created: false; email: string | null };
+  | { created: true; reason: "created"; email: string; password: string }
+  | { created: false; reason: "existing_client" | "email_in_use" | "no_email"; email: string | null };
 
 /** 100000-999999, from the CSPRNG rather than Math.random. */
 function sixDigitPassword(): string {
@@ -38,7 +45,7 @@ export async function provisionPortalAccount(customerId: string): Promise<Provis
     .eq("id", customerId)
     .maybeSingle();
 
-  if (!customer?.email) return { created: false, email: null };
+  if (!customer?.email) return { created: false, reason: "no_email", email: null };
 
   const email = customer.email.trim();
   const normalized = email.toLowerCase();
@@ -56,7 +63,16 @@ export async function provisionPortalAccount(customerId: string): Promise<Provis
     db.from("users").select("id").eq("email_normalized", normalized).maybeSingle(),
   ]);
 
-  if (byCustomer.data || byEmail.data) return { created: false, email };
+  if (byCustomer.data) return { created: false, reason: "existing_client", email };
+  if (byEmail.data) {
+    // Not this customer's account. Nothing here is safe to overwrite:
+    // the row may be a staff login, and giving it a customer_id would
+    // hand a staff session a client portal.
+    console.error(
+      `[provisionPortalAccount] ${email} already belongs to another account, no portal account created`,
+    );
+    return { created: false, reason: "email_in_use", email };
+  }
 
   const password = sixDigitPassword();
   const passwordHash = await hashPassword(password);
@@ -75,10 +91,10 @@ export async function provisionPortalAccount(customerId: string): Promise<Provis
   if (error) {
     // 23505 means somebody else inserted between the check and here,
     // which is the same outcome as the account already existing.
-    if (error.code === "23505") return { created: false, email };
+    if (error.code === "23505") return { created: false, reason: "email_in_use", email };
     console.error("[provisionPortalAccount] could not create account", error.code, error.message);
-    return { created: false, email };
+    return { created: false, reason: "email_in_use", email };
   }
 
-  return { created: true, email, password };
+  return { created: true, reason: "created", email, password };
 }

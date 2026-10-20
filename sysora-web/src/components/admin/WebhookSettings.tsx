@@ -80,6 +80,20 @@ function WebhookCard({ hook }: { hook: WebhookRow }) {
           {status.text}
         </p>
 
+        {/* Sends that arrived while no URL was saved. Without this the
+            only trace was a server log, and a lost confirmation email
+            looked identical to one that was never triggered. */}
+        {hook.missedCount > 0 && (
+          <p className="m-0 rounded-[10px] bg-[#FFF8EE] px-3 py-2 text-[12.5px] leading-[1.55] text-[#8A4B08]">
+            <strong>
+              {hook.missedCount} {hook.missedCount === 1 ? "send has" : "sends have"} had nowhere to
+              go.
+            </strong>{" "}
+            {hook.lastMissedDetail ? `Most recent: ${hook.lastMissedDetail}.` : null} Saving a URL
+            here stops it happening again, but it does not resend what was already missed.
+          </p>
+        )}
+
         <label className={labelClass} htmlFor={`hook-${hook.key}`}>
           GoHighLevel inbound webhook URL
         </label>

@@ -165,7 +165,14 @@ export async function sendPaymentConfirmation(requestId: string): Promise<boolea
   // an account gets no new password and the repeat-purchase hook, which
   // is a different email in GoHighLevel.
   const account = await provisionPortalAccount(row.customer_id);
-  const hook = account.created ? "payment_confirmation" : "hours_topped_up";
+
+  // Only a client who already had a portal account is a repeat purchase.
+  // Everything else is somebody's first order and gets the welcome,
+  // with the password left empty when no account could be made for
+  // them. Routing an anomaly to the top-up email would tell a new
+  // customer their hours had been topped up.
+  const hook =
+    account.reason === "existing_client" ? "hours_topped_up" : "payment_confirmation";
 
   const outcome = await sendWebhook(
     hook,
@@ -190,6 +197,7 @@ export async function sendPaymentConfirmation(requestId: string): Promise<boolea
       portalPassword: account.created ? account.password : null,
       accountCreated: account.created,
     }),
+    row.reference,
   );
 
   if (!outcome.ok) {

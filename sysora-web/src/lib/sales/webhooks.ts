@@ -45,6 +45,10 @@ export type WebhookRow = {
   lastTestOk: boolean | null;
   /** True when no URL is saved but the environment still supplies one. */
   fromEnv: boolean;
+  /** Sends that had nowhere to go, because no URL was configured. */
+  missedCount: number;
+  lastMissedAt: string | null;
+  lastMissedDetail: string | null;
 };
 
 /**
@@ -99,7 +103,7 @@ export async function getWebhookUrl(key: WebhookKey): Promise<string | null> {
 export async function listWebhooks(): Promise<WebhookRow[]> {
   const { data } = await salesDb()
     .from("webhooks")
-    .select("key, label, description, url, last_tested_at, last_test_status, last_test_ok")
+    .select("key, label, description, url, last_tested_at, last_test_status, last_test_ok, missed_count, last_missed_at, last_missed_detail")
     .order("key");
 
   return (data ?? []).map((row) => {
@@ -113,6 +117,9 @@ export async function listWebhooks(): Promise<WebhookRow[]> {
       lastTestStatus: row.last_test_status as number | null,
       lastTestOk: row.last_test_ok as boolean | null,
       fromEnv: !saved && Boolean(ENV_FALLBACK[row.key as WebhookKey]?.trim()),
+      missedCount: (row.missed_count as number | null) ?? 0,
+      lastMissedAt: row.last_missed_at as string | null,
+      lastMissedDetail: row.last_missed_detail as string | null,
     };
   });
 }
@@ -157,8 +164,44 @@ export async function postWebhook(url: string, payload: unknown): Promise<Webhoo
 }
 
 /** Sends to a hook if it is configured. */
-export async function sendWebhook(key: WebhookKey, payload: unknown): Promise<WebhookOutcome> {
+/**
+ * Sends to a hook if it is configured, and records it when one is not.
+ *
+ * A send with nowhere to go used to leave a console line and nothing
+ * else, so the notification vanished and the only way to find out was
+ * to query the database. The counter is surfaced on the settings page,
+ * where somebody is already looking at the hook that is missing a URL.
+ *
+ * `label` is a human reference for the thing that was being announced,
+ * an order reference in practice, and is recorded rather than the
+ * payload, which carries a password on the first order.
+ */
+export async function sendWebhook(
+  key: WebhookKey,
+  payload: unknown,
+  label?: string,
+): Promise<WebhookOutcome> {
   const url = await getWebhookUrl(key);
-  if (!url) return { ok: false, status: null, detail: `No URL configured for ${key}` };
+
+  if (!url) {
+    const detail = label ? `${label} had nowhere to go` : "a send had nowhere to go";
+    await recordMiss(key, detail);
+    return { ok: false, status: null, detail: `No URL configured for ${key}` };
+  }
+
   return postWebhook(url, payload);
+}
+
+async function recordMiss(key: WebhookKey, detail: string): Promise<void> {
+  const db = salesDb();
+  const { data } = await db.from("webhooks").select("missed_count").eq("key", key).maybeSingle();
+
+  await db
+    .from("webhooks")
+    .update({
+      missed_count: ((data?.missed_count as number | null) ?? 0) + 1,
+      last_missed_at: new Date().toISOString(),
+      last_missed_detail: detail,
+    })
+    .eq("key", key);
 }

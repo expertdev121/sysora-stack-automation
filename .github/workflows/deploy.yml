@@ -1,0 +1,85 @@
+name: Deploy to production
+
+# The gate. Vercel's own git auto-deploy is turned off in vercel.json,
+# so production only changes when this workflow finishes, and it only
+# reaches the deploy step if typecheck, lint, tests and build all pass.
+#
+# The `if` on the deploy job is the safety catch. Until the repository
+# variable DEPLOY_VIA_ACTIONS is "true", this workflow verifies and
+# stops, and Vercel keeps deploying as before. Nothing is ever in a
+# state where neither side is deploying.
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Typecheck, lint, test, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sysora-web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: sysora-web/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://www.sysorastack.com
+
+  deploy:
+    name: Deploy
+    needs: verify
+    if: vars.DEPLOY_VIA_ACTIONS == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://www.sysorastack.com
+    defaults:
+      run:
+        working-directory: sysora-web
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Vercel builds from its own environment variables, which is why
+      # none of the Supabase or Stripe keys appear here. They stay in
+      # the Vercel project and never pass through GitHub.
+      - name: Pull Vercel environment
+        run: npx vercel@latest pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build
+        run: npx vercel@latest build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy
+        run: npx vercel@latest deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      # A deploy that returns 200 on the homepage is the minimum bar. If
+      # this fails the deploy has already happened, so it is an alarm
+      # rather than a gate, but a loud one.
+      - name: Smoke test
+        run: |
+          for attempt in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' https://www.sysorastack.com/)
+            echo "attempt $attempt: $code"
+            [ "$code" = "200" ] && exit 0
+            sleep 10
+          done
+          echo "homepage did not return 200 after deploy"
+          exit 1

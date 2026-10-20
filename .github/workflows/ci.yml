@@ -1,11 +1,11 @@
 name: CI
 
-# Runs on every push and every pull request. This is the gate: if it is
-# red, the commit is not fit to go live. docs/operations.md explains how
-# it relates to deployment.
+# Every branch except main, and every pull request. Pushes to main are
+# covered by deploy.yml, which runs the same checks and then ships, so
+# running both there would just do the work twice.
 on:
   push:
-    branches: ["**"]
+    branches-ignore: [main]
   pull_request:
     branches: [main]
 

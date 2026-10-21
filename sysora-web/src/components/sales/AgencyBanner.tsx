@@ -22,17 +22,23 @@ export function AgencyBanner() {
     <div className="border-b-[1.5px] border-[var(--border-faint)] bg-[#F0FAF6]">
       <Link
         href={agencyBanner.href}
-        className="group mx-auto flex h-10 max-w-[1160px] items-center justify-center gap-[10px] px-6 text-[13px] leading-none"
+        className="group mx-auto flex min-h-10 max-w-[1160px] flex-wrap items-center justify-center gap-x-[10px] gap-y-[2px] px-6 py-[9px] text-center text-[13px] leading-[1.4]"
       >
         <span className="flex-none rounded-full bg-white px-[9px] py-[3px] text-[10px] font-bold uppercase tracking-[1.2px] text-[var(--accent-strong)] ring-[1.5px] ring-[var(--border-default)]">
           {agencyBanner.badge}
         </span>
 
-        <span className="font-semibold text-[var(--ink-900)]">{agencyBanner.short}</span>
+        {/* nowrap on each phrase: the bar may wrap between them on a
+            narrow screen, but never through the middle of one. */}
+        <span className="whitespace-nowrap font-semibold text-[var(--ink-900)]">
+          {agencyBanner.short}
+        </span>
 
-        <span className="truncate text-[var(--ink-500)] to-860:hidden">{agencyBanner.body}</span>
+        <span className="whitespace-nowrap text-[var(--ink-500)] to-860:hidden">
+          {agencyBanner.body}
+        </span>
 
-        <span className="flex-none items-center gap-1 font-semibold text-[var(--accent-strong)] group-hover:underline underline-offset-[3px] inline-flex">
+        <span className="inline-flex flex-none items-center gap-1 whitespace-nowrap font-semibold text-[var(--accent-strong)] underline-offset-[3px] group-hover:underline">
           {agencyBanner.cta}
           <span aria-hidden="true" className="transition-transform duration-150 group-hover:translate-x-[2px]">
             →

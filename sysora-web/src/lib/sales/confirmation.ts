@@ -81,12 +81,23 @@ export function paymentConfirmationPayload(order: PaidOrder) {
     rate_per_hour_formatted: rate != null ? `$${rate.toFixed(2)}` : "",
 
     // How they paid, for the receipt line in the email.
-    card_brand: order.cardBrand ?? "",
+    card_brand: order.cardBrand
+      ? order.cardBrand.charAt(0).toUpperCase() + order.cardBrand.slice(1)
+      : "",
     card_last4: order.cardLast4 ?? "",
     receipt_url: order.receiptUrl ?? "",
 
-    // When it runs out, so the email can say so.
+    // When it runs out, so the email can say so. The ISO value is for
+    // anything that needs to compute with it; the formatted one is what
+    // an email template should print.
     hours_expire_at: order.expiresAt ?? "",
+    hours_expire_at_formatted: order.expiresAt
+      ? new Date(order.expiresAt).toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      : "",
 
     // The portal login. `portal_password` is filled on the order that
     // created the account and empty on every one after it, so a workflow

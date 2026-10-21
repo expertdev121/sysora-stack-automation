@@ -77,9 +77,12 @@ export async function provisionPortalAccount(customerId: string): Promise<Provis
   const password = sixDigitPassword();
   const passwordHash = await hashPassword(password);
 
+  // email_normalized is GENERATED ALWAYS AS lower(trim(email)). Postgres
+  // computes it and rejects an insert that supplies one, which is what
+  // silently broke every provisioning attempt until it was found in the
+  // runtime log. Read it, never write it.
   const { error } = await db.from("users").insert({
     email,
-    email_normalized: normalized,
     password_hash: passwordHash,
     full_name: customer.full_name,
     role: "client",

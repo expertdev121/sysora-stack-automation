@@ -64,7 +64,8 @@ describe("payload contract", () => {
     "company_name", "timezone", "reference", "package", "hours", "billing",
     "currency", "amount", "amount_formatted", "amount_cents", "rate_per_hour",
     "rate_per_hour_formatted", "card_brand", "card_last4", "receipt_url",
-    "hours_expire_at", "account_created", "portal_email", "portal_password",
+    "hours_expire_at", "hours_expire_at_formatted", "account_created",
+    "portal_email", "portal_password",
     "portal_login_url", "paid_at", "portal_url", "order_url",
   ];
 

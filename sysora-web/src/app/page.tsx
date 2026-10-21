@@ -58,10 +58,10 @@ export default function Home() {
       >
         <ScrollReveal rootId="page" />
         <HomeStructuredData />
+        <AgencyBanner />
         <SalesHeader />
 
         <SalesHero />
-        <AgencyBanner />
         <Reviews />
         <Packages />
         <Safeguards />

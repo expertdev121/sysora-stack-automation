@@ -756,16 +756,21 @@ export const checkout = {
  * size", and this is the way out for someone who cannot.
  */
 /**
- * The strip under the hero pointing at /on-demand-ghl-team.
+ * The announcement bar above the header.
  *
- * The em-dash in the supplied copy is a comma here. House rules ban
- * em-dashes in anything a customer reads, and the content test fails
- * the build on one, so it could not have shipped as written.
+ * It sits above a sticky header on the busiest page on the site, so it
+ * is one line and scrolls away. `short` is what survives on a phone,
+ * where the full sentence would wrap the bar to three lines and stop
+ * being a bar.
+ *
+ * The em-dash in the supplied copy is a comma. House rules ban them in
+ * anything a customer reads, and the content test fails the build on
+ * one, so it could not have shipped as written.
  */
 export const agencyBanner = {
-  badge: "New, for GHL agencies",
-  title: "Running a GHL agency? Meet your on-demand technical team.",
-  body: "Funnels, workflows, integrations, and white-label technical support, starting at $95 for 5 hours.",
+  badge: "New",
+  short: "Running a GHL agency?",
+  body: "White-label funnels, workflows and integrations, from $95 for 5 hours.",
   cta: "Explore agency support",
   href: "/on-demand-ghl-team",
 } as const;

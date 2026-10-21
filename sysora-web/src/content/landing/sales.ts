@@ -756,6 +756,21 @@ export const checkout = {
  * size", and this is the way out for someone who cannot.
  */
 /**
+ * The strip under the hero pointing at /on-demand-ghl-team.
+ *
+ * The em-dash in the supplied copy is a comma here. House rules ban
+ * em-dashes in anything a customer reads, and the content test fails
+ * the build on one, so it could not have shipped as written.
+ */
+export const agencyBanner = {
+  badge: "New, for GHL agencies",
+  title: "Running a GHL agency? Meet your on-demand technical team.",
+  body: "Funnels, workflows, integrations, and white-label technical support, starting at $95 for 5 hours.",
+  cta: "Explore agency support",
+  href: "/on-demand-ghl-team",
+} as const;
+
+/**
  * The client-portal section, between the delivery timeline and the
  * eight-hour walkthrough.
  *

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { ScrollReveal } from "@/components/layout/ScrollReveal";
 import { HomeStructuredData } from "@/components/seo/StructuredData";
+import { AgencyBanner } from "@/components/sales/AgencyBanner";
 import { Audiences } from "@/components/sales/Audiences";
 import { BookCall } from "@/components/sales/BookCall";
 import { Calculator } from "@/components/sales/Calculator";
@@ -60,6 +61,7 @@ export default function Home() {
         <SalesHeader />
 
         <SalesHero />
+        <AgencyBanner />
         <Reviews />
         <Packages />
         <Safeguards />

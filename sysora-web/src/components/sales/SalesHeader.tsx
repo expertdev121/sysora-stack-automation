@@ -32,10 +32,16 @@ function resolve(href: string, anchorBase: string): string {
 export function SalesHeader({
   anchorBase = "",
   items = nav,
+  ctaLabel = "Choose Your Hours",
+  ctaHref,
 }: {
   anchorBase?: string;
   items?: readonly NavItem[];
+  /** The landing pages sell the same hours under a different framing. */
+  ctaLabel?: string;
+  ctaHref?: string;
 }) {
+  const cta = ctaHref ?? `${anchorBase}#packages`;
   const [stuck, setStuck] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -89,8 +95,8 @@ export function SalesHeader({
           >
             Book a call
           </Link>
-          <Button size="sm" arrow href={`${anchorBase}#packages`} className="to-520:hidden">
-            Choose Your Hours
+          <Button size="sm" arrow href={cta} className="to-520:hidden">
+            {ctaLabel}
           </Button>
           <button
             type="button"
@@ -147,11 +153,11 @@ export function SalesHeader({
               size="md"
               arrow
               fullWidth
-              href={`${anchorBase}#packages`}
+              href={cta}
               className="mt-3"
               onClick={() => setOpen(false)}
             >
-              Choose Your Hours
+              {ctaLabel}
             </Button>
           </nav>
         </div>

@@ -11,6 +11,7 @@ import { formatMoney } from "@/lib/money";
 import { reconcilePayment } from "@/lib/sales/payments";
 import { getPublicSettings, getRequestByReference, getSurveyForOffer } from "@/lib/sales/queries";
 import { isDatabaseConfigured } from "@/lib/supabase/admin";
+import { paid as paidCopy } from "@/content/landing/sales";
 import { routes } from "@/config/site";
 
 export const metadata: Metadata = {
@@ -82,29 +83,51 @@ export default async function CheckoutCompletePage({
     >
       <div className="mb-8 px-6 py-5 rounded-[14px] bg-[var(--mint-50)] border-[1.5px] border-[var(--border-default)]">
         <p className="m-0 text-[15px] leading-[1.75] text-[var(--ink-600)]">
-          A receipt is on its way to{" "}
-          <span className="font-semibold text-[var(--ink-800)]">{request.customer.email}</span>.
-          Keep your reference{" "}
+          {paidCopy.noticeLead}{" "}
+          <span className="font-semibold text-[var(--ink-800)]">{request.customer.email}</span>.{" "}
+          {paidCopy.noticePassword} {paidCopy.noticeReference}{" "}
           <span className="font-mono font-semibold text-[var(--ink-800)]">{request.reference}</span>{" "}
-          for any follow-up.
+          {paidCopy.noticeReferenceTail}
         </p>
       </div>
 
       {survey ? (
         <SurveyForm survey={survey} action={action} />
       ) : (
-        <div className="flex flex-col gap-6">
-          <p className="m-0 text-[17px] leading-[1.75] text-[var(--ink-500)]">
-            That&apos;s everything we need for now. We&apos;ll be in touch shortly.
-          </p>
+        <div className="flex flex-col gap-7">
+          <h2 className="m-0 text-[20px] font-bold text-[var(--ink-900)]">
+            {paidCopy.stepsTitle}
+          </h2>
+
+          <ol className="m-0 flex list-none flex-col gap-4 p-0">
+            {paidCopy.steps.map((step) => (
+              <li
+                key={step.n}
+                className="flex gap-4 rounded-[14px] border-[1.5px] border-[var(--border-faint)] bg-[var(--surface-0)] px-5 py-[18px]"
+              >
+                <span className="grid h-8 w-8 flex-none place-items-center rounded-full bg-[var(--mint-50)] text-[14px] font-bold text-[var(--accent-strong)]">
+                  {step.n}
+                </span>
+                <span>
+                  <span className="block text-[16px] font-bold text-[var(--ink-900)]">
+                    {step.title}
+                  </span>
+                  <span className="mt-[6px] block text-[15px] leading-[1.7] text-[var(--ink-600)]">
+                    {step.body}
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ol>
+
           <div className="flex flex-wrap gap-3">
-            {calendarUrl && (
-              <Button size="lg" arrow href={calendarUrl}>
-                Book your walkthrough
-              </Button>
-            )}
-            <Button size="lg" variant="ghost" href={routes.home}>
-              Back to home
+            <Button size="lg" arrow href="/portal/login">
+              {paidCopy.loginCta}
+            </Button>
+            {/* The booking page carries the real calendar. calendarUrl is
+                kept as an override for when a setting points elsewhere. */}
+            <Button size="lg" variant="ghost" href={calendarUrl || "/book-a-call"}>
+              {paidCopy.callCta}
             </Button>
           </div>
         </div>

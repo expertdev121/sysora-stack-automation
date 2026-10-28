@@ -756,6 +756,42 @@ export const checkout = {
  * size", and this is the way out for someone who cannot.
  */
 /**
+ * The page after payment.
+ *
+ * Onboarding moved into the account, so this page's job is no longer to
+ * collect anything. It is to get the buyer logged in, because the
+ * password is sitting in an email they have not opened yet and nothing
+ * else can start until they do.
+ */
+export const paid = {
+  noticeLead: "Your login is on its way to",
+  noticePassword:
+    "That email has your password in it. If it is not in your inbox, check your spam folder.",
+  noticeReference: "Keep your reference",
+  noticeReferenceTail: "for any follow-up.",
+  stepsTitle: "What to do next",
+  steps: [
+    {
+      n: "1",
+      title: "Log in to your account",
+      body: "Use the password in the email we just sent. You can change it to something only you know once you are in.",
+    },
+    {
+      n: "2",
+      title: "Send us the work",
+      body: "Onboarding and your first build request both happen in there. Filling them in costs no hours, and nothing billable starts until you approve the scope.",
+    },
+    {
+      n: "3",
+      title: "Or talk it through first",
+      body: "If you would rather walk us through the list on a call, book one and we will scope it together.",
+    },
+  ],
+  loginCta: "Log in to your account",
+  callCta: "Book a call",
+} as const;
+
+/**
  * The announcement bar above the header.
  *
  * It sits above a sticky header on the busiest page on the site, so it

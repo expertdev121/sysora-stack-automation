@@ -10,7 +10,7 @@ import { salesDb } from "@/lib/supabase/admin";
 export const metadata: Metadata = { title: "Questions" };
 
 const KIND_LABELS: Record<string, string> = {
-  build_request: "Build request form",
+  build_request: "Task request form",
   pre_checkout: "Before checkout",
   post_payment: "After payment",
   custom: "Custom",

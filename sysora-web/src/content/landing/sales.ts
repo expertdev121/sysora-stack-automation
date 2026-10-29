@@ -779,7 +779,7 @@ export const paid = {
     {
       n: "2",
       title: "Send us the work",
-      body: "Onboarding and your first build request both happen in there. Filling them in costs no hours, and nothing billable starts until you approve the scope.",
+      body: "Onboarding and your first task request both happen in there. Filling them in costs no hours, and nothing billable starts until you approve the scope.",
     },
     {
       n: "3",

@@ -140,7 +140,7 @@ const primary: NavItem[] = [
   { href: "/admin/console", label: "Operations", icon: "overview" },
   { href: "/admin/clients", label: "Clients", icon: "contacts" },
   { href: "/admin/tickets", label: "Tickets", icon: "questions", count: "tickets" },
-  { href: "/admin/builds", label: "Build requests", icon: "requests", count: "builds" },
+  { href: "/admin/builds", label: "Task requests", icon: "requests", count: "builds" },
   { href: "/admin/requests", label: "Orders", icon: "requests" },
   { href: "/admin/contacts", label: "Contacts", icon: "contacts" },
 ];

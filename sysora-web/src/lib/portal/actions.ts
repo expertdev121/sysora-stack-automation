@@ -99,7 +99,6 @@ export async function submitBuildRequest(form: FormData): Promise<ActionResult> 
 
   const title = String(form.get("title") ?? "").trim();
   const detail = String(form.get("detail") ?? "").trim();
-  const budget = String(form.get("budget") ?? "").trim() || null;
   const timing = String(form.get("timing") ?? "").trim() || null;
 
   if (title.length < 4) return { ok: false, error: "Give the project a name." };
@@ -109,8 +108,10 @@ export async function submitBuildRequest(form: FormData): Promise<ActionResult> 
 
   const db = salesDb();
 
-  // Build requests are free to submit, so they are filed against the
-  // build_request offer like the public estimate form does.
+  // Task requests are free to submit, so they are filed against the
+  // build_request offer like the public estimate form does. The offer
+  // slug and the kind stay as they are: renaming them would orphan
+  // every row already filed under them.
   const { data: offer } = await db
     .from("offers")
     .select("id, kind, price_amount, currency")
@@ -134,7 +135,6 @@ export async function submitBuildRequest(form: FormData): Promise<ActionResult> 
       title,
       summary: detail,
       build_stage: "new",
-      budget_band: budget,
       metadata: { source: "portal", timing },
     })
     .select("reference")

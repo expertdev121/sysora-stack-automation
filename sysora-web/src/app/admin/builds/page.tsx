@@ -6,7 +6,7 @@ import { PageHeading } from "@/components/admin/ui";
 import { requirePipeline } from "@/lib/admin/auth";
 import { getBuildRequests } from "@/lib/admin/console";
 
-export const metadata: Metadata = { title: "Build requests", robots: { index: false } };
+export const metadata: Metadata = { title: "Task requests", robots: { index: false } };
 
 const STAGES = [
   ["new", "New"],
@@ -29,7 +29,7 @@ export default async function BuildsPage() {
   return (
     <AdminShell session={session}>
       <PageHeading
-        title="Build requests"
+        title="Task requests"
         eyebrow={`${builds.filter((b) => b.stage === "new").length} waiting to be scoped`}
       />
 

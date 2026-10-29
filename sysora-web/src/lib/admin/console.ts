@@ -54,7 +54,6 @@ export type BuildRow = {
   reference: string;
   title: string;
   clientName: string;
-  budgetBand: string | null;
   stage: string;
   createdAt: string;
 };
@@ -213,7 +212,7 @@ export async function getBuildRequests(): Promise<BuildRow[]> {
   const { data } = await salesDb()
     .from("requests")
     .select(
-      "id, reference, title, build_stage, budget_band, created_at, customers(full_name, company_name, email)",
+      "id, reference, title, build_stage, created_at, customers(full_name, company_name, email)",
     )
     .eq("kind", "build_request")
     .order("created_at", { ascending: false })
@@ -226,9 +225,8 @@ export async function getBuildRequests(): Promise<BuildRow[]> {
     return {
       id: r.id,
       reference: r.reference,
-      title: r.title ?? "Build request",
+      title: r.title ?? "Task request",
       clientName: c?.company_name || c?.full_name || c?.email || "Unknown",
-      budgetBand: r.budget_band,
       stage: r.build_stage ?? "new",
       createdAt: r.created_at,
     };

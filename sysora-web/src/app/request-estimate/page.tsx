@@ -1,34 +1,39 @@
-import type { Metadata } from "next";
-
+import { Breadcrumbs } from "@/components/content/ContentShell";
 import { EstimateForm } from "@/components/sales/EstimateForm";
 import { SalesFooter } from "@/components/sales/SalesFooter";
 import { SalesHeader } from "@/components/sales/SalesHeader";
+import { JsonLd } from "@/components/seo/StructuredData";
 import { estimate } from "@/content/landing/estimate";
+import { pageGraph } from "@/lib/schema";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+const PATH = "/request-estimate";
+
+export const metadata = pageMetadata({
   title: estimate.meta.title,
   description: estimate.meta.description,
-  alternates: { canonical: "/request-estimate" },
-  openGraph: {
-    title: `${estimate.meta.title} | Sysora Stack`,
-    description: estimate.meta.description,
-    url: "/request-estimate",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${estimate.meta.title} | Sysora Stack`,
-    description: estimate.meta.description,
-  },
-};
+  path: PATH,
+});
 
 export default function RequestEstimatePage() {
   return (
     <div className="font-sans bg-[linear-gradient(180deg,var(--surface-0)_0,var(--surface-1)_420px)] text-[var(--ink-600)]">
+      <JsonLd
+        graph={pageGraph({
+          path: PATH,
+          name: `${estimate.meta.title} | Sysora Stack`,
+          description: estimate.meta.description,
+          crumbs: [{ name: "Request an estimate", path: PATH }],
+        })}
+      />
       <SalesHeader anchorBase="/" />
 
       <main className="max-w-[1160px] mx-auto px-6 pt-[clamp(36px,6vh,64px)] pb-[88px]">
         <div className="grid grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] gap-[clamp(28px,4vw,56px)] items-start to-860:grid-cols-1">
           <aside className="sticky top-[104px] to-860:static">
+            <div className="mb-6">
+              <Breadcrumbs trail={[{ name: "Request an estimate", path: PATH }]} />
+            </div>
             <span className="text-[11px] font-bold tracking-[2px] uppercase text-[var(--accent-strong)]">
               {estimate.eyebrow}
             </span>

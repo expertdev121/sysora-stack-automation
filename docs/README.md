@@ -10,6 +10,7 @@ Claude session, needs before touching anything.
 | [operations.md](operations.md) | Running it. Environment variables, webhooks, the cron sweeper, how to verify a change. |
 | [roadmap.md](roadmap.md) | Where we are. What is live, what is knowingly unfinished, what is v2. |
 | [content-rules.md](content-rules.md) | House style for anything a customer reads. |
+| [seo.md](seo.md) | The search and AI-visibility work, what is done, and what only the business can do. |
 
 ## The product in three sentences
 

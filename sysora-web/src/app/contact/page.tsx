@@ -1,27 +1,23 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 
+import { Breadcrumbs } from "@/components/content/ContentShell";
 import { ContactForm } from "@/components/sales/ContactForm";
 import { SalesFooter } from "@/components/sales/SalesFooter";
 import { SalesHeader } from "@/components/sales/SalesHeader";
+import { JsonLd } from "@/components/seo/StructuredData";
+import { entity, printedAddress, siteConfig } from "@/config/site";
 import { contactNav } from "@/content/landing/sales";
 import { contact } from "@/content/landing/contact";
+import { pageGraph } from "@/lib/schema";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+const PATH = "/contact";
+
+export const metadata = pageMetadata({
   title: contact.meta.title,
   description: contact.meta.description,
-  alternates: { canonical: "/contact" },
-  openGraph: {
-    title: `${contact.meta.title} | Sysora Stack`,
-    description: contact.meta.description,
-    url: "/contact",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${contact.meta.title} | Sysora Stack`,
-    description: contact.meta.description,
-  },
-};
+  path: PATH,
+});
 
 /**
  * The contact page, from the Sysora Contact design.
@@ -34,10 +30,20 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <div className="font-sans bg-[linear-gradient(180deg,var(--surface-0)_0,var(--surface-1)_420px)] text-[var(--ink-600)]">
+      <JsonLd
+        graph={pageGraph({
+          path: PATH,
+          name: `${contact.meta.title} | Sysora Stack`,
+          description: contact.meta.description,
+          type: "ContactPage",
+          crumbs: [{ name: "Contact", path: PATH }],
+        })}
+      />
       <SalesHeader anchorBase="/" items={contactNav} />
 
       <main className="mx-auto max-w-[1160px] px-6 pb-[88px] pt-[clamp(36px,6vh,64px)]">
-        <header className="max-w-[720px]">
+        <Breadcrumbs trail={[{ name: "Contact", path: PATH }]} />
+        <header className="mt-6 max-w-[720px]">
           <span className="text-[11px] font-bold uppercase tracking-[2px] text-[var(--accent-strong)]">
             {contact.eyebrow}
           </span>
@@ -83,6 +89,20 @@ export default function ContactPage() {
                 </span>
               </Link>
             ))}
+
+            <address className="px-1 text-[14px] not-italic leading-[1.7] text-[var(--ink-500)]">
+              {siteConfig.name}, {printedAddress()}
+              <br />
+              <a href={`mailto:${siteConfig.email}`} className="font-medium text-[var(--accent-strong)]">
+                {siteConfig.email}
+              </a>
+              {entity.telephone ? (
+                <>
+                  <br />
+                  <a href={`tel:${entity.telephone}`}>{entity.telephone}</a>
+                </>
+              ) : null}
+            </address>
 
             <ul className="flex flex-wrap gap-x-5 gap-y-2 px-1">
               {contact.badges.map((badge) => (

@@ -1,27 +1,28 @@
-import type { Metadata } from "next";
-
 import { LegalDocPage } from "@/components/legal/LegalDocPage";
+import { JsonLd } from "@/components/seo/StructuredData";
 import { terms } from "@/content/legal/terms";
+import { pageGraph } from "@/lib/schema";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Terms and Conditions",
-  description:
-    "The terms governing prepaid Sysora Stack hours: the published rate table, validity and reset, the unused-hours refund guarantee, and what is not included.",
-  alternates: { canonical: "/terms" },
-  openGraph: {
-    title: "Terms and Conditions | Sysora Stack",
-    description:
-      "The terms governing prepaid Sysora Stack hours, including the rate table and the unused-hours refund guarantee.",
-    url: "/terms",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Terms and Conditions | Sysora Stack",
-    description:
-      "The terms governing prepaid Sysora Stack hours, including the rate table and the unused-hours refund guarantee.",
-  },
-};
+const PATH = "/terms";
+const TITLE = "Terms and Conditions";
+const DESCRIPTION =
+  "The terms for prepaid Sysora Stack hours: the published rate table, validity and reset, the unused-hours refund guarantee, and what is not included.";
+
+export const metadata = pageMetadata({ title: TITLE, description: DESCRIPTION, path: PATH });
 
 export default function TermsPage() {
-  return <LegalDocPage doc={terms} />;
+  return (
+    <>
+      <JsonLd
+        graph={pageGraph({
+          path: PATH,
+          name: `${TITLE} | Sysora Stack`,
+          description: DESCRIPTION,
+          crumbs: [{ name: TITLE, path: PATH }],
+        })}
+      />
+      <LegalDocPage doc={terms} crumb={{ name: TITLE, path: PATH }} />
+    </>
+  );
 }

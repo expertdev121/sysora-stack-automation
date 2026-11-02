@@ -28,17 +28,22 @@ export const packs: Pack[] = [
 export const DEFAULT_PACK = 3;
 
 export const meta = {
-  title: "GoHighLevel and Automation Hours From $13/hr, No Contract",
+  title: "GoHighLevel & Automation Hours From $13/hr",
   description:
-    "Buy a block of hours and an 11-person technical team works through your GoHighLevel, automation, integration and development backlog. $19 an hour, down to $13 at volume. Unused hours are refundable.",
+    "GoHighLevel and automation hours from $13/hr, and unused hours are refundable. No contract. Send the list, approve the scope, and we work through it.",
 } as const;
 
+/**
+ * The header. It was all in-page anchors, so nothing in it could pass a
+ * reader or a crawler to another page. Refunds and the calculator stay
+ * reachable from the footer and the pricing page.
+ */
 export const nav = [
   { label: "Packages", href: "#packages" },
-  { label: "The work", href: "#work" },
-  { label: "How it runs", href: "#how" },
-  { label: "Refunds", href: "#refund" },
-  { label: "Calculator", href: "#calculator" },
+  { label: "Services", href: "/services" },
+  { label: "For agencies", href: "/for/agencies" },
+  { label: "Case studies", href: "/case-studies" },
+  { label: "Guides", href: "/guides" },
   { label: "FAQ", href: "#faq" },
 ] as const;
 
@@ -74,7 +79,7 @@ export const hero = {
    */
   headline: "Send us the list. ",
   headlineAccent: "GoHighLevel and automation hours from $13.",
-  lead: "$19 an hour, down to $13 at volume, and the full table is one scroll below. Buy a block of hours and an 11-person technical team works through your backlog: GoHighLevel builds, automations, integrations, websites and custom development. Real people handle chat and tickets around the clock. The hours you do not use are refundable.",
+  lead: "$19 an hour, down to $13 at volume, and the full table is one scroll below. Buy a block of hours and our technical team works through your backlog: GoHighLevel builds, automations, integrations, websites and custom development. Real people handle chat and tickets around the clock. The hours you do not use are refundable.",
   primaryCta: "Choose Your Hours",
   secondaryCta: "Request a Project Estimate",
   bullets: [
@@ -87,7 +92,7 @@ export const hero = {
     unit: "USD / hour",
     tiles: [
       { value: "24/7", label: "Human triage" },
-      { value: "11", label: "Person team" },
+      { value: "1,220", label: "Hours logged" },
       { value: "$0", label: "Lost on unused hours" },
     ],
   },
@@ -278,6 +283,15 @@ export const audiences = [
     },
     badge: "For US marketing agencies and GHL SaaS owners",
     headline: "You keep the client. We do the delivery.",
+    /**
+     * All the homepage shows of this band. The rest moved to /for/agencies,
+     * because two pages saying the same thing compete with each other for
+     * the same searches. That page renders the fields below this one.
+     */
+    teaser:
+      "Your pipeline is fine. The delivery queue is what caps how many clients you can take. We work behind your brand on subaccounts, snapshots, workflows, migrations and A2P, and the hours flex with the month. Start with 5 hours for $95.",
+    teaserLink: "See how agency support works →",
+    teaserHref: "/for/agencies",
     paragraphs: [
       "Your pipeline is fine. The delivery queue is what caps how many clients you can take. Subaccounts to set up, a snapshot to rebuild, workflows that worked last month, a migration the client keeps asking about, and the A2P submission nobody wants to own. Hiring a full-time technical person for that load is a bet on the load staying steady, and agency workloads rarely are.",
       "Hours flex with the month. Scale up for a heavy build period and back down afterwards, without a redundancy conversation.",
@@ -344,8 +358,8 @@ export const audiences = [
     startMid: "",
     startPills2: [] as StartPill[],
     startTail: "then a smaller monthly plan if you want someone on hand afterwards.",
-    link: "See the packages →",
-    href: "#packages",
+    link: "More for local businesses →",
+    href: "/for/local-business",
   },
 ] as const;
 
@@ -379,7 +393,7 @@ export const support = {
   notPromisedBody:
     " unlimited free calls, a dedicated engineer, a response-time target, or a guaranteed resolution window.",
   teamNote:
-    "The team is 11 people, which is what makes the overnight intake possible.",
+    "Intake is staffed around the clock, so a message sent overnight still reaches a person.",
 } as const;
 
 export const howItRuns = {
@@ -470,14 +484,15 @@ export const whoBuilt = {
     "Laravel",
   ],
   paragraphs: [
-    "Sysora Stack is an 11-person technical team working across GoHighLevel, n8n, Make, Zapier, React, Node.js, Next.js and Laravel. It was founded by Nikhil, and the early years of this work were delivered freelance under his name, which is where the reviews on this page come from. Those jobs kept running longer than they were booked for. A webinar funnel build scheduled for one week ran close to two months, because both sides kept testing for what would fail under load. A small tech operations project turned into 640 hours.",
+    "Sysora Stack is a technical team working across GoHighLevel, n8n, Make, Zapier, React, Node.js, Next.js and Laravel. It was founded by Nikhil, and the early years of this work were delivered freelance under his name, which is where the reviews on this page come from. Those jobs kept running longer than they were booked for. A webinar funnel build scheduled for one week ran close to two months, because both sides kept testing for what would fail under load. A small tech operations project turned into 640 hours.",
   ],
   patternLead:
     "The pattern held every time. Nobody was hiring for an automation. They were hiring because nobody in the building could answer one question, which was ",
   patternBold: "how this is supposed to work.",
   disclaimer:
     "Sysora Stack is not an official HighLevel employee team, partner or certified provider.",
-  link: "More on the team at About Sysora Stack →",
+  link: "More at About Sysora Stack →",
+  href: "/about",
 } as const;
 
 export const refund = {
@@ -580,11 +595,11 @@ export const faq = {
   items: [
     {
       q: "Why is the rate so much lower at 150 hours?",
-      a: "Larger single orders mean less scoping overhead, fewer billing cycles and more predictable scheduling for us, and the rate reflects that. It applies to the order you place, not retroactively to past or future orders.",
+      a: "Larger single orders mean less scoping overhead and fewer billing cycles for us. The rate reflects that. It applies to the order you place. It does not apply to past or future orders.",
     },
     {
       q: "Am I paying for a person or for a package?",
-      a: "A team, billed by the hour against a balance you buy up front. An 11-person group covering GoHighLevel, automation, integration, web and software work, plus 24/7 human chat and ticket triage at no extra charge.",
+      a: "A team, billed by the hour against a balance you buy up front. The team covers GoHighLevel, automation, integration, web and software work. 24/7 human chat and ticket triage is included at no extra charge.",
     },
     {
       q: "How do I know the hours are real?",
@@ -592,11 +607,11 @@ export const faq = {
     },
     {
       q: "How is time rounded?",
-      a: "Time is tracked in 15-minute increments, rounded up to the nearest increment per task. A two-minute fix is logged as 15 minutes, and a task that runs 70 minutes is logged as 75. Every entry is visible to you with what it was spent on, and we do not bill you for our own mistakes or for rework caused by them.",
+      a: "Time is tracked in 15-minute increments, rounded up per task. A two-minute fix is logged as 15 minutes. A task that runs 70 minutes is logged as 75. Every entry is visible to you with what it was spent on. We do not bill you for our own mistakes or for rework caused by them.",
     },
     {
       q: "Where do I see my hours and send new work?",
-      a: "In your account. Your balance, every logged entry and what it was spent on are in there, and so is onboarding. You can send a new task and buy more hours from the same place, and a new order is priced at the tier of that order.",
+      a: "In your account. Your balance and every logged entry are in there. So is onboarding. You can send a new task and buy more hours from the same place. A new order is priced at the tier of that order.",
     },
     {
       q: "What happens if I run out mid-project?",
@@ -604,23 +619,23 @@ export const faq = {
     },
     {
       q: "Do my hours roll over?",
-      a: "One-time packs are valid 60 days from purchase. Monthly plans reset at the start of each billing cycle and unused hours do not carry forward. That is why the refund request window matters.",
+      a: "One-time packs are valid 60 days from purchase. Monthly plans reset at the start of each billing cycle. Unused hours do not carry forward. That is why the refund request window matters.",
     },
     {
       q: "Is the 24/7 support unlimited?",
-      a: "24/7 human chat and ticket triage is included with every package, which means a real person receives, reads, triages and routes your request at any hour. Calls, diagnosis, configuration, building, testing and meetings are technical work and come out of your purchased hours.",
+      a: "24/7 human chat and ticket triage is included with every package. A real person receives, reads, triages and routes your request at any hour. Calls, diagnosis, configuration, building, testing and meetings are technical work. Those come out of your purchased hours.",
     },
     {
       q: "Do I have to email you every time I need something?",
-      a: "No. Send the task from your account and it reaches the team. Chat and ticket triage stay open around the clock as well, at no extra charge, and that is the route for anything urgent or unclear. Sending a task costs you nothing, and the work it turns into is what comes out of your hours.",
+      a: "No. Send the task from your account and it reaches the team. Chat and ticket triage stay open around the clock at no extra charge. Use that route for anything urgent or unclear. Sending a task costs you nothing. The work it turns into is what comes out of your hours.",
     },
     {
       q: "How fast will you respond?",
-      a: "We do not publish a response-time commitment, because we have not operationalized one, and a number we cannot hold is worse than no number. Intake is staffed around the clock.",
+      a: "We do not publish a response-time commitment, because we have not operationalized one. A number we cannot hold is worse than no number. Intake is staffed around the clock.",
     },
     {
       q: "How do I cancel a monthly plan?",
-      a: "Message support from your account or email support@sysorastack.com, at least 24 hours before your next renewal date. Cancelling stops future renewals and does not refund earlier cycles. The unused hours in the cycle you have already paid for can be refunded, as long as you ask before that cycle resets.",
+      a: "Message support from your account or email support@sysorastack.com, at least 24 hours before your next renewal date. Cancelling stops future renewals. It does not refund earlier cycles. The unused hours in the cycle you have paid for can be refunded, as long as you ask before that cycle resets.",
     },
     {
       q: "Can you take over an account somebody else built?",
@@ -632,7 +647,7 @@ export const faq = {
     },
     {
       q: "Who owns what you build?",
-      a: "You do. On full payment for the hours used to produce them, the workflows, funnels, configurations, code and documentation we built for you are yours. We keep our own reusable libraries, snapshot templates and internal tooling, and you get a perpetual licence to use those wherever they are embedded in your deliverables. We will not publish your name, your logo or your project as a case study without your written permission.",
+      a: "You do. On full payment for the hours used to produce them, the workflows, funnels, configurations, code and documentation we built for you are yours. We keep our own reusable libraries, snapshot templates and internal tooling. You get a perpetual licence to use those wherever they are embedded in your deliverables. We will not publish your name, your logo or your project as a case study without your written permission.",
     },
     {
       q: "Does Sysora Stack only work in GoHighLevel?",
@@ -808,7 +823,7 @@ export const agencyBanner = {
   short: "Running a GHL agency?",
   body: "White-label funnels, workflows and integrations, from $95 for 5 hours.",
   cta: "Explore agency support",
-  href: "/on-demand-ghl-team",
+  href: "/for/agencies",
 } as const;
 
 /**
@@ -859,8 +874,29 @@ export const footer = {
   badges: ["24/7 human triage", "Unused hours refundable"],
   columns: [
     {
+      title: "Services",
+      links: [
+        { label: "GoHighLevel setup", href: "/services/gohighlevel-setup-and-rebuild" },
+        { label: "A2P 10DLC registration", href: "/services/a2p-10dlc-registration" },
+        { label: "Funnels and websites", href: "/services/funnels-and-websites" },
+        { label: "Workflow automation", href: "/services/workflow-automation" },
+        { label: "API integrations", href: "/services/api-integrations" },
+        { label: "CRM migration", href: "/services/crm-migration" },
+        { label: "AI agents", href: "/services/ai-agents" },
+        { label: "Web app development", href: "/services/web-app-development" },
+      ],
+    },
+    {
+      title: "Who we help",
+      links: [
+        { label: "Marketing agencies", href: "/for/agencies" },
+        { label: "Local businesses", href: "/for/local-business" },
+      ],
+    },
+    {
       title: "Pricing",
       links: [
+        { label: "Pricing", href: "/pricing" },
         { label: "Packages", href: "#packages" },
         { label: "Calculator", href: "#calculator" },
         { label: "Refund guarantee", href: "#refund" },
@@ -870,7 +906,9 @@ export const footer = {
     {
       title: "Company",
       links: [
-        { label: "What we do", href: "#work" },
+        { label: "About", href: "/about" },
+        { label: "Case studies", href: "/case-studies" },
+        { label: "Guides", href: "/guides" },
         { label: "How it runs", href: "#how" },
         { label: "Request an estimate", href: "/request-estimate" },
         { label: "Checkout", href: "/checkout/hours" },

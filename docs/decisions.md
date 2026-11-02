@@ -118,3 +118,9 @@ browser even if an anon key leaks. All access goes through the server.
 different prices. They 308 to `/` or `/request-estimate` and the source
 is deleted. Canonicals previously pointed at `sysora.com`, a parked
 domain that is for sale, which handed any ranking to someone else.
+
+**Revised November 2026.** `/services` and `/about` are real pages again,
+at the owner's request after a search audit, because a site with two
+rankable URLs cannot rank. The offer has not changed: the service pages
+describe work sold by the hour, and the fixed prices stay retired. See
+[seo.md](seo.md).

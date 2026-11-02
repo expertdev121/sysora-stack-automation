@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Lato, Roboto, Space_Grotesk } from "next/font/google";
 
+import { Analytics } from "@/components/seo/Analytics";
 import { siteConfig } from "@/config/site";
+import { OG_DEFAULT } from "@/lib/seo";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -11,11 +13,18 @@ const geistSans = Geist({
   adjustFontFallback: false,
 });
 
+/*
+ * Only the fonts above the fold are preloaded: Geist for body text and
+ * Lato for the H1. Seven preloaded font files were competing with the
+ * largest contentful paint on every page, so the others load when they
+ * are first used. `display: swap` keeps text visible while they do.
+ */
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "swap",
   adjustFontFallback: false,
+  preload: false,
 });
 
 const spaceGrotesk = Space_Grotesk({
@@ -23,12 +32,13 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   display: "swap",
   adjustFontFallback: false,
+  preload: false,
 });
 
 const lato = Lato({
   variable: "--font-lato",
   subsets: ["latin"],
-  weight: ["400", "700", "900"],
+  weight: ["700", "900"],
   display: "swap",
   adjustFontFallback: false,
 });
@@ -38,6 +48,7 @@ const roboto = Roboto({
   subsets: ["latin"],
   display: "swap",
   adjustFontFallback: false,
+  preload: false,
 });
 
 /**
@@ -50,11 +61,18 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: "GoHighLevel, Automation and Dev Hours from $13/hr | Sysora Stack",
+    default: "GoHighLevel & Automation Hours From $13/hr | Sysora Stack",
     template: "%s | Sysora Stack",
   },
   description: siteConfig.description,
-  alternates: { canonical: "/" },
+  // Empty until the site is verified in each tool, and then set in the
+  // environment rather than here. See docs/operations.md.
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+    other: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+      ? { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION }
+      : undefined,
+  },
   // src/app/favicon.ico is served at /favicon.ico by the file convention
   // and covers legacy browsers; the SVG is what modern ones actually use.
   icons: {
@@ -67,16 +85,17 @@ export const metadata: Metadata = {
   },
   manifest: "/site.webmanifest",
   openGraph: {
-    title: "GoHighLevel, Automation and Dev Hours from $13/hr | Sysora Stack",
+    title: "GoHighLevel & Automation Hours From $13/hr | Sysora Stack",
     description: siteConfig.description,
-    url: "/",
     type: "website",
     siteName: siteConfig.name,
+    images: [{ url: OG_DEFAULT, width: 1200, height: 630, alt: siteConfig.name }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "GoHighLevel, Automation and Dev Hours from $13/hr | Sysora Stack",
+    title: "GoHighLevel & Automation Hours From $13/hr | Sysora Stack",
     description: siteConfig.description,
+    images: [OG_DEFAULT],
   },
 };
 
@@ -92,6 +111,7 @@ export default function RootLayout({
     >
       <body className="antialiased">
         {children}
+        <Analytics />
       </body>
     </html>
   );

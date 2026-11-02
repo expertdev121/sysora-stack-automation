@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "@/components/content/ContentShell";
 import { ReadingProgress } from "@/components/legal/ReadingProgress";
 import { RichText } from "@/components/legal/RichText";
 import { SalesFooter } from "@/components/sales/SalesFooter";
@@ -105,7 +106,13 @@ function BlockView({ block }: { block: Block }) {
   }
 }
 
-export function LegalDocPage({ doc }: { doc: LegalDoc }) {
+export function LegalDocPage({
+  doc,
+  crumb,
+}: {
+  doc: LegalDoc;
+  crumb: { name: string; path: string };
+}) {
   return (
     <div
       id="top"
@@ -116,7 +123,8 @@ export function LegalDocPage({ doc }: { doc: LegalDoc }) {
       <SalesHeader anchorBase="/" items={legalNav} />
 
       <main className="mx-auto max-w-[1160px] px-6 pb-[96px] pt-[clamp(32px,5vh,56px)]">
-        <header className="max-w-[760px]">
+        <Breadcrumbs trail={[crumb]} />
+        <header className="mt-6 max-w-[760px]">
           <span className="text-[11px] font-bold uppercase tracking-[2px] text-[var(--accent-strong)]">
             {doc.eyebrow}
           </span>

@@ -20,7 +20,7 @@ export const LOGO_ASPECT = 566.98 / 116;
 export function SysoraLogo({ className = "h-8 w-auto block" }: { className?: string }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={LOGO_URL} alt="Sysora" className={className} width={567} height={116} />
+    <img src={LOGO_URL} alt="Sysora Stack" className={className} width={567} height={116} />
   );
 }
 

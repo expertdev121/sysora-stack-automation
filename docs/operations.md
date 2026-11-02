@@ -17,6 +17,9 @@ development and is gitignored.
 | `ABANDONED_CART_GRACE_MINUTES` | minutes before a cart counts abandoned | 30 |
 | `NEXT_PUBLIC_SITE_URL` | canonical origin for server-built links | set |
 | `GHL_ABANDONED_CART_WEBHOOK_URL` | legacy fallback for the cart hook | set, superseded by the database |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Search Console verification tag | **not set** |
+| `NEXT_PUBLIC_BING_SITE_VERIFICATION` | Bing Webmaster verification tag | **not set** |
+| `NEXT_PUBLIC_GA_ID` | Google Analytics, nothing loads without it | **not set**. Update the privacy policy first, it says the site runs no analytics |
 
 Local development needs `SUPABASE_SERVICE_ROLE_KEY` filled in or every
 page that touches data throws. It ships empty.

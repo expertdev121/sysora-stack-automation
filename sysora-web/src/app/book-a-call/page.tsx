@@ -1,26 +1,21 @@
-import type { Metadata } from "next";
 import Script from "next/script";
 
+import { Breadcrumbs } from "@/components/content/ContentShell";
 import { SalesFooter } from "@/components/sales/SalesFooter";
 import { SalesHeader } from "@/components/sales/SalesHeader";
+import { JsonLd } from "@/components/seo/StructuredData";
 import { booking } from "@/content/landing/booking";
 import { contactNav } from "@/content/landing/sales";
+import { pageGraph } from "@/lib/schema";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+const PATH = "/book-a-call";
+
+export const metadata = pageMetadata({
   title: booking.meta.title,
   description: booking.meta.description,
-  alternates: { canonical: "/book-a-call" },
-  openGraph: {
-    title: `${booking.meta.title} | Sysora Stack`,
-    description: booking.meta.description,
-    url: "/book-a-call",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${booking.meta.title} | Sysora Stack`,
-    description: booking.meta.description,
-  },
-};
+  path: PATH,
+});
 
 /**
  * The Book a call page, from the "Sysora Book a Call" design.
@@ -38,10 +33,19 @@ export const metadata: Metadata = {
 export default function BookACallPage() {
   return (
     <div className="font-sans bg-[linear-gradient(180deg,var(--surface-0)_0,var(--mint-50)_100%)] text-[var(--ink-600)]">
+      <JsonLd
+        graph={pageGraph({
+          path: PATH,
+          name: `${booking.meta.title} | Sysora Stack`,
+          description: booking.meta.description,
+          crumbs: [{ name: "Book a call", path: PATH }],
+        })}
+      />
       <SalesHeader anchorBase="/" items={contactNav} />
 
       <main className="mx-auto grid max-w-[1160px] grid-cols-[minmax(0,438px)_minmax(0,609px)] items-start gap-16 px-6 pb-[clamp(64px,9vh,96px)] pt-[clamp(36px,6vh,64px)] to-980:grid-cols-1 to-980:gap-10">
         <div className="flex flex-col gap-7">
+          <Breadcrumbs trail={[{ name: "Book a call", path: PATH }]} />
           <div>
             <span className="inline-flex items-center gap-[9px] rounded-full border-[1.5px] border-[var(--border-default)] bg-white px-[14px] py-[7px] text-[12.5px] font-semibold text-[var(--text-body)]">
               <span className="h-[7px] w-[7px] rounded-full bg-[var(--accent)]" aria-hidden="true" />

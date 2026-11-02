@@ -59,6 +59,48 @@ export const siteConfig = {
   upwork: "https://www.upwork.com/freelancers/~019b0e0fb5393a59a8",
 } as const;
 
+/**
+ * The facts that make the company and its founder a checkable entity.
+ *
+ * Empty values are deliberate. They are facts only the business can
+ * supply, and everything that reads them, the footer, /about, /contact
+ * and the JSON-LD, leaves a field out rather than print a placeholder.
+ * Filling one in here publishes it everywhere at once, which is also how
+ * the same name and address stay identical across the site.
+ */
+export const entity = {
+  /** Full legal name, surname included. First name only until supplied. */
+  founderName: "Nikhil",
+  founderGivenName: "Nikhil",
+  founderTitle: "Founder and Lead Automation Engineer",
+  founderPhoto: "/nikhil.jpg",
+  founderLinkedIn: "",
+  /** E.164, for example +919800000000. */
+  telephone: "",
+  foundingDate: "",
+  streetAddress: "",
+  postalCode: "",
+  locality: "Jagadhri",
+  region: "Haryana",
+  country: "IN",
+  countryName: "India",
+  /** Add a profile here once it exists. Each one goes into sameAs. */
+  companyProfiles: [] as readonly string[],
+} as const;
+
+/** The one printed form of the address, so it cannot differ between pages. */
+export function printedAddress(): string {
+  return [
+    entity.streetAddress,
+    entity.locality,
+    entity.region,
+    entity.postalCode,
+    entity.countryName,
+  ]
+    .filter(Boolean)
+    .join(", ");
+}
+
 export const navLinks = [
   { label: "Packages", href: "/#packages" },
   { label: "What we do", href: "/#work" },

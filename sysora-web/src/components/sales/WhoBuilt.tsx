@@ -1,3 +1,4 @@
+import Link from "next/link";
 
 import { whoBuilt } from "@/content/landing/sales";
 
@@ -42,6 +43,9 @@ export function WhoBuilt() {
               </p>
               <div className="mt-[26px] pt-5 border-t-[1.5px] border-white/[0.14]">
                 <p className="text-[12.5px] leading-[1.6] text-white/60">{whoBuilt.disclaimer}</p>
+                <Link href={whoBuilt.href} className="mt-3 inline-block text-[14px] font-semibold text-white underline underline-offset-[3px]">
+                  {whoBuilt.link}
+                </Link>
               </div>
             </div>
           </div>

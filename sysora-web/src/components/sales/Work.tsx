@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { work } from "@/content/landing/sales";
 
 const icons = {
@@ -51,6 +53,8 @@ export function Work() {
                   alt={card.illustrationAlt}
                   width={400}
                   height={225}
+                  loading="lazy"
+                  decoding="async"
                   className="block w-full h-full object-cover"
                 />
               </div>
@@ -85,6 +89,12 @@ export function Work() {
           </svg>
           <p className="text-[15.5px] leading-[1.65] text-[var(--ink-700)]">{work.callout}</p>
         </div>
+
+        <p className="mt-6">
+          <Link href="/services" className="text-[15px] font-semibold">
+            See every service →
+          </Link>
+        </p>
       </div>
     </section>
   );

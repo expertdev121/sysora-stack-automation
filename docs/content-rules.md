@@ -49,6 +49,24 @@ a quotation would misrepresent it.
 Only ever `/checkout/hours?hours={5,10,25,50,75,100,150}&billing={once,monthly}`.
 This includes the resume link in the abandoned-cart payload.
 
+## Long-form pages
+
+Services, guides and case studies live in `src/content/articles/`.
+
+- Open on a direct answer of 40 to 60 words. The test fails otherwise.
+- Full title of 60 characters at most, description of 155 at most.
+- Headings are questions where a reader would ask one.
+- Answers in an FAQ state one fact per sentence.
+- A platform fact needs a vendor source listed on the page. Change a
+  page's `modified` date only when it has been re-checked.
+- Never claim first-hand timing or volume data. The task ledger has none
+  to report yet.
+- Case studies use only the public Upwork record. Clients are not named
+  and nothing is added about their business, because the FAQ promises
+  not to publish a client's project without written permission.
+- No headcount. "11-person team" was removed because nothing could back
+  it. Put a number back only alongside a page that names the people.
+
 ## Sweeping
 
 Check the **rendered HTML of the live pages**, not the source. Source

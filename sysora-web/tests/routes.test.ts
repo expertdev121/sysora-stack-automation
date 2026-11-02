@@ -103,7 +103,7 @@ describe("routes", () => {
   });
 
   it("links to no page that was deleted", () => {
-    const GONE = ["/services", "/about", "/systems-review", "/systems-team", "/build-request"];
+    const GONE = ["/on-demand-ghl-team", "/systems-review", "/systems-team", "/build-request"];
     const resurrected = internalLinks()
       .filter((l) => GONE.some((g) => stripQuery(l.href) === g || stripQuery(l.href).startsWith(g + "/")))
       .map((l) => `${l.file}:${l.line} -> ${l.href}`);

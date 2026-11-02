@@ -1,6 +1,5 @@
 /**
- * Copy for /on-demand-ghl-team, from the "Sysora GHL Specific Page"
- * design.
+ * Copy for /for/agencies, from the "Sysora GHL Specific Page" design.
  *
  * A landing page aimed at one audience, GoHighLevel agencies, rather
  * than the homepage's general offer. Same prices, same terms, same
@@ -16,7 +15,7 @@ export const ghlTeam = {
   meta: {
     title: "On-Demand GoHighLevel Team for Agencies",
     description:
-      "White-label GoHighLevel, automation and development help for agencies, by the hour. Start with 5 prepaid hours for $95. No contract, no full-time hire, unused hours refundable.",
+      "White-label GoHighLevel and automation help for agencies, by the hour. Start with 5 prepaid hours for $95. No contract, and unused hours are refundable.",
   },
 
   nav: [

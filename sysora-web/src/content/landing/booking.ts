@@ -9,9 +9,9 @@
  */
 export const booking = {
   meta: {
-    title: "Book a Free Call, GoHighLevel and Automation Help",
+    title: "Book a Free GoHighLevel and Automation Call",
     description:
-      "Book a free call with Sysora Stack. Tell us what is slowing the business down, we look at your setup with you, and you leave with a clear next step. No pitch deck, no obligation.",
+      "Book a free call with Sysora Stack. Tell us what is slowing the business down, and leave with a clear next step. No pitch deck and no obligation.",
   },
   eyebrow: "Free 15-minute call",
   title: "Not sure where to start? Book your call with us.",

@@ -8,7 +8,6 @@ const field =
   "mt-[6px] w-full rounded-xl border-[1.5px] border-[var(--border-default)] bg-white px-4 py-[11px] text-[14.5px] text-[var(--ink-800)] outline-none transition-colors focus:border-[var(--accent)]";
 const label = "text-[13px] font-semibold text-[var(--ink-900)]";
 
-const BUDGETS = ["Under $1k", "$1k to $3k", "$3k to $10k", "Over $10k", "Not sure yet"];
 const TIMING = ["As soon as possible", "This quarter", "Next quarter", "Just exploring"];
 
 export function BuildRequestForm() {
@@ -34,30 +33,27 @@ export function BuildRequestForm() {
         });
       }}
     >
-      <h2 className="text-[15px] font-bold text-[var(--ink-900)]">Request a build</h2>
+      <h2 className="text-[15px] font-bold text-[var(--ink-900)]">Assign a task to our team</h2>
 
       <label className="mt-4 block">
-        <span className={label}>What do you want built?</span>
-        <input name="title" className={field} placeholder="Patient intake portal" required />
+        <span className={label}>What do you need done?</span>
+        <input
+          name="title"
+          className={field}
+          placeholder="Patient intake form in GoHighLevel"
+          required
+        />
       </label>
 
-      <div className="mt-4 grid grid-cols-2 gap-4 to-640:grid-cols-1">
-        <label className="block">
-          <span className={label}>Budget</span>
-          <select name="budget" className={field} defaultValue={BUDGETS[1]}>
-            {BUDGETS.map((b) => <option key={b}>{b}</option>)}
-          </select>
-        </label>
-        <label className="block">
-          <span className={label}>Timing</span>
-          <select name="timing" className={field} defaultValue={TIMING[1]}>
-            {TIMING.map((t) => <option key={t}>{t}</option>)}
-          </select>
-        </label>
-      </div>
+      <label className="mt-4 block">
+        <span className={label}>Timing</span>
+        <select name="timing" className={field} defaultValue={TIMING[1]}>
+          {TIMING.map((t) => <option key={t}>{t}</option>)}
+        </select>
+      </label>
 
       <label className="mt-4 block">
-        <span className={label}>What should it do?</span>
+        <span className={label}>What does it need to do?</span>
         <textarea
           name="detail"
           rows={4}

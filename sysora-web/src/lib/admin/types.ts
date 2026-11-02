@@ -138,7 +138,7 @@ export const STATUS_TONE: Record<RequestStatus, "mint" | "amber" | "slate" | "re
 };
 
 export const KIND_LABELS: Record<OfferKind, string> = {
-  build_request: "Build request",
+  build_request: "Task request",
   systems_review: "Systems review",
   systems_team: "Systems team",
 };

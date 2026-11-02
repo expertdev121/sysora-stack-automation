@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
+import { formatDate } from "@/components/content/ContentShell";
 import { ScrollReveal } from "@/components/layout/ScrollReveal";
+import { PAGES_UPDATED } from "@/content/pages";
 import { HomeStructuredData } from "@/components/seo/StructuredData";
 import { AgencyBanner } from "@/components/sales/AgencyBanner";
 import { Audiences } from "@/components/sales/Audiences";
@@ -25,29 +27,17 @@ import { TrackRecord } from "@/components/sales/TrackRecord";
 import { WhoBuilt } from "@/components/sales/WhoBuilt";
 import { Work } from "@/components/sales/Work";
 import { meta } from "@/content/landing/sales";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  // `absolute` because the root layout's "%s — Sysora Stack" template was
-  // not being applied to this segment, so the brand was missing from the
-  // one title that matters most. Stating it outright is deterministic.
-  title: { absolute: `${meta.title} | Sysora Stack` },
+// `absoluteTitle` because the root layout's title template was not being
+// applied to this segment, so the brand was missing from the one title
+// that matters most. Stating it outright is deterministic.
+export const metadata: Metadata = pageMetadata({
+  title: meta.title,
   description: meta.description,
-  alternates: { canonical: "/" },
-  // Was inherited from the root layout, which still sold the retired $49
-  // review — so every share, Slack unfurl and LinkedIn preview advertised
-  // an offer that no longer exists.
-  openGraph: {
-    title: `${meta.title} | Sysora Stack`,
-    description: meta.description,
-    url: "/",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${meta.title} | Sysora Stack`,
-    description: meta.description,
-  },
-};
+  path: "/",
+  absoluteTitle: true,
+});
 
 export default function Home() {
   return (
@@ -80,7 +70,7 @@ export default function Home() {
         <FinalCta />
         <BookCall />
 
-        <SalesFooter />
+        <SalesFooter updated={formatDate(PAGES_UPDATED)} />
       </div>
     </SalesProvider>
   );

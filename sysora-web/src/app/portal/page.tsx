@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { AccessChecklist } from "@/components/portal/AccessChecklist";
 import { HoursRing } from "@/components/portal/HoursRing";
 import { PortalShell } from "@/components/portal/PortalShell";
 import { QuickActions, type QuickAction } from "@/components/portal/QuickActions";
+import { ACCESS_EMAIL, getAccessGrant } from "@/lib/portal/access";
 import { requireClient } from "@/lib/portal/auth";
 import {
   getBalance,
@@ -54,12 +56,13 @@ function greeting(): string {
 export default async function PortalOverview() {
   const session = await requireClient();
   const chrome = await getChrome(session.customerId);
-  const [balance, tasks, tickets, plan, card] = await Promise.all([
+  const [balance, tasks, tickets, plan, card, grant] = await Promise.all([
     getBalance(session.customerId),
     getTasks(session.customerId),
     getTickets(session.customerId),
     getPlan(session.customerId),
     getCardOnFile(session.customerId),
+    getAccessGrant(session.customerId),
   ]);
 
   const openTickets = tickets.filter((t) => t.status !== "resolved");
@@ -87,7 +90,12 @@ export default async function PortalOverview() {
 
   const actions: QuickAction[] = [
     { href: "/portal/support", icon: "ticket", label: "Submit a support ticket", sub: "Triage any hour" },
-    { href: "/portal/build-requests", icon: "build", label: "Request a build", sub: "Free scope and quote" },
+    {
+      href: "/portal/build-requests",
+      icon: "build",
+      label: "Assign a task to our team",
+      sub: "We scope it before anything is billed",
+    },
     { href: "/portal/invoices", icon: "invoice", label: "View invoices", sub: "Download receipts" },
     {
       href: "/portal/billing",
@@ -110,6 +118,9 @@ export default async function PortalOverview() {
       mustChangePassword={chrome.mustChangePassword}
     >
       <div className="flex flex-col gap-5">
+        {/* First, because nothing billable can start without it. */}
+        <AccessChecklist grant={grant} accessEmail={ACCESS_EMAIL} />
+
         <section className="grid grid-cols-[150px_1fr] items-center gap-9 rounded-[18px] border border-[var(--line-mint)] bg-white p-[30px] to-860:grid-cols-1 to-860:justify-items-center to-860:gap-6">
           <HoursRing remaining={balance.remaining} purchased={balance.purchased} />
 

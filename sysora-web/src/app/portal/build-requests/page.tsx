@@ -6,7 +6,7 @@ import { requireClient } from "@/lib/portal/auth";
 import { getBuildRequests, getTickets, getChrome } from "@/lib/portal/queries";
 
 export const metadata: Metadata = {
-  title: "Build requests",
+  title: "Task requests",
   robots: { index: false, follow: false },
 };
 
@@ -28,7 +28,7 @@ export default async function BuildRequestsPage() {
   const open = tickets.filter((t) => t.status !== "resolved").length;
 
   return (
-    <PortalShell eyebrow="Projects" title="Build requests" openTickets={chrome.openTickets}
+    <PortalShell eyebrow="Your team" title="Task requests" openTickets={chrome.openTickets}
       remaining={chrome.remaining}
       purchased={chrome.purchased}
       userName={session.fullName}
@@ -36,8 +36,9 @@ export default async function BuildRequestsPage() {
       company={chrome.company}
       mustChangePassword={chrome.mustChangePassword}>
       <p className="max-w-[640px] text-[14.5px] leading-[1.7] text-[var(--text-muted)]">
-        For work too big to guess at in hours. Send the scope and we come back with a written time
-        estimate and a milestone plan — free, and before anything is billed.
+        Hand a piece of work to our team. Tell us what you need and we come back with a written
+        time estimate and a plan. Scoping costs no hours, and nothing is billed until you
+        approve it.
       </p>
 
       <BuildRequestForm />
@@ -45,7 +46,7 @@ export default async function BuildRequestsPage() {
       <section className="mt-6 flex flex-col gap-3">
         {builds.length === 0 ? (
           <p className="rounded-[18px] border border-[var(--line-mint)] bg-white px-6 py-10 text-center text-[13.5px] text-[var(--text-muted)]">
-            No build requests yet.
+            No task requests yet.
           </p>
         ) : (
           builds.map((b) => {
@@ -60,8 +61,7 @@ export default async function BuildRequestsPage() {
                     {b.title}
                   </h2>
                   <p className="mt-1 text-[12.5px] text-[var(--text-muted)]">
-                    <span className="font-mono">{b.reference}</span>
-                    {b.budgetBand ? ` · ${b.budgetBand}` : ""} ·{" "}
+                    <span className="font-mono">{b.reference}</span> ·{" "}
                     {new Date(b.createdAt).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",

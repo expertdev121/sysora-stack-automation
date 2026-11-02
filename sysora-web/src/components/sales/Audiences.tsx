@@ -56,6 +56,8 @@ export function Audiences() {
                   alt={audience.media.alt}
                   width={500}
                   height={400}
+                  loading="lazy"
+                  decoding="async"
                   className="block w-full h-full object-cover"
                 />
               </div>
@@ -73,6 +75,30 @@ export function Audiences() {
                 {audience.headline}
               </h2>
 
+              {"teaser" in audience ? (
+                <>
+                  <p className="mt-4 text-[16px] leading-[1.75] text-[var(--ink-500)]">
+                    {audience.teaser}
+                  </p>
+                  <Link href={audience.teaserHref} className="mt-5 text-[15px] font-semibold">
+                    {audience.teaserLink}
+                  </Link>
+                </>
+              ) : (
+                <AudienceDetail audience={audience} />
+              )}
+            </div>
+          </div>
+        </section>
+      ))}
+    </>
+  );
+}
+
+/** The full band, for an audience whose page does not take its place here. */
+function AudienceDetail({ audience }: { audience: Extract<(typeof audiences)[number], { id: "local" }> }) {
+  return (
+    <>
               {audience.paragraphs.map((paragraph) => (
                 <p
                   key={paragraph.slice(0, 32)}
@@ -130,10 +156,6 @@ export function Audiences() {
                   {audience.link}
                 </Link>
               </div>
-            </div>
-          </div>
-        </section>
-      ))}
     </>
   );
 }

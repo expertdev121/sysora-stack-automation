@@ -18,6 +18,14 @@ console.
 | `/contact` | Form, writes to `contact_messages`. |
 | `/request-estimate`, `/request/[reference]` | For work too large for a pack. |
 | `/terms`, `/privacy-policy` | Content from `src/content/legal/`. |
+| `/services`, `/services/[slug]` | Hub and eight service pages. Data in `src/content/articles/`. |
+| `/guides`, `/guides/[slug]` | Hub and fourteen guides, same data shape. |
+| `/case-studies`, `/case-studies/[slug]` | Hub and four write-ups, same data shape. |
+| `/pricing`, `/about` | Built from `packs` and `entity`, so they cannot disagree with checkout or the schema. |
+| `/for/agencies`, `/for/local-business` | The audience pages. `/on-demand-ghl-team` redirects to the first. |
+| `/llms.txt` | A static route, so its prices come from `packs`. |
+
+See [seo.md](seo.md) for how metadata and schema are built.
 
 ### Client portal, `/portal`
 Login, overview, hours ledger, plans and hours, invoices, payment and

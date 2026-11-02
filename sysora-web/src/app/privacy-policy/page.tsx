@@ -1,26 +1,28 @@
-import type { Metadata } from "next";
-
 import { LegalDocPage } from "@/components/legal/LegalDocPage";
+import { JsonLd } from "@/components/seo/StructuredData";
 import { privacy } from "@/content/legal/privacy";
+import { pageGraph } from "@/lib/schema";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description:
-    "How Sysora Stack collects, uses, shares and protects personal information, including the data we process inside our customers’ systems.",
-  alternates: { canonical: "/privacy-policy" },
-  openGraph: {
-    title: "Privacy Policy | Sysora Stack",
-    description:
-      "How Sysora Stack collects, uses, shares and protects personal information.",
-    url: "/privacy-policy",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Privacy Policy | Sysora Stack",
-    description: "How Sysora Stack collects, uses, shares and protects personal information.",
-  },
-};
+const PATH = "/privacy-policy";
+const TITLE = "Privacy Policy";
+const DESCRIPTION =
+  "How Sysora Stack collects, uses, shares and protects personal information, including the data we process inside our customers’ systems.";
+
+export const metadata = pageMetadata({ title: TITLE, description: DESCRIPTION, path: PATH });
 
 export default function PrivacyPolicyPage() {
-  return <LegalDocPage doc={privacy} />;
+  return (
+    <>
+      <JsonLd
+        graph={pageGraph({
+          path: PATH,
+          name: `${TITLE} | Sysora Stack`,
+          description: DESCRIPTION,
+          crumbs: [{ name: TITLE, path: PATH }],
+        })}
+      />
+      <LegalDocPage doc={privacy} crumb={{ name: TITLE, path: PATH }} />
+    </>
+  );
 }

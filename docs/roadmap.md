@@ -17,8 +17,9 @@ are all in production on `www.sysorastack.com`.
 - Payment-confirmation webhook, which also provisions the portal
   account and carries its six-digit code.
 - Terms, privacy policy, contact, book a call with the GHL calendar.
-- SEO: one canonical domain, sitemap, robots with AI-crawler rules, the
-  old catalogue 308ing to `/`.
+- SEO: one canonical domain, sitemap, robots with AI-crawler rules. The
+  November 2026 audit's page set, schema and `llms.txt` are written up in
+  [seo.md](seo.md), along with what still needs the business to act.
 
 ## Known gaps in v1
 
@@ -61,7 +62,9 @@ console. Query it directly until someone builds the page.
 ### Two unbuilt designs
 `Sysora GoHighLevel Services.dc.html` and `Sysora Order Complete.dc.html`
 exist in the design project with no implementation. `Sysora Blog.dc.html`
-is designed and also unbuilt; blogs were explicitly deferred.
+is designed and also unbuilt. The `/services` and `/guides` pages added in
+November 2026 were built from the site's existing styles, not from those
+design files, and may want reconciling with them.
 
 ### The deploy gate is built but switched off
 A push to `main` runs typecheck, lint, 65 tests and a build in GitHub
@@ -84,8 +87,10 @@ tells you a commit is bad, it does not stop it.
 Each of these was a deliberate removal. Re-adding them would be a
 regression.
 
-- The `/services` catalogue and the $49 Business Systems Review. Gone,
-  redirected, and the copy that referenced them has been rewritten.
+- The priced `/services` catalogue and the $49 Business Systems Review.
+  `/services` exists again as of November 2026, but only as a description
+  of the work, sold by the hour. Do not bring back fixed prices or the
+  "approved or a full refund" promise. See [seo.md](seo.md).
 - The worked-example refund table on the homepage. Removed from the
   design, so removed from the build.
 - The badges floating off the audience illustrations. In no version of

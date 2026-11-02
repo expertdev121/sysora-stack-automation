@@ -30,11 +30,6 @@ export function BuildCard({
 
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <span className="font-mono text-[11.5px] text-[var(--text-muted)]">{build.reference}</span>
-        {build.budgetBand && (
-          <span className="rounded-full bg-[var(--surface-1)] px-2 py-[2px] text-[11.5px] text-[var(--text-muted)]">
-            {build.budgetBand}
-          </span>
-        )}
       </div>
 
       {nextStage && (

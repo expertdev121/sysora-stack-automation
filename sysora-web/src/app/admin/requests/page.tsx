@@ -24,7 +24,7 @@ export const metadata: Metadata = { title: "Requests" };
 const FILTERS = [
   { key: "open", label: "Open" },
   { key: "all", label: "All" },
-  { key: "build_request", label: "Build requests" },
+  { key: "build_request", label: "Task requests" },
   { key: "systems_review", label: "Reviews" },
   { key: "systems_team", label: "Systems team" },
   { key: "mine", label: "Assigned to me" },

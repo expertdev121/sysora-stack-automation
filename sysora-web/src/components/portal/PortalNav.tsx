@@ -16,7 +16,7 @@ const ITEMS: NavItem[] = [
   { href: "/portal/plans", label: "Plans and hours" },
   { href: "/portal/invoices", label: "Invoices" },
   { href: "/portal/billing", label: "Payment and plan" },
-  { href: "/portal/build-requests", label: "Build requests" },
+  { href: "/portal/build-requests", label: "Task requests" },
   { href: "/portal/support", label: "Support" },
   { href: "/portal/password", label: "Password" },
 ];

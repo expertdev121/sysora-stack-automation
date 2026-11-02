@@ -1,29 +1,32 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 
+import { Breadcrumbs, RelatedLinks, formatDate } from "@/components/content/ContentShell";
+import { JsonLd } from "@/components/seo/StructuredData";
 import { SalesFooter } from "@/components/sales/SalesFooter";
 import { SalesHeader } from "@/components/sales/SalesHeader";
 import { Button } from "@/components/ui/Button";
 import { ghlTeam, GHL_CHECKOUT_HREF } from "@/content/landing/ghl-team";
+import { audiences } from "@/content/landing/sales";
+import { PAGES_UPDATED, agencyAnswer } from "@/content/pages";
+import { pageGraph } from "@/lib/schema";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+const PATH = "/for/agencies";
+
+export const metadata = pageMetadata({
   title: ghlTeam.meta.title,
   description: ghlTeam.meta.description,
-  alternates: { canonical: "/on-demand-ghl-team" },
-  openGraph: {
-    title: `${ghlTeam.meta.title} | Sysora Stack`,
-    description: ghlTeam.meta.description,
-    url: "/on-demand-ghl-team",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${ghlTeam.meta.title} | Sysora Stack`,
-    description: ghlTeam.meta.description,
-  },
-};
+  path: PATH,
+  og: "agencies",
+});
+
+const CRUMBS = [{ name: "For agencies", path: PATH }];
 
 /**
- * The GoHighLevel agency landing page.
+ * The agency hub, previously at /on-demand-ghl-team, which redirects here.
+ *
+ * It carries the white-label detail the homepage used to repeat, so the
+ * two pages stop competing for the same searches.
  *
  * Same hours, same prices, same terms as the homepage, aimed at one
  * audience. Every buying CTA goes to the published checkout shape with
@@ -99,9 +102,20 @@ const STATUS_TONE = {
 
 export default function OnDemandGhlTeamPage() {
   const { hero, problem, services, howItWorks, starter, why, demo, faq, finalCta } = ghlTeam;
+  const band = audiences.find((audience) => audience.id === "agencies")!;
 
   return (
     <div className="font-sans text-[var(--ink-600)] bg-[var(--surface-0)] overflow-x-clip">
+      <JsonLd
+        graph={pageGraph({
+          path: PATH,
+          name: `${ghlTeam.meta.title} | Sysora Stack`,
+          description: ghlTeam.meta.description,
+          og: "agencies",
+          crumbs: CRUMBS,
+          faq: faq.items,
+        })}
+      />
       <SalesHeader
         items={ghlTeam.nav}
         ctaLabel="Start with 5 hours"
@@ -109,8 +123,11 @@ export default function OnDemandGhlTeamPage() {
       />
 
       {/* ---- Hero ---- */}
-      <section className="bg-[linear-gradient(180deg,#F0FAF6,var(--surface-0))] px-6 pb-[clamp(72px,9vh,120px)] pt-[clamp(56px,8vh,112px)]">
-        <div className={`${WRAP} grid grid-cols-[minmax(0,550px)_minmax(0,498px)] items-center gap-16 to-980:grid-cols-1 to-980:gap-10`}>
+      <section className="bg-[linear-gradient(180deg,#F0FAF6,var(--surface-0))] px-6 pb-[clamp(72px,9vh,120px)] pt-6">
+        <div className={WRAP}>
+          <Breadcrumbs trail={CRUMBS} />
+        </div>
+        <div className={`${WRAP} mt-[clamp(32px,5vh,72px)] grid grid-cols-[minmax(0,550px)_minmax(0,498px)] items-center gap-16 to-980:grid-cols-1 to-980:gap-10`}>
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[var(--border-default)] bg-white px-[14px] py-[7px] text-[11px] font-bold uppercase tracking-[1.6px] text-[var(--accent-strong)]">
               <span className="h-[6px] w-[6px] rounded-full bg-[var(--accent)]" aria-hidden="true" />
@@ -122,9 +139,15 @@ export default function OnDemandGhlTeamPage() {
               <span className="text-[var(--accent-strong)]">{hero.titleAccent}</span>
             </h1>
 
-            <p className="mt-5 text-[17px] font-semibold text-[var(--ink-900)]">{hero.subhead}</p>
+            <p className="mt-5 max-w-[540px] text-[16.5px] leading-[1.7] text-[var(--ink-700)]">
+              {agencyAnswer}
+            </p>
+            <p className="mt-4 text-[17px] font-semibold text-[var(--ink-900)]">{hero.subhead}</p>
             <p className="mt-3 max-w-[540px] text-[16px] leading-[1.75] text-[var(--ink-500)]">
               {hero.body}
+            </p>
+            <p className="mt-3 text-[13px] text-[var(--ink-400)]">
+              Last updated <time dateTime={PAGES_UPDATED}>{formatDate(PAGES_UPDATED)}</time>
             </p>
 
             <div className="mt-7 flex flex-wrap gap-3">
@@ -329,6 +352,41 @@ export default function OnDemandGhlTeamPage() {
         </div>
       </section>
 
+      {/* ---- Moved here from the homepage's agency band ---- */}
+      <section className={SECTION}>
+        <div className={`${WRAP} grid grid-cols-2 items-start gap-16 to-980:grid-cols-1 to-980:gap-10`}>
+          <div>
+            <p className={EYEBROW}>{band.badge}</p>
+            <h2 className={H2}>{band.headline}</h2>
+            {band.paragraphs.map((paragraph) => (
+              <p key={paragraph.slice(0, 32)} className="mt-[18px] text-[16px] leading-[1.75] text-[var(--ink-500)]">
+                {paragraph}
+              </p>
+            ))}
+            <p className="mt-6 rounded-[14px] border-[1.5px] border-[var(--border-default)] bg-white px-5 py-4 text-[14.5px] leading-[1.7] text-[var(--ink-600)]">
+              <strong className="text-[var(--ink-900)]">{band.noteTitle}</strong> {band.noteBody}
+            </p>
+          </div>
+          <div>
+            <h3 className="text-[18px] font-bold text-[var(--ink-900)]">What do agency hours go on?</h3>
+            <ul className="mt-4 flex flex-col gap-[10px]">
+              {band.chips.map((chip) => (
+                <li key={chip} className="relative pl-5 text-[15.5px] leading-[1.65] text-[var(--ink-600)]">
+                  <span aria-hidden="true" className="absolute left-0 top-[10px] h-[6px] w-[6px] rounded-full bg-[var(--accent)]" />
+                  {chip}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-5 text-[15px] leading-[1.7] text-[var(--ink-600)]">
+              Agencies tend to start with 25 or 50 hours to clear a backlog, or 50, 100 or 150 hours monthly for standing capacity.{" "}
+              <Link href="/pricing" className="font-semibold text-[var(--accent-strong)] underline underline-offset-[3px]">
+                See the pricing
+              </Link>
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ---- How it works ---- */}
       <section id="how-it-works" className={`${SECTION} scroll-mt-[92px]`}>
         <div className={WRAP}>
@@ -511,6 +569,18 @@ export default function OnDemandGhlTeamPage() {
               </details>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="px-6 pb-[clamp(56px,8vh,96px)]">
+        <div className={`${WRAP} max-w-[780px]`}>
+          <RelatedLinks
+            paths={[
+              "/guides/gohighlevel-snapshots",
+              "/guides/gohighlevel-saas-mode-setup",
+              "/case-studies/640-hour-tech-operations",
+            ]}
+          />
         </div>
       </section>
 
